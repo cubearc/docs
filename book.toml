@@ -1,0 +1,26 @@
+[book]
+title = "CubeArc documentation"
+description = "Use Cube, Cube Play and reusable investigation recipes."
+authors = ["CubeArc contributors"]
+language = "en"
+src = "build/src"
+
+[build]
+build-dir = "site"
+create-missing = false
+
+[output.html]
+site-url = "/docs/"
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/cubearc/docs"
+no-section-label = true
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+limit-results = 30
+use-boolean-and = true
