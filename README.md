@@ -8,7 +8,8 @@ authoring policy, site assembly and GitHub Pages publishing.
 
 ## Preview
 
-Use Python 3.12+, Git and curl. Check out the four repositories side by side.
+Use Python 3.12+, Git and curl. Check out the four repositories side by side,
+using the product revisions in `sources.lock.json` for a reproducible first build.
 From this repository:
 
 ```sh
