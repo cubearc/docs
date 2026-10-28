@@ -1,5 +1,11 @@
 # CubeArc documentation
 
+> [!WARNING]
+> **Beta software.** CubeArc projects are under active development and are not yet
+> stable. Features, APIs, file formats and workflows may change without backward
+> compatibility. Bugs and incomplete features are expected. Keep backups of
+> important data and independently verify results before relying on them.
+
 The [documentation portal](https://cubearc.github.io/docs/) for [Cube](https://github.com/cubearc/cube),
 [Cube Play](https://github.com/cubearc/play) and
 [Recipes](https://github.com/cubearc/recipes).
