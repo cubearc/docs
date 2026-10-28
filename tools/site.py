@@ -66,7 +66,7 @@ def present_operation(operation, content):
     title = operation_title(operation)
     body = content.partition("\n")[2].lstrip("\n")
     return (f'<div id="{slug(operation)}"></div>\n\n# {title}\n\n'
-            f'<p class="docs-operation-id">Operation ID: <code>{html.escape(operation)}</code></p>\n\n'
+            f'<span class="docs-operation-id">Operation ID: \x60{operation}\x60</span>\n\n'
             + body)
 
 

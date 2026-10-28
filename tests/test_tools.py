@@ -54,7 +54,7 @@ class ReferenceChecks(unittest.TestCase):
         page = portal.present_operation("encoding.base64.decode", content)
         self.assertIn("# Decode Base64\n", page)
         self.assertIn('id="encodingbase64decode"', page)
-        self.assertIn('<code>encoding.base64.decode</code>', page)
+        self.assertIn('Operation ID: \x60encoding.base64.decode\x60', page)
         self.assertTrue(page.endswith(content.partition("\n")[2].lstrip("\n")))
 
     def test_unknown_navigation_cannot_fall_back_to_a_machine_identifier(self):
