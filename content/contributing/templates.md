@@ -52,6 +52,10 @@ and limits below it. Use headings that name the subject, such as “Fixed-width
 arithmetic”. Keep long explanations out of table cells, and keep implementation
 history out of the lookup path.
 
+Link shared Concepts for vocabulary such as scalars, work budgets or incomplete
+results. Keep the operation's exact values and failure policy here. A reference
+should let the reader find those facts without rereading a general explanation.
+
 For operation contracts, update the source definitions and generate the reference.
 Do not reproduce generated parameter schemas in a hand-written page; explain
 the rules that need context and link to the exact contract.

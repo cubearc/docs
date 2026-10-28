@@ -40,6 +40,37 @@ its code; this repository owns the portal and shared writing guidance.
 Use **challenge** for an activity, **recipe** for a reusable workflow and
 **operation** for a transformation. Distinguish available features from proposals.
 
+## Shared explanations and local facts
+
+Before expanding a dense paragraph, check the linked guides, family reference and
+Concepts pages. Decide which page owns each fact:
+
+| Content | Canonical location |
+| --- | --- |
+| Bytes, scalars, normalization and preparation terms | Cube Concepts |
+| Work units, memory/report budgets and conservative estimates | Cube Concepts |
+| Complete answers, shorter listings and interrupted searches | Cube Concepts |
+| Exact defaults, ceilings, accounting and failure behavior | Owning operation reference |
+| Allocator layouts, test fixtures and design history | Contributing or architecture |
+
+For example, explain conservative preflight once in
+[resource limits](https://github.com/cubearc/cube/blob/main/docs/concepts/resource-limits.md).
+A multiset reference still states its combined budget, charged work and failure
+policy, then links to that explanation. A local caveat stays beside an action
+when it changes what the reader should do.
+
+Shared vocabulary does not imply a universal policy. Keep per-input and aggregate
+limits distinct, separate scratch from combined or process memory, and preserve
+defaults versus hard ceilings. Some operations fail on exhaustion; others return
+an incomplete search or only omit listing rows. Never rewrite these as one global
+error rule. Text preparation also varies: link the shared profile only from
+operations that actually use it.
+
+Deduplicate explanations rather than deleting exact local facts. Generated
+contracts and compatibility pointers have intentional repeated structure. A short
+local availability statement is useful; changing adapter counts and paragraphs
+re-explaining direct calls versus pipelines are not needed on each page.
+
 ## Structure a reference page
 
 Reference answers a lookup question. Start with a short description of what the
@@ -140,6 +171,12 @@ old section links survived the edit.
 Check changed examples, local links and the rendered page. Run the existing
 generator, conformance or site checks when the change affects them. In the PR,
 name the pages changed and the checks actually run.
+
+For a family-wide cleanup, compare the final pages against the original and the
+implementation for lost units, defaults, empty/zero cases and completion policy.
+Check conceptual repetition across related pages, not only copied sentences.
+Paragraph-length and similarity reports are triage aids, not acceptance tests.
+Follow links labeled as limits or rules to verify they reach the relevant section.
 
 Use the [page patterns](templates.md) as a starting point, not a required outline.
 
