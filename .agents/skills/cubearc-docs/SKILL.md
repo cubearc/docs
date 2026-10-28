@@ -30,6 +30,12 @@ Update affected examples, links and navigation. Generate reference from its
 canonical definitions and use checks appropriate to the change.
 For source/version or assembly changes, run the tool tests and locked site build.
 
+Inspect `cubearc/docs` for every product-documentation delivery. Update
+`sources.lock.json` to the validated product commits, and adjust affected shared
+pages and reader-facing navigation names. Follow the guide's portal-delivery
+section; product Markdown is not published until the portal adopts its revision.
+Verify the authorized Pages deployment, or report the remaining publication step.
+
 Preserve the requested mode: a review or planning request produces findings or a
 plan; an implementation request produces the scoped changes and validation.
 Report the pages changed and any remaining evidence or delivery gap.

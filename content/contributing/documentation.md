@@ -101,6 +101,24 @@ Do not hand-edit generated schemas or copy their parameter lists into guides.
 Change a task example when its behavior changes. A new operation does not
 automatically need a new guide, a Python walkthrough or a README section.
 
+## Deliver documentation to the portal
+
+Product documentation and the published portal have separate repositories.
+For a change to Cube, Play or Recipes documentation, inspect `cubearc/docs` as
+part of the same delivery. Merging product Markdown alone does not update the
+portal: `docs/sources.lock.json` selects the published product revisions.
+
+After the product change is committed and validated, update its full SHA in that
+manifest and any affected shared pages or navigation names. New operation IDs
+and categories need readable titles in `docs/tools/navigation.py`; the locked
+build must retain exact catalog/reference parity. Keep product semantics in the
+owning repository rather than copying them into the portal repository.
+
+Follow [site maintenance](site.md#adopt-a-product-revision) for clean pinned
+checkouts, tool tests, link checks, the locked build and publication verification.
+Complete these steps within the authorized delivery scope. For review-only work,
+report the required portal changes; when no portal update is needed, explain why.
+
 ## Move or consolidate a page
 
 Update links and navigation. Keep old paths and section anchors working with
