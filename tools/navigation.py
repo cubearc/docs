@@ -7,7 +7,7 @@ CATEGORIES = {
     "audio": "Audio",
     "binary": "Binary",
     "blockchain": "Offline key material",
-    "ciphers": "Classical ciphers",
+    "ciphers": "Ciphers",
     "cryptanalysis": "Classical cryptanalysis",
     "encoding": "Encoding",
     "esolang": "Brainfuck",
@@ -63,6 +63,14 @@ CIPHERS = {
 }
 
 TITLES = {
+    "cipher.chacha8": "Apply ChaCha8",
+    "cipher.chacha12": "Apply ChaCha12",
+    "cipher.chacha20": "Apply ChaCha20",
+    "cipher.xchacha20": "Apply XChaCha20",
+    "cipher.salsa20_12": "Apply Salsa20/12",
+    "cipher.salsa20": "Apply Salsa20/20",
+    "cipher.vernam": "Apply educational Vernam",
+    "cipher.enigma": "Transform Enigma I or M3",
     "analysis.affine.rank": "Rank Affine candidates",
     "analysis.caesar.rank": "Rank Caesar candidates",
     "analysis.crib.verify": "Check known plaintext",
