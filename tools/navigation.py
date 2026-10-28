@@ -104,6 +104,7 @@ TITLES = {
     "blockchain.wif.validate": "Validate a WIF key",
     "cipher.atbash": "Apply Atbash",
     "cipher.beaufort": "Apply Beaufort",
+    "cipher.enigma": "Run Enigma I or M3",
     "cipher.cardan.extract": "Extract through a Cardan grille",
     "cipher.cardan.overlay": "Overlay a Cardan grille",
     "cipher.porta": "Apply Porta",
