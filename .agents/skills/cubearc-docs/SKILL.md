@@ -13,6 +13,11 @@ Find the existing canonical page before creating one. Choose the reader task and
 keep shared explanation in one place. Use the guide's routing table for operation,
 interface, architecture and recipe changes.
 
+Choose one main interface per task. Put Python integration patterns in the SDK
+guide instead of copying each CLI example. Add another interface example only
+when it explains a distinct use case. Read the prose as user instructions:
+explain the action and result, and keep authoring process out of product pages.
+
 Update affected examples, links and navigation. Generate reference from its
 canonical definitions and use checks appropriate to the change.
 For source/version or assembly changes, run the tool tests and locked site build.

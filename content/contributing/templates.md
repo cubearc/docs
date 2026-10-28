@@ -1,36 +1,47 @@
 # Page patterns
 
-Choose a pattern for a new page; adapt it to the task. Avoid empty sections.
+Use only the sections that help the reader. Short pages do not need a heading
+for every paragraph.
 
 ## Getting Started
 
-1. State the first result the reader will obtain.
-2. Link to installation and list the inputs needed.
-3. Show one small working example and its expected output.
-4. Explain the one or two conventions needed to interpret that result.
-5. Link to the next useful task.
+Give the reader one small success:
 
-For Cube, decoding `SGVsbG8=` to the exact bytes of `Hello` is sufficient.
-Embedded archive recovery belongs in a separate task guide.
+1. State the result and link to installation.
+2. Show the input and one working command.
+3. Explain the output.
+4. Link to the next useful task.
+
+For Cube, decoding `SGVsbG8=` to `Hello` is enough for a first result.
 
 ## Task guide
 
-Use a title such as “Recover an embedded ZIP”.
-Describe when to use the task, provide an original fixture or explicit input,
-show the commands or code, then interpret the result.
+Use a title that describes an action, such as “Extract a channel from an image”.
 
-Include CLI and Python examples together when useful. Explain shared semantics
-once; keep only interface-specific details beside each example.
-Link to the reference for complete formats and limits.
+Start with when the task is useful and the input it needs. Show the main steps,
+then explain what the result means. Keep a necessary caveat beside the step it
+affects. Link to the reference for complete options and limits.
+
+Choose one interface for the walkthrough. Add another example only when it
+teaches a different use case; SDK integration belongs in the SDK guide.
 
 ## Concept
 
-Answer a question such as “Why does decoding display hexadecimal?”.
-Define the distinction, show a small example, and link to tasks that use it.
-Keep command catalogs and implementation history in their owning reference.
+Answer a question such as “Why does decoding display hexadecimal?”
+
+Explain the distinction with a small example and link to a task that uses it.
+Keep command lists and API details in the reference.
+
+## Reference
+
+Help the reader look something up: inputs, outputs, parameters, supported formats
+and limits. Use descriptive section titles and keep the page easy to scan.
+
+For operation contracts, update the source definitions and generate the reference.
+Link to a guide when a worked example would help.
 
 ## Improve an existing page
 
-When adding an image operation, first inspect the image task and reference pages.
-Update an affected example or add a link from the appropriate index.
-Reuse the shared image/byte explanation; preserve the README's first-use focus.
+If a command changes, update its example and expected output.
+If the behavior is already explained elsewhere, link to that explanation.
+Create a page only when the reader has a new task or question.
