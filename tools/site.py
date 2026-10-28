@@ -164,6 +164,7 @@ def assemble(sources_root, locked=False):
                         raise ValueError(f"Ambiguous operation titles in {category}")
                     content = (f'<div id="{slug(category + " operations")}"></div>\n\n'
                                f"# {category_title(category)}\n\n" +
+                               ('<a id="classical-ciphers"></a>\n\n' if category == "ciphers" else "") +
                                "\n".join(f"- [{operation_title(i)}]({i}.md)" for i in ids) + "\n")
                     write(output / category_page, content)
                     for operation_id in ids:

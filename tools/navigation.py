@@ -7,7 +7,7 @@ CATEGORIES = {
     "audio": "Audio",
     "binary": "Binary",
     "blockchain": "Offline key material",
-    "ciphers": "Classical ciphers",
+    "ciphers": "Ciphers",
     "cryptanalysis": "Classical cryptanalysis",
     "encoding": "Encoding",
     "esolang": "Brainfuck",
@@ -63,6 +63,15 @@ CIPHERS = {
 }
 
 TITLES = {
+    "cipher.aes.encrypt_blocks": "Encrypt raw AES blocks",
+    "cipher.aes.decrypt_blocks": "Decrypt raw AES blocks",
+    "cipher.chacha8": "Transform raw ChaCha8 bytes",
+    "cipher.chacha12": "Transform raw ChaCha12 bytes",
+    "cipher.chacha20": "Transform raw ChaCha20 bytes",
+    "cipher.xchacha20": "Transform raw XChaCha20 bytes",
+    "cipher.salsa20_12": "Transform raw Salsa20/12 bytes",
+    "cipher.salsa20": "Transform raw Salsa20 bytes",
+    "cipher.vernam": "Apply exact Vernam XOR",
     "analysis.affine.rank": "Rank Affine candidates",
     "analysis.caesar.rank": "Rank Caesar candidates",
     "analysis.crib.verify": "Check known plaintext",
