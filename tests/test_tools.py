@@ -49,6 +49,12 @@ class LinkChecks(unittest.TestCase):
 
 
 class ReferenceChecks(unittest.TestCase):
+    def test_operation_page_promotes_its_title_and_preserves_fenced_content(self):
+        text = "## encoding.a\n\nDescription.\n\n\x60\x60\x60md\n## example heading\n\x60\x60\x60\n"
+        page = portal.operation_sections(text)["encoding.a"]
+        self.assertTrue(page.startswith("# encoding.a\n"))
+        self.assertIn("\x60\x60\x60md\n## example heading\n\x60\x60\x60", page)
+
     def test_example_headings_do_not_become_operations(self):
         text = "# Reference\n## encoding.a\n\n\x60\x60\x60md\n## fake\n\x60\x60\x60\n## encoding.b\n"
         self.assertEqual(set(portal.operation_sections(text)), {"encoding.a", "encoding.b"})

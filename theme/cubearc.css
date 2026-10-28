@@ -145,7 +145,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
   transition: color .12s, background .12s;
 }
 #mdbook-sidebar .chapter-link-wrapper { align-items: center; }
-#mdbook-sidebar .chapter-link-wrapper > a:first-child { flex: 1; min-width: 0; }
+#mdbook-sidebar .chapter-link-wrapper > a:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 #mdbook-sidebar .chapter li a:hover { background: var(--docs-panel); color: var(--docs-accent); }
 #mdbook-sidebar .chapter li a.active {
   color: var(--docs-accent); background: var(--docs-accent-soft); font-weight: 600;
@@ -200,8 +200,8 @@ main pre .hljs { background: var(--docs-code); }
 main pre .buttons { top: 8px; right: 7px; }
 main .table-wrapper { margin: 23px 0; border: 1px solid var(--docs-line); border-radius: 7px; overflow: auto; }
 main table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 0; }
-main th { padding: 11px 15px; background: var(--docs-panel); color: var(--docs-heading); font-weight: 600; text-align: left; }
-main td { padding: 11px 15px; border-top: 1px solid var(--docs-line); vertical-align: top; }
+main th, main thead td { padding: 11px 15px; background: var(--docs-panel); color: var(--docs-heading); font-weight: 600; text-align: left; }
+main td { padding: 11px 15px; border: 0; border-top: 1px solid var(--docs-line); vertical-align: top; }
 main tr:nth-child(2n) { background: transparent; }
 main details { margin: 24px 0; padding: 13px 17px; border: 1px solid var(--docs-line); border-radius: 7px; }
 main summary { color: var(--docs-muted); font-size: 12px; cursor: pointer; }

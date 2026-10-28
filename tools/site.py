@@ -43,7 +43,9 @@ def operation_sections(text):
         if operation in result:
             raise ValueError(f"Duplicate reference operation: {operation}")
         end = headings[index + 1][0] if index + 1 < len(headings) else len(lines)
-        result[operation] = "#" + "".join(lines[start:end]).strip() + "\n"
+        section = lines[start:end]
+        section[0] = section[0][1:]
+        result[operation] = "".join(section).strip() + "\n"
     return result
 
 
