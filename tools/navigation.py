@@ -8,6 +8,7 @@ CATEGORIES = {
     "binary": "Binary",
     "blockchain": "Offline key material",
     "ciphers": "Classical ciphers",
+    "cryptanalysis": "Classical cryptanalysis",
     "encoding": "Encoding",
     "esolang": "Brainfuck",
     "file": "Files and archives",
@@ -62,6 +63,15 @@ CIPHERS = {
 }
 
 TITLES = {
+    "analysis.affine.rank": "Rank Affine candidates",
+    "analysis.caesar.rank": "Rank Caesar candidates",
+    "analysis.crib.verify": "Check known plaintext",
+    "analysis.frequency.compare": "Compare symbol frequencies",
+    "analysis.homophonic.inspect": "Inspect homophonic tokens",
+    "analysis.language.score": "Score candidate language",
+    "analysis.period.estimate": "Estimate repeating-key periods",
+    "analysis.transposition.rank": "Rank transposition candidates",
+    "analysis.vigenere.rank": "Rank Vigenère candidates",
     "audio.bits.extract": "Extract audio bits",
     "audio.dtmf.detect": "Detect DTMF tones",
     "audio.metadata.inspect": "Inspect FLAC metadata",
