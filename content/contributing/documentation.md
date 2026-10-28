@@ -40,6 +40,39 @@ its code; this repository owns the portal and shared writing guidance.
 Use **challenge** for an activity, **recipe** for a reusable workflow and
 **operation** for a transformation. Distinguish available features from proposals.
 
+## Structure a reference page
+
+Reference answers a lookup question. Start with a short description of what the
+feature does, then organize facts by operation, input, output, rules and limits.
+Link to a task guide for the walkthrough.
+
+- Use descriptive, sentence-case headings. Group related facts under a heading
+  the reader can find from the page outline, such as “Byte order” or “Input limits”.
+- Put the defining rule first. Keep each paragraph about one idea; separate
+  behavior, resource limits and implementation background.
+- Use tables when readers need to compare the same properties: operation and
+  behavior, parameter and default, or resource and maximum. Give columns concise
+  headers. Keep cells short; explain complex rules below the table.
+- Use bullets for independent rules and numbered steps for an actual sequence.
+  Do not turn every sentence into a bullet or repeat a table in prose.
+- Show a small example when it resolves ambiguity. Include the expected result;
+  avoid copying the task guide or adding every language binding.
+- Keep exact units, defaults, boundary cases, result meanings and failure behavior.
+  Separate a listing cap from a computation limit, and metadata from verified data.
+- Name operations for people in titles and navigation. Put exact IDs in code
+  formatting where they help identify an API.
+
+When revising dense prose, regroup and rewrite it. Adding a heading above each
+old paragraph does not resolve mixed topics. Put contributor workflow, release
+history and proposals in their appropriate pages or issues.
+
+Use [Binary](https://cubearc.github.io/docs/cube/reference/topics/binary-transformations.html)
+as a compact reference example. These conventions follow Google's guidance on
+[paragraphs](https://developers.google.com/style/paragraph-structure),
+[headings](https://developers.google.com/style/headings) and
+[tables](https://developers.google.com/style/tables), and Microsoft's
+[scannable content](https://learn.microsoft.com/en-us/style-guide/scannable-content/).
+
 ## Choose examples
 
 Use one main interface for a task; the Cube task guides normally use the CLI.
@@ -80,6 +113,11 @@ can be removed when they add no separate explanation.
 
 Read the page as a user: are the input, action and result clear? Remove empty
 sections, repeated warnings and unexplained jargon.
+
+For reference, try finding a default, a limit and an error rule without reading
+the whole page. Review the heading outline and tables on a narrow screen. Check
+that table headers are semantic column headers, and that technical details and
+old section links survived the edit.
 
 Check changed examples, local links and the rendered page. Run the existing
 generator, conformance or site checks when the change affects them. In the PR,

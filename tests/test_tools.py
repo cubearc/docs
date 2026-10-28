@@ -119,6 +119,20 @@ class ReferenceChecks(unittest.TestCase):
 
 
 class PublishingChecks(unittest.TestCase):
+    def test_table_column_headers_preserve_content_and_body_cells(self):
+        original = (
+            '<table><thead><tr><td style="text-align: left"><code>unit_bytes</code></td>'
+            '<th>Rule &amp; limit</th><th scope="col">Existing</th></tr></thead>'
+            '<tbody><tr><td>1</td><td>&lt;thead&gt;&lt;td&gt;literal&lt;/td&gt;</td>'
+            '<td>unchanged</td></tr></tbody></table>'
+        )
+        rendered = portal.accessible_table_headers(original)
+        self.assertIn('<th scope="col" style="text-align: left"><code>unit_bytes</code></th>', rendered)
+        self.assertIn('<th scope="col">Rule &amp; limit</th>', rendered)
+        self.assertIn('<th scope="col">Existing</th>', rendered)
+        self.assertEqual(rendered.split('<tbody>')[1], original.split('<tbody>')[1])
+        self.assertEqual(portal.accessible_table_headers(rendered), rendered)
+
     def test_locked_build_rejects_dirty_or_wrong_revision(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
