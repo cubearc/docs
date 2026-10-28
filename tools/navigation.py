@@ -48,6 +48,8 @@ CIPHERS = {
     "four_square": "Four-square", "fractionated_morse": "fractionated Morse",
     "grandpre": "Grandpré", "gromark": "Gromark", "gronsfeld": "Gronsfeld",
     "hill": "Hill", "homophonic": "homophonic substitution",
+    "interrupted_key": "Interrupted Key", "progressive_key": "Progressive Key",
+    "vigenere_multiplicative": "Vigenère–Multiplicative",
     "monome_dinome": "Monome-dinome", "morbit": "Morbit", "myszkowski": "Myszkowski",
     "nicodemus": "Nicodemus", "nihilist_substitution": "Nihilist substitution",
     "periodic_gromark": "periodic Gromark", "phillips": "Phillips", "playfair": "Playfair",
