@@ -53,6 +53,12 @@ search and theme controls. Keep product navigation, keyboard search, mobile
 navigation and dark mode working when changing them. Review the home page and
 a task page at desktop and mobile widths before publishing.
 
+`tools/navigation.py` owns presentation names for reference categories and
+operations. Its naming patterns cover regular families; explicit titles cover
+other actions. Before adopting new operations, review their names for a human
+reader. An unknown operation or category blocks publication until it has a
+readable title. These names do not change canonical IDs, schemas or URLs.
+
 The local Inter font in `assets/fonts/` comes from
 [Inter 4.1](https://github.com/rsms/inter/tree/e3a3d4c57d5ecc01453a575621882a384c1995a3).
 Keep its SIL Open Font License with the font file. The build copies these assets

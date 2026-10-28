@@ -49,6 +49,20 @@ class LinkChecks(unittest.TestCase):
 
 
 class ReferenceChecks(unittest.TestCase):
+    def test_reader_title_preserves_identifier_anchor_and_reference_content(self):
+        content = '# encoding.base64.decode\n\nDecode exact bytes.\n\n```json\n{"inputs": {"input": "AA=="}}\n```\n'
+        page = portal.present_operation("encoding.base64.decode", content)
+        self.assertIn("# Decode Base64\n", page)
+        self.assertIn('id="encodingbase64decode"', page)
+        self.assertIn('<code>encoding.base64.decode</code>', page)
+        self.assertTrue(page.endswith(content.partition("\n")[2].lstrip("\n")))
+
+    def test_unknown_navigation_cannot_fall_back_to_a_machine_identifier(self):
+        with self.assertRaisesRegex(ValueError, "reader-facing navigation title"):
+            portal.operation_title("encoding.future.decode")
+        with self.assertRaisesRegex(ValueError, "reader-facing category title"):
+            portal.category_title("future_category")
+
     def test_operation_page_promotes_its_title_and_preserves_fenced_content(self):
         text = "## encoding.a\n\nDescription.\n\n\x60\x60\x60md\n## example heading\n\x60\x60\x60\n"
         page = portal.operation_sections(text)["encoding.a"]

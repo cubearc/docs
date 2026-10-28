@@ -39,6 +39,10 @@ The portal assembles those sources at recorded commits.
   rationale. Keep the latter discoverable under contributor/reference sections.
 - Describe available behavior. Label development builds, unsupported formats and
   unverified platform instructions accurately.
+- Use readable names in menus and titles: “Decode Base64”, “Binary” and “Images”.
+  Keep operation IDs available as reference metadata and search terms. Preserve
+  stable URLs when improving a label; avoid raw IDs, snake case and lowercase
+  category keys as navigation text.
 
 Use **challenge** for a generic activity, **recipe** for a reusable workflow and
 **operation** for a named transformation. A pipeline composes compatible operations.

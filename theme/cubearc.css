@@ -208,6 +208,8 @@ main summary { color: var(--docs-muted); font-size: 12px; cursor: pointer; }
 .docs-source-note { color: var(--docs-muted); font-size: 10px; }
 .docs-source-note a { color: var(--docs-muted); }
 .docs-source-note code { border: 0; background: transparent; padding: 0 3px; }
+.content main .docs-operation-id { margin: -8px 0 25px; color: var(--docs-muted); font-size: 11px; }
+.docs-operation-id code { padding: 3px 6px; font-size: 11px; }
 .docs-rail { position: fixed; top: 111px; right: 28px; width: calc(var(--docs-rail-width) - 28px); font-size: 11px; }
 .docs-rail-title { margin: 0 0 15px; color: var(--docs-heading); font-size: 11px; font-weight: 600; }
 .docs-toc { display: grid; gap: 11px; padding-left: 14px; border-left: 1px solid var(--docs-line); }

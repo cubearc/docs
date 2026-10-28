@@ -12,7 +12,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from check_links import LINK, check, prose
+from check_links import LINK, check, prose, slug
+from navigation import category_title, operation_title
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY = re.compile(r"^(\s*)- \[([^\]]+)\]\(([^)]+)\)\s*$")
@@ -59,6 +60,14 @@ def operation_pages(cube):
     if set(ids) != set(sections):
         raise ValueError(f"Catalog/reference mismatch: {sorted(set(ids) ^ set(sections))}")
     return catalog, sections
+
+
+def present_operation(operation, content):
+    title = operation_title(operation)
+    body = content.partition("\n")[2].lstrip("\n")
+    return (f'<div id="{slug(operation)}"></div>\n\n# {title}\n\n'
+            f'<p class="docs-operation-id">Operation ID: <code>{html.escape(operation)}</code></p>\n\n'
+            + body)
 
 
 def relative_link(destination, current):
@@ -147,15 +156,21 @@ def assemble(sources_root, locked=False):
                 destination = "cube/reference/operations/index.md"
                 mapping[source] = destination
                 summary.append(f"  {indent}- [{title}]({destination})")
-                for category, ids in sorted(categories.items()):
+                for category, ids in sorted(categories.items(), key=lambda item: category_title(item[0])):
                     category_page = f"cube/reference/operations/{category}/index.md"
-                    summary.append(f"    {indent}- [{category}]({category_page})")
-                    content = f"# {category} operations\n\n" + "\n".join(f"- [\x60{i}\x60]({i}.md)" for i in ids) + "\n"
+                    summary.append(f"    {indent}- [{category_title(category)}]({category_page})")
+                    titles = [operation_title(operation) for operation in ids]
+                    if len(titles) != len(set(titles)):
+                        raise ValueError(f"Ambiguous operation titles in {category}")
+                    content = (f'<div id="{slug(category + " operations")}"></div>\n\n'
+                               f"# {category_title(category)}\n\n" +
+                               "\n".join(f"- [{operation_title(i)}]({i}.md)" for i in ids) + "\n")
                     write(output / category_page, content)
                     for operation_id in ids:
                         page = f"cube/reference/operations/{category}/{operation_id}.md"
-                        summary.append(f"      {indent}- [{operation_id}]({page})")
+                        summary.append(f"      {indent}- [{operation_title(operation_id)}]({page})")
                         content = rewrite(operations[operation_id], source, page, mapping, repositories, versions)
+                        content = present_operation(operation_id, content)
                         content += f"\n[Canonical schemas](../../../../catalog.json) · [Source contract](https://github.com/cubearc/cube/blob/{versions['cube']['revision']}/contracts/v1/catalog.json)\n"
                         write(output / page, content)
                 continue
@@ -180,8 +195,8 @@ def assemble(sources_root, locked=False):
     write(output / "SUMMARY.md", "\n".join(summary))
     write(output / "cube/reference/operations/index.md", "# Operation reference\n\n"
           f"Generated from Cube {catalog['engine_version']} at \x60{versions['cube']['revision'][:12]}\x60. "
-          "Choose a category or search for an operation ID. Schemas and examples describe the documented revision; inspect your installed build with \x60cube ops describe\x60.\n\n" +
-          "\n".join(f"- [{category}]({category}/index.md): {len(ids)} operations" for category, ids in sorted(categories.items())))
+          "Choose a category or search by name or operation ID. Schemas and examples describe the documented revision; inspect your installed build with \x60cube ops describe\x60.\n\n" +
+          "\n".join(f"- [{category_title(category)}]({category}/index.md): {len(ids)} operations" for category, ids in sorted(categories.items(), key=lambda item: category_title(item[0]))))
     shutil.copyfile(repositories["cube"] / "contracts/v1/catalog.json", output / "catalog.json")
     shutil.copyfile(repositories["cube"] / "crates/cube-core/src/operations/contracts/conformance.json", output / "conformance.json")
     write(output / "versions.md", "# Documented versions\n\n"
