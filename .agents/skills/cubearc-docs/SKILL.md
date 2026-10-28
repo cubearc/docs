@@ -18,6 +18,14 @@ guide instead of copying each CLI example. Add another interface example only
 when it explains a distinct use case. Read the prose as user instructions:
 explain the action and result, and keep authoring process out of product pages.
 
+For reference, follow the guide's reference structure: a short overview,
+descriptive sentence-case headings, tables for comparable rules/defaults/limits,
+and lists for independent facts. Regroup mixed topics instead of adding headings
+to dense paragraphs. Preserve exact semantics, bounds, result meanings and old
+anchors. Keep code IDs out of reader-facing titles and avoid repeating schemas
+or equivalent language examples. Review the rendered outline, table headers and
+mobile layout, then try finding a default, limit and error rule by scanning.
+
 Update affected examples, links and navigation. Generate reference from its
 canonical definitions and use checks appropriate to the change.
 For source/version or assembly changes, run the tool tests and locked site build.

@@ -35,10 +35,26 @@ Keep command lists and API details in the reference.
 ## Reference
 
 Help the reader look something up: inputs, outputs, parameters, supported formats
-and limits. Use descriptive section titles and keep the page easy to scan.
+and limits. Start with one or two sentences about the feature. Choose sections
+from this pattern according to the facts the reader needs:
+
+| Section | Content |
+| --- | --- |
+| Operations or supported formats | A comparison table with short descriptions |
+| Parameters and defaults | Setting, default and valid values |
+| Behavior | Units, ordering, normalization, edge cases and result meaning |
+| Limits | Resource, maximum and what happens when exceeded |
+| Example | One small input and its expected result |
+| Related tasks | Links to walkthroughs or interface integration |
+
+For a broad family, give each operation group its own section and place its rules
+and limits below it. Use headings that name the subject, such as “Fixed-width
+arithmetic”. Keep long explanations out of table cells, and keep implementation
+history out of the lookup path.
 
 For operation contracts, update the source definitions and generate the reference.
-Link to a guide when a worked example would help.
+Do not reproduce generated parameter schemas in a hand-written page; explain
+the rules that need context and link to the exact contract.
 
 ## Improve an existing page
 

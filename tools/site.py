@@ -232,6 +232,31 @@ class Page(HTMLParser):
                 self.links.append(values[key])
 
 
+def accessible_table_headers(content):
+    """Give mdBook's Markdown table headers column semantics without changing cells."""
+    def promote(match):
+        header = re.sub(r"<td(?=[\s>])", '<th scope="col"', match[2], flags=re.I)
+        header = re.sub(r"</td\s*>", "</th>", header, flags=re.I)
+        header = re.sub(
+            r"<th\b([^>]*)>",
+            lambda cell: cell[0] if re.search(r"\bscope\s*=", cell[1], re.I)
+            else '<th scope="col"' + cell[1] + '>',
+            header, flags=re.I,
+        )
+        return match[1] + header + match[3]
+
+    return re.sub(r"(<thead\b[^>]*>)(.*?)(</thead\s*>)", promote, content,
+                  flags=re.I | re.S)
+
+
+def prepare_html(site):
+    for path in site.rglob("*.html"):
+        original = path.read_text()
+        updated = accessible_table_headers(original)
+        if updated != original:
+            path.write_text(updated)
+
+
 def check_html(site):
     site = site.resolve()
     pages = {}
@@ -278,6 +303,7 @@ def main():
         if not binary.is_file():
             raise SystemExit("Run python3 tools/install_mdbook.py first.")
         subprocess.run([str(binary), "build", str(ROOT)], check=True)
+        prepare_html(ROOT / "site")
         check_html(ROOT / "site")
 
 

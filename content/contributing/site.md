@@ -46,6 +46,9 @@ The source link checker validates local files and GitHub-style heading fragments
 The site build also checks rendered HTML targets/fragments. External URLs remain
 external sources; these checks do not claim to verify their live content.
 
+Build through `tools/site.py`: after mdBook renders, it promotes table header cells
+to `<th scope="col">` for screen readers. Direct mdBook builds skip that step.
+
 ## Maintain the theme
 
 `theme/cubearc.css` and `theme/cubearc.js` adapt mdBook's native navigation,
@@ -63,3 +66,14 @@ The local Inter font in `assets/fonts/` comes from
 [Inter 4.1](https://github.com/rsms/inter/tree/e3a3d4c57d5ecc01453a575621882a384c1995a3).
 Keep its SIL Open Font License with the font file. The build copies these assets
 into the site so readers do not need a third-party font service.
+
+## Brand assets
+
+Use the official CubeArc logo stored in `assets/cubearc-logo.png`. The favicon uses
+the same unmodified image in `theme/favicon.png`. The source is the
+[organization avatar supplied for this site](https://avatars.githubusercontent.com/u/347263577?s=400&u=9f0de0fa7c7439f3854768e7f76faa6f76121dcb&v=4).
+
+The palette follows the logo's blue face and dark neutral surfaces. Light-theme
+links use `#005fcc`; dark-theme links use `#75b7ff`. Keep the related accent,
+background and focus colors together in `theme/cubearc.css`. Verify contrast on
+the actual backgrounds when adjusting them.

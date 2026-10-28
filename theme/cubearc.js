@@ -13,7 +13,7 @@
   const searchIcon = icon("m21 21-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z");
   const menuIcon = icon("M4 6h16M4 12h16M4 18h16");
   const moonIcon = icon("M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z");
-  const cubeIcon = icon("m12 2 9 5v10l-9 5-9-5V7l9-5Zm-9 5 9 5 9-5M12 12v10");
+
   const element = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -38,7 +38,7 @@
   const header = element("header", "docs-header");
   header.innerHTML = `
     <button type="button" class="docs-icon-button docs-menu" aria-label="Open navigation" aria-controls="mdbook-sidebar" aria-expanded="false">${menuIcon}</button>
-    <a class="docs-brand" href="${href("index.html")}" aria-label="CubeArc documentation home">${cubeIcon}<span class="docs-wordmark">CubeArc</span><span class="docs-brand-label">Docs</span></a>
+    <a class="docs-brand" href="${href("index.html")}" aria-label="CubeArc documentation home"><img class="docs-brand-logo" src="${href("assets/cubearc-logo.png")}" width="40" height="40" alt=""><span class="docs-wordmark">CubeArc</span><span class="docs-brand-label">Docs</span></a>
     <nav aria-label="Products">${Object.entries(names).map(([key, label]) => `<a href="${href(key + "/index.html")}"${product === key ? ' aria-current="true"' : ""}>${label}</a>`).join("")}</nav>
     <div class="docs-header-actions">
       <button type="button" class="docs-icon-button docs-mobile-search" aria-label="Search documentation">${searchIcon}</button>
