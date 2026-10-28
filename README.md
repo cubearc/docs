@@ -1,6 +1,6 @@
 # CubeArc documentation
 
-The documentation portal for [Cube](https://github.com/cubearc/cube),
+The [documentation portal](https://cubearc.github.io/docs/) for [Cube](https://github.com/cubearc/cube),
 [Cube Play](https://github.com/cubearc/play) and
 [Recipes](https://github.com/cubearc/recipes).
 Product guides live beside their code; this repository owns the shared

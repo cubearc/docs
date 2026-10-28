@@ -115,6 +115,8 @@ def assemble(sources_root, locked=False):
     if output.exists():
         shutil.rmtree(output)
     output.mkdir(parents=True)
+    if (ROOT / "assets").is_dir():
+        shutil.copytree(ROOT / "assets", output / "assets")
     mapping = {}
     documents = []
     summary = ["# Summary", "", "[CubeArc](index.md)", "", "- [Documented versions](versions.md)"]

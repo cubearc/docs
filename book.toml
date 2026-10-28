@@ -15,6 +15,9 @@ default-theme = "light"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/cubearc/docs"
 no-section-label = true
+sidebar-header-nav = false
+additional-css = ["theme/cubearc.css"]
+additional-js = ["theme/cubearc.js"]
 
 [output.html.fold]
 enable = true

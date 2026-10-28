@@ -45,3 +45,15 @@ adopt that revision here.
 The source link checker validates local files and GitHub-style heading fragments.
 The site build also checks rendered HTML targets/fragments. External URLs remain
 external sources; these checks do not claim to verify their live content.
+
+## Maintain the theme
+
+`theme/cubearc.css` and `theme/cubearc.js` adapt mdBook's native navigation,
+search and theme controls. Keep product navigation, keyboard search, mobile
+navigation and dark mode working when changing them. Review the home page and
+a task page at desktop and mobile widths before publishing.
+
+The local Inter font in `assets/fonts/` comes from
+[Inter 4.1](https://github.com/rsms/inter/tree/e3a3d4c57d5ecc01453a575621882a384c1995a3).
+Keep its SIL Open Font License with the font file. The build copies these assets
+into the site so readers do not need a third-party font service.
