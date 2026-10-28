@@ -178,6 +178,16 @@
   const syncSearch = () => document.documentElement.classList.toggle("docs-search-open", !searchWrapper.classList.contains("hidden"));
   new MutationObserver(syncSearch).observe(searchWrapper, { attributes: true, attributeFilter: ["class"] });
   syncSearch();
+  const results = document.getElementById("mdbook-searchresults");
+  new MutationObserver(() => {
+    const query = searchbar.value.trim().toLowerCase();
+    if (!/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$/.test(query)) return;
+    const exact = [...results.children].find(item => {
+      const link = item.querySelector("a");
+      return link && new URL(link.href).pathname.split("/").pop() === query + ".html";
+    });
+    if (exact && exact !== results.firstElementChild) results.prepend(exact);
+  }).observe(results, { childList: true });
 
   const context = element("div", "docs-context");
   const breadcrumb = element("div", "docs-breadcrumb");
