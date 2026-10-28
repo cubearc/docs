@@ -63,6 +63,8 @@ CIPHERS = {
 }
 
 TITLES = {
+    "cipher.aes.encrypt_blocks": "Encrypt raw AES blocks",
+    "cipher.aes.decrypt_blocks": "Decrypt raw AES blocks",
     "cipher.chacha8": "Apply ChaCha8",
     "cipher.chacha12": "Apply ChaCha12",
     "cipher.chacha20": "Apply ChaCha20",
