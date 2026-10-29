@@ -234,6 +234,8 @@ TITLES = {
     "text.unicode.compare": "Compare Unicode text",
     "text.unicode.inspect": "Inspect Unicode characters",
     "text.utf8.decode": "Decode UTF-8",
+    "text.concat": "Concatenate text",
+    "bytes.concat": "Concatenate bytes",
     "text.utf8.encode": "Encode UTF-8",
     "text.word.extract": "Extract positions within words",
     "text.word.lengths": "Measure word lengths",
