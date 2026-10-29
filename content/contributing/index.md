@@ -3,7 +3,7 @@
 Change documentation where its behavior is implemented:
 
 - **Cube:** CLI, Python, Rust APIs and operation contracts.
-- **Play:** local workspaces, Lab, terminal, notes and challenge progress.
+- **Play:** the Electron workbench, scoped investigation data and native execution.
 - **Recipes:** reusable workflows, examples and compatibility fixtures.
 - **Docs:** this portal, shared editorial policy and publication.
 

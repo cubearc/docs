@@ -26,7 +26,7 @@ The shared engine for transforming data, from one command to a Python or Rust ap
 
 ### Cube Play
 
-A local workspace to inspect files, connect operations in the visual Lab, and keep your findings.
+An Electron investigation IDE with local Stage notebooks, Asset canvases and retained Run evidence. Try the source preview on macOS.
 
 [Start an investigation →](https://github.com/cubearc/play/blob/main/docs/getting-started.md)
 
