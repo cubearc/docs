@@ -1,4 +1,5 @@
 """Exercise data loss, broken-link and revision errors that must block publishing."""
+import base64
 import importlib.util
 import json
 import subprocess
@@ -6,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import check_links
@@ -119,6 +121,59 @@ class ReferenceChecks(unittest.TestCase):
 
 
 class PublishingChecks(unittest.TestCase):
+    def test_product_screenshot_is_published_with_its_local_image_link(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            docs = root / "docs"
+            (docs / "content").mkdir(parents=True)
+            subprocess.run(["git", "init", "-q", str(docs)], check=True)
+            (docs / "content/index.md").write_text("# Documentation\n")
+            (docs / "content/contributing").mkdir()
+            for name in ("index", "documentation", "templates", "site"):
+                (docs / f"content/contributing/{name}.md").write_text(f"# {name}\n")
+            names = ("cube", "play", "recipes")
+            (docs / "sources.lock.json").write_text(json.dumps({
+                "sources": {name: "a" * 40 for name in names}
+            }))
+            sources = root / "sources"
+            for name in names:
+                repository = sources / name
+                (repository / "docs").mkdir(parents=True)
+                subprocess.run(["git", "init", "-q", str(repository)], check=True)
+                (repository / "docs/SUMMARY.md").write_text(
+                    f"- [{name}](index.md)\n"
+                )
+                (repository / "docs/index.md").write_text(f"# {name}\n")
+            cube = sources / "cube"
+            (cube / "contracts/v1").mkdir(parents=True)
+            (cube / "contracts/v1/catalog.json").write_text(json.dumps({
+                "engine_version": "fixture", "operations": []
+            }))
+            (cube / "docs/reference").mkdir()
+            (cube / "docs/reference/operations.md").write_text("# Operations\n")
+            contracts = cube / "crates/cube-core/src/operations/contracts"
+            contracts.mkdir(parents=True)
+            (contracts / "conformance.json").write_text("[]\n")
+            screenshot = sources / "play/docs/assets/desktop/notebook.png"
+            screenshot.parent.mkdir(parents=True)
+            screenshot.write_bytes(base64.b64decode(
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lE"
+                "QVR42mP8/x8AAwMCAO+jB1cAAAAASUVORK5CYII="
+            ))
+            (sources / "play/docs/index.md").write_text(
+                "# Play\n\n![Stage notebook](assets/desktop/notebook.png)\n"
+                "[Open full screenshot](assets/desktop/notebook.png)\n"
+            )
+            with patch.object(portal, "ROOT", docs.resolve()):
+                output = portal.assemble(sources)
+            published = output / "play/assets/desktop/notebook.png"
+            self.assertTrue(published.is_file(), "Screenshot missing from portal")
+            self.assertEqual(published.read_bytes(), screenshot.read_bytes())
+            guide = (output / "play/index.md").read_text()
+            self.assertIn("![Stage notebook](assets/desktop/notebook.png)", guide)
+            self.assertIn("[Open full screenshot](assets/desktop/notebook.png)", guide)
+            self.assertNotIn("/blob/", guide.split("---")[0])
+
     def test_table_column_headers_preserve_content_and_body_cells(self):
         original = (
             '<table><thead><tr><td style="text-align: left"><code>unit_bytes</code></td>'

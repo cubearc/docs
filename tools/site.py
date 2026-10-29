@@ -141,6 +141,16 @@ def assemble(sources_root, locked=False):
         categories.setdefault(operation["category"], []).append(operation["operation"])
     for name in pins:
         repository = repositories[name]
+        assets = repository / "docs/assets"
+        for asset in sorted(assets.rglob("*")):
+            if asset.is_symlink() or not asset.resolve().is_relative_to(repository):
+                raise ValueError(f"Unsafe documentation asset: {asset}")
+            if not asset.is_file():
+                continue
+            destination = f"{name}/assets/{asset.relative_to(assets).as_posix()}"
+            (output / destination).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(asset, output / destination)
+            mapping[asset.resolve()] = destination
         nav = repository / "docs/SUMMARY.md"
         for line in nav.read_text().splitlines():
             match = ENTRY.match(line)

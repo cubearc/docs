@@ -49,6 +49,16 @@ external sources; these checks do not claim to verify their live content.
 Build through `tools/site.py`: after mdBook renders, it promotes table header cells
 to `<th scope="col">` for screen readers. Direct mdBook builds skip that step.
 
+## Product screenshots
+
+Keep product screenshots beside their guides under that repository's `docs/assets/`
+directory. The assembler copies those files into `<product>/assets/` and rewrites
+relative Markdown image/full-size links to local portal URLs. Publication uses
+the exact pinned checkout; image bytes are not loaded through GitHub blob pages.
+Symlinks or assets escaping the product checkout are refused. Review the rendered
+image, meaningful alt text and caption at desktop/mobile widths, then verify the
+public PNG against its source after deployment.
+
 ## Maintain the theme
 
 `theme/cubearc.css` and `theme/cubearc.js` adapt mdBook's native navigation,
