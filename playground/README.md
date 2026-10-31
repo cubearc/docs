@@ -86,7 +86,7 @@ unit tests or ImageGen boards does not establish those properties. The automated
 suite also checks 200% CSS text enlargement at 1440/834/320 pixels and a short
 844×390 landscape viewport. CSS text enlargement is distinct from native browser
 zoom, screen-reader review and physical-device qualification.
-Run `node --test playground/tests/pipeline-import.integration.mjs` after building
+Run `node --test playground/tests/pipeline-import.integration.mjs playground/tests/runtime.integration.mjs` after building
 to check editable saved recipes, exact parameters and preserved advanced
 definitions against the installed actual SDK. `BROWSER_ENGINE` may select
 `chromium`, `firefox` or `webkit` for the end-to-end suite. Clipboard readback is
@@ -94,7 +94,7 @@ automated in Chromium; the other engines check success or the visible download
 fallback when clipboard permission is unavailable.
 
 The locked development-only `axe-core` engine runs WCAG 2, 2.1 and 2.2 A/AA tagged
-rules against fifteen representative first-use, result, tool, error and narrow
+rules against representative first-use, result, tool, error and narrow
 layouts, including binary/Unicode files, empty input and long results. Populated
 Decode/Encode results and the pipeline editor are checked at all six widths even
 when screenshot export is disabled; long-output export/copy retain complete data. `PLAYGROUND_A11Y_REPORT=/path/to/report.json` retains the engine/browser
@@ -157,3 +157,8 @@ builds the application only when the reviewed Cube lock actually contains the
 SDK; adopting that revision is a separate delivery step after Cube integration.
 No workflow in this change publishes npm packages. A push to docs `main` invokes
 the existing Pages deployment, so do not push until publication is authorized.
+
+The complete direct operation catalog is consumed from the qualified SDK. File
+inspection sends actual selected bytes and reports unknown filesystem-only facts
+as null. Direct execution and support for the existing linear pipeline model are
+separate capabilities; adding a binding does not invent pipeline semantics.

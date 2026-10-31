@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { verifyFileReadOrdering } from './support/file-ordering.mjs';
 import { verifyAutomaticSelection } from './support/automatic-selection.mjs';
+import { verifyNewBindings } from './support/bindings.mjs';
 import { verifyPresentation } from './support/presentation.mjs';
 import { verifyFragments } from './support/fragments.mjs';
 import { createServer } from 'node:http';
@@ -48,10 +49,10 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
         (section !== 'pipelines' || document.querySelector(marker).textContent === 'Pipelines');
     }, section);
   }
-  async function auditAccessibility(label) {
-    await page.evaluate(() => document.fonts.ready);
-    if (!await page.evaluate(() => Boolean(window.axe))) await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
-    const result = await page.evaluate(async () => {
+  async function auditAccessibility(label, target = page) {
+    await target.evaluate(() => document.fonts.ready);
+    if (!await target.evaluate(() => Boolean(window.axe))) await target.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
+    const result = await target.evaluate(async () => {
       const result = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] } });
       const summary = rule => ({ id: rule.id, impact: rule.impact, nodes: rule.nodes.map(node => ({ targets: node.target, failureSummary: node.failureSummary })) });
       return { version: window.axe.version, hash: location.hash, section: document.querySelector('nav a[aria-current=page]')?.hash, heading: document.querySelector('#main h1')?.textContent, width: innerWidth, passes: result.passes.length,
@@ -79,6 +80,7 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   page.on('pageerror', error => errors.push(error.message));
   page.on('request', request => { if (!request.url().startsWith(origin) && !request.url().startsWith('blob:')) external.push(request.url()); });
   await page.goto(`${origin}/docs/playground/`);
+  await verifyNewBindings(context,origin,auditAccessibility);
   await page.getByRole('heading', { name: 'Decode text', exact: true }).waitFor({ timeout: 45000 });
   await auditAccessibility('first-use');
   await page.getByRole('button', { name: 'Try an example', exact: true }).click();
@@ -225,12 +227,25 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'All tools', exact: true }).click();
   await page.locator('#tool-search').fill('file.info.inspect');
   await page.locator('[data-tool="file.info.inspect"]').click();
-  assert.equal(await page.getByRole('button', { name: 'Use tool', exact: true }).isDisabled(), true);
-  await page.getByText('This operation is documented in Cube. No executable binding is available in this browser runtime.', { exact: true }).waitFor();
-  await auditAccessibility('unavailable-tool');
+  assert.equal(await page.getByRole('button', { name: 'Use tool', exact: true }).isDisabled(), false);
+  await page.getByRole('button', { name: 'Use tool', exact: true }).click();
+  await page.locator('#playground-file').setInputFiles({ name: 'opaque.bin', mimeType: 'application/octet-stream', buffer: Buffer.from([0,255,128]) });
+  await page.getByText('opaque.bin', { exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
+  const inspected = JSON.parse(await page.locator('[data-result-operation="file.info.inspect"] .viewer pre').first().textContent());
+  assert.equal(inspected.size,3);
+  assert.equal(inspected.source_kind,'artifact');
+  assert.equal(inspected.regular_file,null);
+  assert.equal(inspected.modified,null);
+  assert.equal(inspected.created,null);
+  await auditAccessibility('file-artifact-result');
+  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'All tools', exact: true }).click();
   await page.locator('#tool-search').fill('binary.xor');
   await page.locator('[data-tool="binary.xor"]').click();
   await page.getByRole('button', { name: 'Use tool', exact: true }).click();
+  await page.getByRole('button', { name: 'Clear', exact: true }).click();
+  await page.locator('#playground-input').fill('Keep this input');
   await page.getByRole('button', { name: 'Run tools', exact: true }).click();
   await page.getByText('Not applicable or needs options (1)', { exact: true }).waitFor();
   await page.getByText('Not applicable or needs options (1)', { exact: true }).click();
