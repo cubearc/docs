@@ -1694,6 +1694,30 @@
       "display_name": "XOR with a repeating key",
       "summary": "Combine bytes with a repeating key using XOR; this is not secure encryption.",
       "aliases": []
+    },
+    "cipher.rot8000": {
+      "display_name": "ROT8000",
+      "summary": "Rotate the fixed BMP character set and preserve non-BMP text."
+    },
+    "cipher.malespin": {
+      "display_name": "Malespín",
+      "summary": "Exchange the ten letters in the written Malespín profile while retaining case."
+    },
+    "cipher.vatsyayana": {
+      "display_name": "Vatsyayana",
+      "summary": "Substitute each exact character with its explicitly paired partner."
+    },
+    "cipher.nomenclator": {
+      "display_name": "Nomenclator",
+      "summary": "Encode segmented units or inspect codebook readings, nulls and cancellation."
+    },
+    "cipher.syllabary": {
+      "display_name": "Syllabary",
+      "summary": "Use an explicit 10 by 10 syllabary and preserve unit boundaries."
+    },
+    "cipher.great_cipher": {
+      "display_name": "Great Cipher of 1691",
+      "summary": "Read or encode the Grand Chiffre de 1691 using the published Bazeries table."
     }
   },
   "operations": {
@@ -4206,6 +4230,51 @@
       "display_name": "XOR with a repeating key",
       "summary": "Combine bytes with a repeating key using XOR; this is not secure encryption.",
       "aliases": []
+    },
+    "cipher.rot8000": {
+      "display_name": "ROT8000",
+      "tool_id": "cipher.rot8000",
+      "summary": "Rotate the fixed BMP character set and preserve non-BMP text."
+    },
+    "cipher.malespin": {
+      "display_name": "Malespín",
+      "tool_id": "cipher.malespin",
+      "summary": "Exchange the ten letters in the written Malespín profile while retaining case."
+    },
+    "cipher.vatsyayana": {
+      "display_name": "Vatsyayana",
+      "tool_id": "cipher.vatsyayana",
+      "summary": "Substitute each exact character with its explicitly paired partner."
+    },
+    "cipher.nomenclator.encode": {
+      "display_name": "Encode Nomenclator",
+      "tool_id": "cipher.nomenclator",
+      "summary": "Encode segmented units or inspect codebook readings, nulls and cancellation."
+    },
+    "cipher.nomenclator.decode": {
+      "display_name": "Decode Nomenclator",
+      "tool_id": "cipher.nomenclator",
+      "summary": "Encode segmented units or inspect codebook readings, nulls and cancellation."
+    },
+    "cipher.syllabary.encode": {
+      "display_name": "Encode Syllabary",
+      "tool_id": "cipher.syllabary",
+      "summary": "Use an explicit 10 by 10 syllabary and preserve unit boundaries."
+    },
+    "cipher.syllabary.decode": {
+      "display_name": "Decode Syllabary",
+      "tool_id": "cipher.syllabary",
+      "summary": "Use an explicit 10 by 10 syllabary and preserve unit boundaries."
+    },
+    "cipher.great_cipher.encode": {
+      "display_name": "Encode Great Cipher of 1691",
+      "tool_id": "cipher.great_cipher",
+      "summary": "Read or encode the Grand Chiffre de 1691 using the published Bazeries table."
+    },
+    "cipher.great_cipher.decode": {
+      "display_name": "Decode Great Cipher of 1691",
+      "tool_id": "cipher.great_cipher",
+      "summary": "Read or encode the Grand Chiffre de 1691 using the published Bazeries table."
     }
   }
 }
