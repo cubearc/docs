@@ -292,6 +292,9 @@ def check_html(site):
                 target = target / "index.html"
             if not target.exists():
                 errors.append(f"{path.relative_to(site)}: missing {link}")
+            elif (target == site / "playground/index.html" and not raw
+                  and url.fragment in {"/playground", "/pipelines", "/tools"}):
+                continue
             elif url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
                 errors.append(f"{path.relative_to(site)}: missing fragment {link}")
     if errors:
@@ -304,6 +307,7 @@ def main():
     parser.add_argument("command", choices=["assemble", "build", "check-html"])
     parser.add_argument("--sources-root", type=Path, default=ROOT.parent)
     parser.add_argument("--locked", action="store_true")
+    parser.add_argument("--playground", type=Path, help="Stage a built, matching SDK application under /docs/playground/")
     args = parser.parse_args()
     if args.command == "check-html":
         check_html(ROOT / "site")
@@ -314,6 +318,10 @@ def main():
         if not binary.is_file():
             raise SystemExit("Run python3 tools/install_mdbook.py first.")
         subprocess.run([str(binary), "build", str(ROOT)], check=True)
+        if args.playground:
+            from stage_playground import stage
+            pins = json.loads((ROOT / "sources.lock.json").read_text())["sources"]
+            stage(args.playground.resolve(), ROOT / "site", pins["cube"], development=not args.locked)
         prepare_html(ROOT / "site")
         check_html(ROOT / "site")
 
