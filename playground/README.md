@@ -65,8 +65,10 @@ automated in Chromium; the other engines check success or the visible download
 fallback when clipboard permission is unavailable.
 
 The locked development-only `axe-core` engine runs WCAG 2, 2.1 and 2.2 A/AA tagged
-rules against fourteen representative first-use, result, tool, error and narrow
-layouts, including binary/Unicode files and empty input. `PLAYGROUND_A11Y_REPORT=/path/to/report.json` retains the engine/browser
+rules against fifteen representative first-use, result, tool, error and narrow
+layouts, including binary/Unicode files, empty input and long results. Populated
+Decode/Encode results and the pipeline editor are checked at all six widths even
+when screenshot export is disabled; long-output export/copy retain complete data. `PLAYGROUND_A11Y_REPORT=/path/to/report.json` retains the engine/browser
 version, checked states, violations and checks needing manual review. Violations
 fail the test; incomplete checks remain explicit rather than becoming passes.
 These checks do not establish complete accessibility conformance or replace

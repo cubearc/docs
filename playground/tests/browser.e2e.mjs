@@ -60,10 +60,17 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
 
   if (evidence) await mkdir(evidence, { recursive: true });
   async function captureScreen(label) {
-    if (!evidence) return;
-    await page.locator('#main').focus();
-    await page.waitForFunction(() => !document.querySelector('#notice').textContent);
-    for (const width of [1440, 834, 390]) { await page.setViewportSize({ width, height: 1000 }); await page.screenshot({ path: `${evidence}/${label}-${width}.png`, fullPage: true }); }
+    if (evidence) {
+      await page.locator('#main').focus();
+      await page.waitForFunction(() => !document.querySelector('#notice').textContent);
+    }
+    for (const width of [1440, 1100, 834, 700, 390, 320]) {
+      await page.setViewportSize({ width, height: 1000 });
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${label} must reflow at ${width}.`);
+      const small = await page.locator('main button:visible, main select:visible').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height < 43.5).map(node => node.id || node.textContent));
+      assert.deepEqual(small, [], `${label} must retain comfortable controls at ${width}.`);
+      if (evidence && [1440, 834, 390].includes(width)) await page.screenshot({ path: `${evidence}/${label}-${width}.png`, fullPage: true });
+    }
     await page.setViewportSize({ width: 1440, height: 1100 });
   }
   page.on('pageerror', error => errors.push(error.message));
@@ -299,6 +306,21 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   assert.equal(await page.getByLabel('Encode Base64 contents', { exact: true }).textContent(), '', 'Empty output is a valid real result rather than a loading or missing-result state.');
   await auditAccessibility('empty-input-encode');
+  const longText = 'x'.repeat(6000);
+  const longEncoded = Buffer.from(longText).toString('base64');
+  await page.locator('#playground-input').fill(longText);
+  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
+  const longResult = page.locator('[data-result-operation="encoding.base64.encode"]');
+  assert.equal(await longResult.getByLabel('Encode Base64 contents', { exact: true }).textContent(), longEncoded.slice(0, 4096));
+  await longResult.getByText('Export', { exact: true }).click();
+  const [longDownload] = await Promise.all([page.waitForEvent('download'), longResult.getByRole('button', { name: 'Download selected view', exact: true }).click()]);
+  assert.equal(await readFile(await longDownload.path(), 'utf8'), longEncoded, 'Export must preserve all 8,000 characters despite the 4,096-character preview.');
+  await longResult.getByRole('button', { name: 'Copy', exact: false }).click();
+  if (engine === 'chromium') assert.equal(await page.evaluate(() => navigator.clipboard.readText()), longEncoded);
+  await captureScreen('long-encode-results');
+  await auditAccessibility('long-encode-results');
+
   await verifyFileReadOrdering(page, exportedDocument);
 
   assert.deepEqual(accessibility.flatMap(snapshot => snapshot.violations.map(rule => ({ label: snapshot.label, ...rule }))), [], 'Automated accessibility violations must be resolved without disabling rules.');
