@@ -22,8 +22,8 @@ application backend or cloud execution service.
 The build installs the provided tarball offline with lifecycle scripts disabled,
 uses its actual runtime catalog and capability metadata, and stages its exact
 Wasm/module assets under a source-fingerprint directory. Presentation names come
-from the existing `tools/navigation.py`; this app has no competing operation
-registry. Tool details are projected from the matching Cube checkout's reviewed
+from `tools/tool-presentation.json` through the shared `tools/navigation.py`
+projection; this editorial metadata does not define operation contracts or runtime support. Tool details are projected from the matching Cube checkout's reviewed
 conformance cases and exact runtime contract hashes. The build rejects missing,
 stale or duplicate IDs/versions/hashes, a mismatched source catalog/revision, and
 dirty production example sources. Each selected tool shows synthetic named input,
@@ -38,6 +38,33 @@ unavailable operations remain discoverable. No readability score claims a solve;
 encoding alternatives are equally relevant. Selecting another tool, stopping or
 starting an explicit run revokes queued automatic comparisons; it does not
 relabel earlier results as work from the new selection.
+
+## Edit tool names and summaries
+
+Edit `tools/tool-presentation.json` to update reader-facing language. Each tool
+has an explicit `display_name` and `summary`. Every canonical operation has its
+own `display_name`, `summary` and `tool_id` pointing to that tool. For example:
+
+```json
+{
+  "tool_id": "cipher.book",
+  "display_name": "Decode book coordinates",
+  "summary": "Encode a message as positions in a reference text, or decode those positions using the same text."
+}
+```
+
+The generated `presentation.json` carries those fields to the application.
+Documentation titles use the same operation names. Group membership and labels
+are explicit; the browser does not infer a tool from an action title or ID suffix.
+Keep descriptions focused on input, useful transformation and output. Precise
+Core descriptions, schemas and limits remain available under Technical details.
+
+Keep familiar names and earlier terms in `aliases` when useful for search. If a
+tool is split, list its prior key in `legacy_tool_ids` so saved favorites and
+unversioned links still resolve. Exact canonical operation/version links retain
+their identities. The build rejects missing or extra operation IDs, incomplete
+fields, unused groups and groups spanning categories. Update the metadata when
+adopting a Core catalog change; execution availability always comes from the SDK.
 
 ## Validate actual integration
 

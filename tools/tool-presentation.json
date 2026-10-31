@@ -1,0 +1,4211 @@
+{
+  "format_version": 1,
+  "tools": {
+    "cipher.book": {
+      "display_name": "Book cipher",
+      "summary": "Encode a message as positions in a reference text, or decode those positions using the same text.",
+      "aliases": [
+        "a book cipher"
+      ]
+    },
+    "cipher.caesar_box": {
+      "display_name": "Caesar Box",
+      "summary": "Rearrange text through a rectangular grid, or restore its original order.",
+      "aliases": [
+        "a Caesar box"
+      ]
+    },
+    "cipher.rail_fence": {
+      "display_name": "Rail Fence cipher",
+      "summary": "Arrange letters in zigzag rows to encode a message, or restore the letters to their original order.",
+      "aliases": [
+        "a rail fence"
+      ]
+    },
+    "cipher.running_key": {
+      "display_name": "Running-key cipher",
+      "summary": "Encode or decode a message using a reference key text at least as long as the required letters.",
+      "aliases": [
+        "a running key"
+      ]
+    },
+    "cipher.straddling": {
+      "display_name": "Straddling checkerboard",
+      "summary": "Convert letters to digit codes using your checkerboard, or decode the digit sequence.",
+      "aliases": [
+        "a straddling checkerboard"
+      ]
+    },
+    "cipher.turning_grille": {
+      "display_name": "Turning grille",
+      "summary": "Read or place letters through a grille mask as it turns across a grid.",
+      "aliases": [
+        "a turning grille"
+      ]
+    },
+    "symbol.a1z26": {
+      "display_name": "A1Z26 letter numbers",
+      "summary": "Convert letters to their alphabet positions, from A=1 to Z=26, or decode those numbers.",
+      "aliases": [
+        "A1Z26"
+      ]
+    },
+    "number.add": {
+      "display_name": "Add two integers",
+      "summary": "Add two exact signed integers without converting or rounding the values.",
+      "aliases": [
+        "Add"
+      ]
+    },
+    "binary.add_wrapping": {
+      "display_name": "Add byte values",
+      "summary": "Add pairs of unsigned values and wrap results to the selected byte width.",
+      "aliases": [
+        "Add with wrapping"
+      ]
+    },
+    "cipher.adfgvx": {
+      "display_name": "ADFGVX",
+      "summary": "Encode or decode letters and digits using a keyed grid and column rearrangement.",
+      "aliases": []
+    },
+    "cipher.adfgx": {
+      "display_name": "ADFGX",
+      "summary": "Encode or decode letters using a keyed grid and column rearrangement.",
+      "aliases": []
+    },
+    "cipher.affine": {
+      "display_name": "Affine cipher",
+      "summary": "Transform letters using a multiplication and shift key, or reverse that transformation.",
+      "aliases": [
+        "Affine"
+      ]
+    },
+    "cipher.amsco": {
+      "display_name": "AMSCO",
+      "summary": "Rearrange alternating groups of letters using a column key, or restore their order.",
+      "aliases": []
+    },
+    "image.decode": {
+      "display_name": "Read image pixels",
+      "summary": "Read pixel data from a supported image file for further inspection or transformation.",
+      "aliases": [
+        "an image"
+      ],
+      "legacy_tool_ids": [
+        "image"
+      ]
+    },
+    "image.encode": {
+      "display_name": "Save as PNG",
+      "summary": "Turn image pixel data into a PNG file.",
+      "aliases": [
+        "an image"
+      ],
+      "legacy_tool_ids": [
+        "image"
+      ]
+    },
+    "logic.boolean.analyze": {
+      "display_name": "Analyze a truth table",
+      "summary": "Evaluate all supported variable combinations and compare Boolean expressions when requested.",
+      "aliases": []
+    },
+    "probability.finite.analyze": {
+      "display_name": "Calculate finite probabilities",
+      "summary": "Analyze supplied outcomes and weights, including events, conditional probabilities and expectations.",
+      "aliases": [
+        "Analyze finite probabilities"
+      ]
+    },
+    "cipher.atbash": {
+      "display_name": "Atbash",
+      "summary": "Replace each letter with its opposite in the alphabet: A with Z, B with Y, and so on.",
+      "aliases": [
+        "Apply Atbash"
+      ]
+    },
+    "cipher.beaufort": {
+      "display_name": "Beaufort",
+      "summary": "Apply the reciprocal Beaufort letter substitution using a repeating key.",
+      "aliases": [
+        "Apply Beaufort"
+      ]
+    },
+    "binary.and": {
+      "display_name": "Bitwise AND",
+      "summary": "Keep bits that are set in both equal-length byte sequences.",
+      "aliases": [
+        "Apply bitwise AND"
+      ]
+    },
+    "binary.or": {
+      "display_name": "Bitwise OR",
+      "summary": "Keep bits that are set in either of two equal-length byte sequences.",
+      "aliases": [
+        "Apply bitwise OR"
+      ]
+    },
+    "cipher.chacha12": {
+      "display_name": "ChaCha12",
+      "summary": "Apply the ChaCha12 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply ChaCha12"
+      ]
+    },
+    "cipher.chacha20": {
+      "display_name": "ChaCha20",
+      "summary": "Apply the ChaCha20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply ChaCha20"
+      ]
+    },
+    "cipher.chacha8": {
+      "display_name": "ChaCha8",
+      "summary": "Apply the ChaCha8 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply ChaCha8"
+      ]
+    },
+    "cipher.vernam": {
+      "display_name": "Vernam cipher",
+      "summary": "Combine text with the supplied key using this educational Vernam cipher profile.",
+      "aliases": [
+        "Apply educational Vernam"
+      ]
+    },
+    "cipher.porta": {
+      "display_name": "Porta",
+      "summary": "Transform letters using the Porta cipher and a repeating keyword.",
+      "aliases": [
+        "Apply Porta"
+      ]
+    },
+    "cipher.portax": {
+      "display_name": "Portax",
+      "summary": "Transform pairs of letters using the Portax cipher and your key settings.",
+      "aliases": [
+        "Apply Portax"
+      ]
+    },
+    "cipher.rot13": {
+      "display_name": "ROT13",
+      "summary": "Rotate English letters by 13 places; applying it again restores the original text.",
+      "aliases": [
+        "Apply ROT13"
+      ]
+    },
+    "cipher.rot18": {
+      "display_name": "ROT18",
+      "summary": "Apply ROT13 to English letters and ROT5 to digits.",
+      "aliases": [
+        "Apply ROT18"
+      ]
+    },
+    "cipher.rot47": {
+      "display_name": "ROT47",
+      "summary": "Rotate printable ASCII characters by 47 places.",
+      "aliases": [
+        "Apply ROT47"
+      ]
+    },
+    "cipher.rot5": {
+      "display_name": "ROT5",
+      "summary": "Rotate digits by five places while leaving other characters unchanged.",
+      "aliases": [
+        "Apply ROT5"
+      ]
+    },
+    "cipher.salsa20_12": {
+      "display_name": "Salsa20/12",
+      "summary": "Apply the 12-round Salsa20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply Salsa20/12"
+      ]
+    },
+    "cipher.salsa20": {
+      "display_name": "Salsa20/20",
+      "summary": "Apply the 20-round Salsa20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply Salsa20/20"
+      ]
+    },
+    "cipher.xchacha20": {
+      "display_name": "XChaCha20",
+      "summary": "Apply the XChaCha20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply XChaCha20"
+      ]
+    },
+    "cipher.autokey": {
+      "display_name": "Autokey cipher",
+      "summary": "Encode or decode text with a key that grows from the message or ciphertext.",
+      "aliases": [
+        "Autokey"
+      ]
+    },
+    "cipher.bacon": {
+      "display_name": "Bacon's cipher",
+      "summary": "Represent letters as groups of five symbols, or read those groups back as letters.",
+      "aliases": [
+        "Bacon"
+      ]
+    },
+    "encoding.base32": {
+      "display_name": "Base32",
+      "summary": "Encode bytes as Base32 text, or decode Base32 text back to bytes.",
+      "aliases": []
+    },
+    "encoding.base58": {
+      "display_name": "Base58",
+      "summary": "Encode bytes as Base58 text, or decode Base58 text back to bytes.",
+      "aliases": []
+    },
+    "encoding.base58check": {
+      "display_name": "Base58Check",
+      "summary": "Encode bytes with a Base58Check checksum, or decode and verify a Base58Check value.",
+      "aliases": []
+    },
+    "encoding.base64": {
+      "display_name": "Base64",
+      "summary": "Encode bytes as Base64 text, or decode a Base64 message back to bytes.",
+      "aliases": []
+    },
+    "cipher.bazeries": {
+      "display_name": "Bazeries cipher",
+      "summary": "Encode or decode text using the Bazeries grid, grouping and number key.",
+      "aliases": [
+        "Bazeries"
+      ]
+    },
+    "cipher.bifid": {
+      "display_name": "Bifid cipher",
+      "summary": "Mix letter coordinates from a Polybius grid to encode or decode text.",
+      "aliases": [
+        "Bifid"
+      ]
+    },
+    "symbol.braille": {
+      "display_name": "Braille dot patterns",
+      "summary": "Convert bytes to Unicode Braille dot patterns or read their dot masks; this does not translate Braille language.",
+      "aliases": [
+        "Braille dot masks"
+      ]
+    },
+    "cipher.caesar": {
+      "display_name": "Caesar cipher",
+      "summary": "Shift letters by a chosen number of places, or reverse the shift.",
+      "aliases": [
+        "Caesar"
+      ]
+    },
+    "cipher.chaocipher": {
+      "display_name": "Chaocipher",
+      "summary": "Encode or decode a message using two alphabets that change after each letter.",
+      "aliases": []
+    },
+    "recipe.check": {
+      "display_name": "Check a recipe result",
+      "summary": "Run a recipe and compare its result with the exact typed expected value you supply.",
+      "aliases": []
+    },
+    "analysis.crib.verify": {
+      "display_name": "Check a known text fragment",
+      "summary": "Check whether an expected text fragment matches a candidate message.",
+      "aliases": [
+        "Check known plaintext"
+      ]
+    },
+    "cipher.columnar": {
+      "display_name": "Columnar transposition",
+      "summary": "Rearrange text by reading keyed columns, or restore the original order.",
+      "aliases": [
+        "columnar transposition"
+      ]
+    },
+    "image.bitwise": {
+      "display_name": "Combine image pixels",
+      "summary": "Combine matching image samples with XOR, AND or OR.",
+      "aliases": [
+        "Combine images with bitwise operations"
+      ]
+    },
+    "image.pairs": {
+      "display_name": "Compare pairs of images",
+      "summary": "Compare or combine supplied image pairs and retain a separate result for each pair.",
+      "aliases": [
+        "Compare and combine image pairs"
+      ]
+    },
+    "esolang.brainfuck.compare": {
+      "display_name": "Compare Brainfuck cell widths",
+      "summary": "Run a Brainfuck program with selected cell widths and compare its outcomes.",
+      "aliases": [
+        "Compare Brainfuck runs"
+      ]
+    },
+    "text.multiset.compare": {
+      "display_name": "Compare character counts",
+      "summary": "Compare which characters occur in two texts and how many of each are present.",
+      "aliases": [
+        "Compare character inventories"
+      ]
+    },
+    "probability.dice.compare": {
+      "display_name": "Compare dice rolls",
+      "summary": "Calculate exact win, tie and loss probabilities for two independent dice totals.",
+      "aliases": [
+        "Compare dice outcomes"
+      ]
+    },
+    "file.binary.compare": {
+      "display_name": "Compare file bytes",
+      "summary": "Compare file data byte by byte and report differences.",
+      "aliases": []
+    },
+    "image.compare": {
+      "display_name": "Compare image pixels",
+      "summary": "Compare exact image samples and report differences, with an optional difference mask.",
+      "aliases": [
+        "Compare image samples"
+      ]
+    },
+    "analysis.frequency.compare": {
+      "display_name": "Compare letter frequencies",
+      "summary": "Compare symbol counts with a reference frequency table you supply.",
+      "aliases": [
+        "Compare symbol frequencies"
+      ]
+    },
+    "text.unicode.compare": {
+      "display_name": "Compare Unicode text",
+      "summary": "Compare exact characters and optionally inspect a separately labeled normalized view.",
+      "aliases": []
+    },
+    "video.frames.compare": {
+      "display_name": "Compare video frames",
+      "summary": "Compare selected supported video frames by their exact decoded pixel values.",
+      "aliases": []
+    },
+    "cipher.complete_columnar": {
+      "display_name": "Complete columnar transposition",
+      "summary": "Encode or decode a transposition arranged into complete keyed columns.",
+      "aliases": [
+        "complete columnar transposition"
+      ]
+    },
+    "number.binomial": {
+      "display_name": "Count combinations",
+      "summary": "Calculate how many ways you can choose k items from n without regard to order.",
+      "aliases": [
+        "Compute a binomial coefficient"
+      ]
+    },
+    "probability.dice.sum": {
+      "display_name": "Calculate dice-total probabilities",
+      "summary": "Calculate the exact distribution of totals for the weighted dice you supply.",
+      "aliases": [
+        "Compute a dice-sum distribution"
+      ]
+    },
+    "number.digital_root": {
+      "display_name": "Calculate a digital root",
+      "summary": "Repeatedly add decimal digits until one digit remains.",
+      "aliases": [
+        "Compute a digital root"
+      ]
+    },
+    "number.gcd": {
+      "display_name": "Find the greatest common divisor",
+      "summary": "Find the largest positive divisor shared by two whole numbers, with explicit handling of zero.",
+      "aliases": [
+        "Compute a greatest common divisor"
+      ]
+    },
+    "number.mod_inverse": {
+      "display_name": "Find a modular inverse",
+      "summary": "Find a value that multiplies your number to one under the selected modulus, when it exists.",
+      "aliases": [
+        "Compute a modular inverse"
+      ]
+    },
+    "number.mod_pow": {
+      "display_name": "Calculate a modular power",
+      "summary": "Raise an integer to a power and return its remainder under the selected modulus.",
+      "aliases": [
+        "Compute a modular power"
+      ]
+    },
+    "number.multinomial": {
+      "display_name": "Count grouped arrangements",
+      "summary": "Count distinct arrangements of items divided into the supplied groups.",
+      "aliases": [
+        "Compute a multinomial coefficient"
+      ]
+    },
+    "number.extended_gcd": {
+      "display_name": "Find Bézout coefficients",
+      "summary": "Find integer coefficients that express the greatest common divisor of two numbers.",
+      "aliases": [
+        "Compute Bézout coefficients"
+      ]
+    },
+    "hash.crc16_ibm3740": {
+      "display_name": "CRC-16/IBM-3740",
+      "summary": "Calculate a CRC-16/IBM-3740 checksum for the supplied bytes.",
+      "aliases": [
+        "Compute CRC-16/IBM-3740"
+      ]
+    },
+    "hash.crc32": {
+      "display_name": "CRC-32",
+      "summary": "Calculate a CRC-32 checksum for the supplied bytes.",
+      "aliases": [
+        "Compute CRC-32"
+      ]
+    },
+    "hash.crc32c": {
+      "display_name": "CRC-32C",
+      "summary": "Calculate a CRC-32C checksum for the supplied bytes.",
+      "aliases": [
+        "Compute CRC-32C"
+      ]
+    },
+    "hash.keccak256": {
+      "display_name": "Keccak-256",
+      "summary": "Calculate the Keccak-256 fingerprint of the supplied bytes; this is distinct from SHA3-256.",
+      "aliases": [
+        "Compute Keccak-256"
+      ]
+    },
+    "hash.md5": {
+      "display_name": "MD5",
+      "summary": "Calculate an MD5 fingerprint for compatibility checks; MD5 is not suitable for secure authentication.",
+      "aliases": [
+        "Compute MD5"
+      ]
+    },
+    "hash.ripemd160": {
+      "display_name": "RIPEMD-160",
+      "summary": "Calculate the RIPEMD-160 fingerprint of the supplied bytes.",
+      "aliases": [
+        "Compute RIPEMD-160"
+      ]
+    },
+    "hash.sha1": {
+      "display_name": "SHA-1",
+      "summary": "Calculate a legacy SHA-1 fingerprint; it is not suitable for collision-resistant security.",
+      "aliases": [
+        "Compute SHA-1"
+      ]
+    },
+    "hash.sha256": {
+      "display_name": "SHA-256",
+      "summary": "Calculate the SHA-256 fingerprint of the supplied bytes.",
+      "aliases": [
+        "Compute SHA-256"
+      ]
+    },
+    "hash.sha512": {
+      "display_name": "SHA-512",
+      "summary": "Calculate the SHA-512 fingerprint of the supplied bytes.",
+      "aliases": [
+        "Compute SHA-512"
+      ]
+    },
+    "text.word.values": {
+      "display_name": "Calculate word values",
+      "summary": "Calculate values for words using the character-value table and settings you choose.",
+      "aliases": [
+        "Compute word values"
+      ]
+    },
+    "bytes.concat": {
+      "display_name": "Join byte sequences",
+      "summary": "Append one byte sequence to another without converting either to text.",
+      "aliases": [
+        "Concatenate bytes"
+      ]
+    },
+    "text.concat": {
+      "display_name": "Join text",
+      "summary": "Join two text values with an optional separator while preserving their characters and line endings.",
+      "aliases": [
+        "Concatenate text"
+      ]
+    },
+    "cipher.condi": {
+      "display_name": "Condi cipher",
+      "summary": "Encode or decode letters using a keyed alphabet and a shift that changes with the message.",
+      "aliases": [
+        "Condi"
+      ]
+    },
+    "number.alphabet.convert": {
+      "display_name": "Convert a custom number alphabet",
+      "summary": "Convert integer values between the digit alphabets and bases you choose.",
+      "aliases": [
+        "Convert a custom digit alphabet"
+      ]
+    },
+    "number.base.convert": {
+      "display_name": "Convert number base",
+      "summary": "Convert a whole number between bases 2 through 36.",
+      "aliases": [
+        "Convert a number base"
+      ]
+    },
+    "image.grayscale": {
+      "display_name": "Convert to grayscale",
+      "summary": "Reduce color pixels to grayscale while preserving their alpha channel.",
+      "aliases": []
+    },
+    "image.histogram": {
+      "display_name": "Count image colors",
+      "summary": "Count exact colors or selected channel combinations in an image.",
+      "aliases": []
+    },
+    "number.permutations": {
+      "display_name": "Count ordered selections",
+      "summary": "Calculate how many ordered selections of k items can be made from n items.",
+      "aliases": [
+        "Count permutations"
+      ]
+    },
+    "audio.spectrogram": {
+      "display_name": "Calculate a spectrogram",
+      "summary": "Measure how audio frequencies change over successive time windows.",
+      "aliases": [
+        "Create a spectrogram"
+      ]
+    },
+    "image.crop": {
+      "display_name": "Crop an image",
+      "summary": "Keep a rectangular region of pixels without resizing it.",
+      "aliases": []
+    },
+    "symbol.tokens": {
+      "display_name": "Custom symbol codes",
+      "summary": "Convert text using your explicit symbol table, or decode its tokens with the same table.",
+      "aliases": [
+        "custom symbols"
+      ]
+    },
+    "image.qr.decode": {
+      "display_name": "Read QR codes",
+      "summary": "Find supported QR codes in image data and return their payload bytes.",
+      "aliases": [
+        "Decode QR codes"
+      ]
+    },
+    "cipher.aes.decrypt_blocks": {
+      "display_name": "Decrypt AES blocks",
+      "summary": "Decrypt complete AES blocks with a supplied key; padding and message authentication are not included.",
+      "aliases": [
+        "Decrypt raw AES blocks"
+      ]
+    },
+    "blockchain.bitcoin.derive": {
+      "display_name": "Derive a Bitcoin address",
+      "summary": "Calculate a public Bitcoin address from a supplied private key, entirely offline.",
+      "aliases": []
+    },
+    "blockchain.ethereum.derive": {
+      "display_name": "Derive an Ethereum address",
+      "summary": "Calculate a public Ethereum address from a supplied private key, entirely offline.",
+      "aliases": []
+    },
+    "graph.cycle": {
+      "display_name": "Find a graph cycle",
+      "summary": "Check whether the supplied graph contains a cycle and report the result.",
+      "aliases": [
+        "Detect a graph cycle"
+      ]
+    },
+    "audio.dtmf.detect": {
+      "display_name": "Find telephone keypad tones",
+      "summary": "Find candidate DTMF tones and their timing in audio, with uncertainty reported.",
+      "aliases": [
+        "Detect DTMF tones"
+      ]
+    },
+    "audio.morse.detect": {
+      "display_name": "Find Morse tone timings",
+      "summary": "Find tone and silence intervals at a frequency you choose; this step does not decode letters.",
+      "aliases": [
+        "Detect Morse timing"
+      ]
+    },
+    "cipher.digrafid": {
+      "display_name": "Digrafid",
+      "summary": "Encode or decode pairs of symbols using two keyed grids and a chosen period.",
+      "aliases": []
+    },
+    "cipher.double_columnar": {
+      "display_name": "Double columnar transposition",
+      "summary": "Apply two keyed column rearrangements, or reverse them to recover text.",
+      "aliases": [
+        "double columnar transposition"
+      ]
+    },
+    "cipher.aes.encrypt_blocks": {
+      "display_name": "Encrypt AES blocks",
+      "summary": "Encrypt complete AES blocks with a supplied key; padding and message authentication are not included.",
+      "aliases": [
+        "Encrypt raw AES blocks"
+      ]
+    },
+    "analysis.period.estimate": {
+      "display_name": "Estimate a repeating key length",
+      "summary": "Compare evidence for possible key lengths in a repeating-key cipher.",
+      "aliases": [
+        "Estimate repeating-key periods"
+      ]
+    },
+    "logic.boolean.evaluate": {
+      "display_name": "Evaluate a Boolean expression",
+      "summary": "Calculate the result of a Boolean expression for the named variable values you supply.",
+      "aliases": []
+    },
+    "image.palette.expand": {
+      "display_name": "Expand PNG palette colors",
+      "summary": "Replace palette indexes with their corresponding RGBA pixel values.",
+      "aliases": [
+        "Expand a PNG palette"
+      ]
+    },
+    "investigation.report": {
+      "display_name": "Export an investigation report",
+      "summary": "Create a report with explicit choices about included results and redacted information.",
+      "aliases": []
+    },
+    "image.colors.export": {
+      "display_name": "Export color masks",
+      "summary": "Create separate PNG masks or layers for exact colors in an image.",
+      "aliases": [
+        "Export color masks and layers"
+      ]
+    },
+    "image.pixels.export": {
+      "display_name": "Export pixel values",
+      "summary": "Export selected pixel samples with their channel and position information.",
+      "aliases": [
+        "Export pixel samples"
+      ]
+    },
+    "image.csv.export": {
+      "display_name": "Export pixels as CSV",
+      "summary": "Write image coordinates and sample values as a CSV table.",
+      "aliases": [
+        "Export pixels to CSV"
+      ]
+    },
+    "blockchain.private.export": {
+      "display_name": "Convert private key format",
+      "summary": "Convert a private key between bytes, hexadecimal and WIF; the output contains secret key data.",
+      "aliases": [
+        "Export private key material"
+      ]
+    },
+    "file.range.extract": {
+      "display_name": "Extract a byte range",
+      "summary": "Copy a selected range of bytes from file data.",
+      "aliases": []
+    },
+    "web.har.asset": {
+      "display_name": "Extract a saved web response",
+      "summary": "Read an embedded response body from a saved HAR file without downloading it.",
+      "aliases": [
+        "Extract an embedded HAR body"
+      ]
+    },
+    "image.bit_plane.extract": {
+      "display_name": "Extract an image bit plane",
+      "summary": "Read one bit position from image samples to inspect patterns that may be hidden in that plane.",
+      "aliases": []
+    },
+    "image.channel.extract": {
+      "display_name": "Extract a color channel",
+      "summary": "Read a selected image channel as sample bytes and, when requested, a grayscale PNG.",
+      "aliases": [
+        "Extract an image channel"
+      ]
+    },
+    "web.html.asset": {
+      "display_name": "Extract embedded HTML data",
+      "summary": "Read an inline asset or supported data URL from supplied HTML without fetching external content.",
+      "aliases": [
+        "Extract an inline HTML asset"
+      ]
+    },
+    "audio.bits.extract": {
+      "display_name": "Extract bits from audio",
+      "summary": "Read selected bits from audio samples in the channel and order you choose.",
+      "aliases": [
+        "Extract audio bits"
+      ]
+    },
+    "text.extract": {
+      "display_name": "Extract characters by position",
+      "summary": "Read characters at selected positions in the order you specify.",
+      "aliases": [
+        "Extract character positions"
+      ]
+    },
+    "text.josephus.extract": {
+      "display_name": "Read text by elimination",
+      "summary": "Select characters using repeated Josephus-style counting and removal.",
+      "aliases": [
+        "Extract in Josephus order"
+      ]
+    },
+    "video.frames.extract": {
+      "display_name": "Extract JPEG frames from MOV",
+      "summary": "Read explicitly selected baseline JPEG frames from a supported MOV file.",
+      "aliases": []
+    },
+    "image.lsb.extract": {
+      "display_name": "Extract low-order image bits",
+      "summary": "Read selected low-order bits from image pixels as bytes using explicit ordering settings.",
+      "aliases": [
+        "Extract least-significant bits"
+      ]
+    },
+    "video.audio.extract": {
+      "display_name": "Extract audio from MOV",
+      "summary": "Copy a supported raw PCM audio track from MOV to WAV without changing its sample bytes.",
+      "aliases": [
+        "Extract PCM audio from MOV"
+      ]
+    },
+    "audio.pcm.extract": {
+      "display_name": "Extract audio samples",
+      "summary": "Read raw PCM sample bytes and values from selected audio channels and ranges.",
+      "aliases": [
+        "Extract PCM samples"
+      ]
+    },
+    "text.word.extract": {
+      "display_name": "Read positions inside words",
+      "summary": "Extract selected characters from each word, including positions counted from the end.",
+      "aliases": [
+        "Extract positions within words"
+      ]
+    },
+    "file.strings.extract": {
+      "display_name": "Find text in a file",
+      "summary": "Extract readable ASCII text and its locations from file data.",
+      "aliases": [
+        "Extract printable strings"
+      ]
+    },
+    "cipher.cardan.extract": {
+      "display_name": "Read through a Cardan grille",
+      "summary": "Read the characters visible through the positions selected by a grille mask.",
+      "aliases": [
+        "Extract through a Cardan grille"
+      ]
+    },
+    "graph.shortest_path": {
+      "display_name": "Find a shortest path",
+      "summary": "Find a shortest path between two nodes in the supplied graph.",
+      "aliases": []
+    },
+    "text.word_ladder.shortest": {
+      "display_name": "Find a word ladder",
+      "summary": "Find a shortest chain of one-character substitutions using your dictionary.",
+      "aliases": [
+        "Find a shortest word ladder"
+      ]
+    },
+    "graph.euler_trail": {
+      "display_name": "Find a route through every edge",
+      "summary": "Find an Euler trail that visits each graph edge once, when one exists.",
+      "aliases": [
+        "Find an Euler trail"
+      ]
+    },
+    "text.anagram.search": {
+      "display_name": "Find anagrams",
+      "summary": "Find matching anagrams using the dictionary you supply.",
+      "aliases": []
+    },
+    "file.appended.detect": {
+      "display_name": "Find data after a file",
+      "summary": "Look for extra data following a recognized file boundary.",
+      "aliases": [
+        "Find appended data"
+      ]
+    },
+    "graph.components": {
+      "display_name": "Find connected groups",
+      "summary": "Find connected components in the graph you supply.",
+      "aliases": [
+        "Find connected components"
+      ]
+    },
+    "file.signature.scan": {
+      "display_name": "Find embedded file signatures",
+      "summary": "Search file data for signatures that may mark embedded files.",
+      "aliases": [
+        "Find embedded signatures"
+      ]
+    },
+    "text.grid.factors": {
+      "display_name": "Find possible text grids",
+      "summary": "List rectangle dimensions that fit the length of your text exactly.",
+      "aliases": []
+    },
+    "symbol.semaphore": {
+      "display_name": "Flag semaphore",
+      "summary": "Convert letters to pairs of flag directions, or read explicit direction pairs as letters.",
+      "aliases": [
+        "flag semaphore"
+      ]
+    },
+    "cipher.four_square": {
+      "display_name": "Four-square cipher",
+      "summary": "Encode or decode pairs of letters using four alphabet squares.",
+      "aliases": [
+        "Four-square"
+      ]
+    },
+    "cipher.fractionated_morse": {
+      "display_name": "Fractionated Morse",
+      "summary": "Combine Morse patterns with a keyed alphabet to encode or decode a message.",
+      "aliases": [
+        "fractionated Morse"
+      ]
+    },
+    "number.pascal": {
+      "display_name": "Generate Pascal's triangle",
+      "summary": "Generate rows of Pascal's triangle with exact integer values.",
+      "aliases": [
+        "Generate Pascal rows"
+      ]
+    },
+    "text.combinations": {
+      "display_name": "Generate text combinations",
+      "summary": "Build every ordered combination from the groups of text fragments you supply.",
+      "aliases": [
+        "Generate string combinations"
+      ]
+    },
+    "cipher.grandpre": {
+      "display_name": "Grandpré cipher",
+      "summary": "Replace letters with coordinates in a supplied letter grid, or read coordinates back as letters.",
+      "aliases": [
+        "Grandpré"
+      ]
+    },
+    "cipher.gromark": {
+      "display_name": "Gromark",
+      "summary": "Encode or decode text using a mixed alphabet and a five-digit starting key.",
+      "aliases": []
+    },
+    "cipher.gronsfeld": {
+      "display_name": "Gronsfeld cipher",
+      "summary": "Shift letters using a repeating sequence of key digits, or reverse those shifts.",
+      "aliases": [
+        "Gronsfeld"
+      ]
+    },
+    "encoding.hex": {
+      "display_name": "Hexadecimal (Hex)",
+      "summary": "Convert bytes to hexadecimal text, or hexadecimal text back to bytes.",
+      "aliases": [
+        "hexadecimal"
+      ]
+    },
+    "cipher.hill": {
+      "display_name": "Hill cipher",
+      "summary": "Encode or decode groups of letters using the supplied alphabet and key matrix.",
+      "aliases": [
+        "Hill"
+      ]
+    },
+    "cipher.homophonic": {
+      "display_name": "Homophonic substitution",
+      "summary": "Map letters to explicit cipher tokens, allowing several tokens to represent one letter.",
+      "aliases": [
+        "homophonic substitution"
+      ]
+    },
+    "file.signature.detect": {
+      "display_name": "Identify a file type",
+      "summary": "Compare header bytes with known file signatures.",
+      "aliases": [
+        "Identify a file signature"
+      ]
+    },
+    "image.dimensions": {
+      "display_name": "Read image dimensions",
+      "summary": "Read the image width and height in pixels.",
+      "aliases": [
+        "Image dimensions"
+      ]
+    },
+    "image.csv.import": {
+      "display_name": "Read pixels from CSV",
+      "summary": "Build image pixel data from a complete CSV grid and explicit image settings.",
+      "aliases": [
+        "Import pixels from CSV"
+      ]
+    },
+    "esolang.brainfuck.report": {
+      "display_name": "Inspect Brainfuck execution",
+      "summary": "Run a Brainfuck program and inspect its execution summary, tape and optional trace.",
+      "aliases": []
+    },
+    "web.har.inspect": {
+      "display_name": "Inspect a saved HAR file",
+      "summary": "Read request and response metadata already present in a saved HAR file.",
+      "aliases": []
+    },
+    "video.container.inspect": {
+      "display_name": "Read video file information",
+      "summary": "Read supported video container, track and timing information without decoding the video.",
+      "aliases": [
+        "Inspect a video container"
+      ]
+    },
+    "audio.wave.inspect": {
+      "display_name": "Read WAV information",
+      "summary": "Inspect WAV format information and file sections without decoding samples.",
+      "aliases": [
+        "Inspect a WAV container"
+      ]
+    },
+    "audio.spectrum": {
+      "display_name": "Measure audio frequencies",
+      "summary": "Calculate the frequency spectrum of selected audio samples.",
+      "aliases": [
+        "Inspect an audio spectrum"
+      ]
+    },
+    "file.exif.inspect": {
+      "display_name": "Read EXIF information",
+      "summary": "Read supported EXIF metadata from supplied file data.",
+      "aliases": [
+        "Inspect EXIF metadata"
+      ]
+    },
+    "file.info.inspect": {
+      "display_name": "Read file information",
+      "summary": "Inspect basic file information and evidence from its header.",
+      "aliases": [
+        "Inspect file information"
+      ]
+    },
+    "audio.metadata.inspect": {
+      "display_name": "Read FLAC information",
+      "summary": "Read FLAC stream information and text tags without decoding the audio.",
+      "aliases": [
+        "Inspect FLAC metadata"
+      ]
+    },
+    "file.hex.inspect": {
+      "display_name": "View file bytes as hex",
+      "summary": "Inspect selected file bytes with their positions and hexadecimal values.",
+      "aliases": [
+        "Inspect hexadecimal bytes"
+      ]
+    },
+    "analysis.homophonic.inspect": {
+      "display_name": "Inspect cipher tokens",
+      "summary": "Count and inspect the tokens used by a homophonic substitution cipher.",
+      "aliases": [
+        "Inspect homophonic tokens"
+      ]
+    },
+    "image.geometry.inspect": {
+      "display_name": "Check image dimensions and layout",
+      "summary": "Compare declared image dimensions with the raw pixel layout you specify.",
+      "aliases": [
+        "Inspect image geometry"
+      ]
+    },
+    "image.png.inspect": {
+      "display_name": "Inspect PNG file sections",
+      "summary": "Read PNG chunks, byte positions and checksum evidence without decoding pixels.",
+      "aliases": [
+        "Inspect PNG chunks"
+      ]
+    },
+    "web.html.inspect": {
+      "display_name": "Inspect saved HTML",
+      "summary": "Inspect HTML text, references and embedded-data ranges without rendering or running scripts.",
+      "aliases": []
+    },
+    "text.unicode.inspect": {
+      "display_name": "Inspect text characters",
+      "summary": "Inspect character categories, control characters and possible invisible characters.",
+      "aliases": [
+        "Inspect Unicode characters"
+      ]
+    },
+    "text.codepoints": {
+      "display_name": "Read Unicode code points",
+      "summary": "List the Unicode numbers and original positions of text characters.",
+      "aliases": [
+        "Inspect Unicode code points"
+      ]
+    },
+    "image.raw.interpret": {
+      "display_name": "Read raw image data",
+      "summary": "Interpret raw bytes as pixels using the dimensions, channels and row layout you specify.",
+      "aliases": [
+        "Interpret raw image bytes"
+      ]
+    },
+    "cipher.interrupted_key": {
+      "display_name": "Interrupted-key Vigenère",
+      "summary": "Encode or decode Vigenère text with key restarts at the positions you specify.",
+      "aliases": [
+        "Interrupted Key"
+      ]
+    },
+    "binary.not": {
+      "display_name": "Invert bits",
+      "summary": "Flip every zero bit to one and every one bit to zero.",
+      "aliases": []
+    },
+    "image.invert": {
+      "display_name": "Invert image colors",
+      "summary": "Invert selected image sample values, preserving transparency by default.",
+      "aliases": [
+        "Invert image samples"
+      ]
+    },
+    "image.colors.extract": {
+      "display_name": "Isolate a color",
+      "summary": "Keep selected exact colors as a mask or a transparent-background image layer.",
+      "aliases": [
+        "Isolate exact colors"
+      ]
+    },
+    "text.keyboard.coordinates": {
+      "display_name": "Keyboard coordinates",
+      "summary": "Convert characters to row, column and layer positions on your keyboard layout, or read those positions.",
+      "aliases": [
+        "keyboard coordinates"
+      ]
+    },
+    "text.keyboard.shift": {
+      "display_name": "Keyboard shifts",
+      "summary": "Move characters by a chosen key displacement on your keyboard layout, or reverse a valid mapping.",
+      "aliases": [
+        "keyboard shifts"
+      ]
+    },
+    "symbol.keypad": {
+      "display_name": "Phone keypad codes",
+      "summary": "Convert letters to telephone-keypad groups, or inspect the letters those groups can represent.",
+      "aliases": [
+        "keypad groups"
+      ]
+    },
+    "text.class.map": {
+      "display_name": "Group characters by class",
+      "summary": "Map characters to the explicit classes you define and retain their source positions.",
+      "aliases": [
+        "Map character classes"
+      ]
+    },
+    "symbol.clock.directions": {
+      "display_name": "Read clock-hand directions",
+      "summary": "Map a clock reading or explicit hand angles to compass directions, retaining boundary uncertainty.",
+      "aliases": [
+        "Map clock hands to directions"
+      ]
+    },
+    "number.maximum": {
+      "display_name": "Find the largest integer",
+      "summary": "Return the largest value in a supplied list of exact signed integers.",
+      "aliases": [
+        "Maximum"
+      ]
+    },
+    "audio.waveform.envelope": {
+      "display_name": "Measure waveform levels",
+      "summary": "Find minimum and maximum sample levels across successive audio intervals.",
+      "aliases": [
+        "Measure a waveform envelope"
+      ]
+    },
+    "image.spatial.autocorrelation": {
+      "display_name": "Measure repeating image patterns",
+      "summary": "Compare a selected image channel with shifted copies to measure repeated patterns.",
+      "aliases": [
+        "Measure spatial autocorrelation"
+      ]
+    },
+    "text.statistics": {
+      "display_name": "Count letters and text patterns",
+      "summary": "Measure character frequencies, repeated groups and other text statistics without identifying a cipher automatically.",
+      "aliases": [
+        "Measure text statistics"
+      ]
+    },
+    "text.word.lengths": {
+      "display_name": "Count characters in each word",
+      "summary": "Measure each word's character length while retaining its original position.",
+      "aliases": [
+        "Measure word lengths"
+      ]
+    },
+    "image.mirror": {
+      "display_name": "Flip an image",
+      "summary": "Mirror pixels horizontally or vertically.",
+      "aliases": [
+        "Mirror an image"
+      ]
+    },
+    "cipher.monome_dinome": {
+      "display_name": "Monome-dinome",
+      "summary": "Encode or decode letters using a table of one- and two-digit codes.",
+      "aliases": []
+    },
+    "cipher.morbit": {
+      "display_name": "Morbit",
+      "summary": "Encode or decode paired Morse symbols using your digit key.",
+      "aliases": []
+    },
+    "symbol.morse": {
+      "display_name": "Morse code",
+      "summary": "Convert letters and digits to dots and dashes, or read Morse code as text.",
+      "aliases": []
+    },
+    "cipher.myszkowski": {
+      "display_name": "Myszkowski transposition",
+      "summary": "Rearrange letters using a keyword that can contain repeated letters, or reverse the rearrangement.",
+      "aliases": [
+        "Myszkowski"
+      ]
+    },
+    "cipher.nicodemus": {
+      "display_name": "Nicodemus cipher",
+      "summary": "Combine Vigenère substitution with keyed column groups to encode or decode text.",
+      "aliases": [
+        "Nicodemus"
+      ]
+    },
+    "cipher.nihilist_substitution": {
+      "display_name": "Nihilist substitution",
+      "summary": "Encode or decode text using numbered Polybius coordinates and an additive key.",
+      "aliases": []
+    },
+    "text.normalize": {
+      "display_name": "Normalize Unicode text",
+      "summary": "Convert text to a selected Unicode normalization form.",
+      "aliases": []
+    },
+    "cipher.cardan.overlay": {
+      "display_name": "Write through a Cardan grille",
+      "summary": "Place text at positions selected by a grille mask over supplied cover text.",
+      "aliases": [
+        "Overlay a Cardan grille"
+      ]
+    },
+    "text.integer": {
+      "display_name": "Read an integer",
+      "summary": "Parse strictly formatted decimal text as an exact signed integer.",
+      "aliases": [
+        "Parse integer"
+      ]
+    },
+    "json.parse": {
+      "display_name": "Read JSON",
+      "summary": "Parse JSON into typed data, reporting invalid or ambiguous documents.",
+      "aliases": [
+        "Parse JSON"
+      ]
+    },
+    "cipher.periodic_gromark": {
+      "display_name": "Periodic Gromark",
+      "summary": "Encode or decode text using a keyed alphabet and a periodically changing Gromark key.",
+      "aliases": [
+        "periodic Gromark"
+      ]
+    },
+    "cipher.phillips": {
+      "display_name": "Phillips cipher",
+      "summary": "Encode or decode letters using the selected schedule of changing alphabet squares.",
+      "aliases": [
+        "Phillips"
+      ]
+    },
+    "cipher.playfair": {
+      "display_name": "Playfair cipher",
+      "summary": "Encode or decode pairs of letters using a keyed square and explicit filler settings.",
+      "aliases": [
+        "Playfair"
+      ]
+    },
+    "cipher.pollux": {
+      "display_name": "Pollux",
+      "summary": "Map Morse dots, dashes and gaps to your digit groups, or decode those digits.",
+      "aliases": []
+    },
+    "cipher.polybius": {
+      "display_name": "Polybius square",
+      "summary": "Convert letters to row-and-column coordinates in a supplied square, or read those coordinates.",
+      "aliases": [
+        "Polybius"
+      ]
+    },
+    "investigation.profile.plan": {
+      "display_name": "Preview file inspection steps",
+      "summary": "Show which checks an inspection profile would run and why some may be skipped.",
+      "aliases": [
+        "Preview an inspection profile"
+      ]
+    },
+    "cipher.progressive_key": {
+      "display_name": "Progressive-key Vigenère",
+      "summary": "Encode or decode Vigenère text with an extra shift that changes between key-length groups.",
+      "aliases": [
+        "Progressive Key"
+      ]
+    },
+    "cipher.quagmire": {
+      "display_name": "Quagmire",
+      "summary": "Encode or decode text with the selected Quagmire alphabet and indicator-key settings.",
+      "aliases": []
+    },
+    "cipher.ragbaby": {
+      "display_name": "Ragbaby cipher",
+      "summary": "Encode or decode letters using a keyed alphabet and shifts based on word and letter positions.",
+      "aliases": [
+        "Ragbaby"
+      ]
+    },
+    "analysis.affine.rank": {
+      "display_name": "Try Affine keys",
+      "summary": "Compare candidate Affine keys using the scoring model you supply.",
+      "aliases": [
+        "Rank Affine candidates"
+      ]
+    },
+    "analysis.caesar.rank": {
+      "display_name": "Try Caesar shifts",
+      "summary": "Compare possible Caesar shifts using the scoring model you supply.",
+      "aliases": [
+        "Rank Caesar candidates"
+      ]
+    },
+    "analysis.transposition.rank": {
+      "display_name": "Try transposition candidates",
+      "summary": "Compare the supplied letter rearrangements using your scoring settings.",
+      "aliases": [
+        "Rank transposition candidates"
+      ]
+    },
+    "analysis.vigenere.rank": {
+      "display_name": "Try Vigenère keys",
+      "summary": "Search and compare Vigenère key candidates using your language model and search settings.",
+      "aliases": [
+        "Rank Vigenère candidates"
+      ]
+    },
+    "image.pixels.read": {
+      "display_name": "Read pixels at coordinates",
+      "summary": "Read exact pixel values at the image coordinates you choose.",
+      "aliases": [
+        "Read exact pixels"
+      ]
+    },
+    "investigation.session.record": {
+      "display_name": "Record investigation steps",
+      "summary": "Record operation history and observations separately from your hypotheses.",
+      "aliases": [
+        "Record investigation provenance"
+      ]
+    },
+    "file.carve": {
+      "display_name": "Recover a file section",
+      "summary": "Extract a selected range of bytes as a candidate file section.",
+      "aliases": [
+        "Recover a file range"
+      ]
+    },
+    "cipher.redefence": {
+      "display_name": "Redefence",
+      "summary": "Encode or decode a zigzag transposition with a keyed order for its rails.",
+      "aliases": []
+    },
+    "text.keyboard.remap": {
+      "display_name": "Change keyboard layout",
+      "summary": "Map characters by physical key positions between the explicit keyboard layouts you supply.",
+      "aliases": [
+        "Remap keyboard positions"
+      ]
+    },
+    "text.grid.render": {
+      "display_name": "Arrange text in a grid",
+      "summary": "Place text in a grid using the chosen traversal and output settings.",
+      "aliases": [
+        "Render a text grid"
+      ]
+    },
+    "image.reorder": {
+      "display_name": "Reorder color channels",
+      "summary": "Change the order of image channels without changing their sample values.",
+      "aliases": [
+        "Reorder image channels"
+      ]
+    },
+    "investigation.replay": {
+      "display_name": "Repeat an investigation",
+      "summary": "Verify the input and operation versions before repeating supported recorded runs.",
+      "aliases": [
+        "Replay an investigation"
+      ]
+    },
+    "audio.reverse": {
+      "display_name": "Reverse audio",
+      "summary": "Reverse selected audio sample frames while keeping channels together.",
+      "aliases": [
+        "Reverse audio frames"
+      ]
+    },
+    "binary.reverse": {
+      "display_name": "Reverse bytes",
+      "summary": "Reverse the order of bytes while keeping each byte unchanged.",
+      "aliases": []
+    },
+    "text.reverse": {
+      "display_name": "Reverse text",
+      "summary": "Reverse Unicode character values; combining marks and line endings are reversed too.",
+      "aliases": [
+        "Reverse text characters"
+      ]
+    },
+    "image.rotate": {
+      "display_name": "Rotate an image",
+      "summary": "Rotate pixels by a right angle without interpolation.",
+      "aliases": []
+    },
+    "binary.rotate_left": {
+      "display_name": "Rotate bits left",
+      "summary": "Move bits left within each selected unit, wrapping them around at the edge.",
+      "aliases": []
+    },
+    "binary.rotate_right": {
+      "display_name": "Rotate bits right",
+      "summary": "Move bits right within each selected unit, wrapping them around at the edge.",
+      "aliases": []
+    },
+    "cipher.route": {
+      "display_name": "Route transposition",
+      "summary": "Rearrange text by reading a grid along the selected route, or reverse that route.",
+      "aliases": [
+        "route transposition"
+      ]
+    },
+    "esolang.brainfuck.execute": {
+      "display_name": "Run Brainfuck",
+      "summary": "Execute a Brainfuck program with supplied input and bounded execution settings.",
+      "aliases": [
+        "Run a Brainfuck program"
+      ]
+    },
+    "pipeline.execute": {
+      "display_name": "Run a pipeline",
+      "summary": "Run a validated ordered pipeline with supplied inputs and optional intermediate results.",
+      "aliases": []
+    },
+    "recipe.execute": {
+      "display_name": "Run a recipe",
+      "summary": "Run a validated recipe using explicitly supplied input values.",
+      "aliases": []
+    },
+    "investigation.profile.run": {
+      "display_name": "Run a file inspection profile",
+      "summary": "Run the selected local inspection checks and record each outcome.",
+      "aliases": [
+        "Run an inspection profile"
+      ]
+    },
+    "cipher.enigma": {
+      "display_name": "Enigma",
+      "summary": "Transform a message using the selected Enigma rotors, starting positions and plugboard settings.",
+      "aliases": [
+        "Run Enigma I or M3"
+      ]
+    },
+    "analysis.language.score": {
+      "display_name": "Score text with a language model",
+      "summary": "Measure how well text matches a language model you supply; a score is not proof of a solution.",
+      "aliases": [
+        "Score candidate language"
+      ]
+    },
+    "cipher.scytale": {
+      "display_name": "Scytale cipher",
+      "summary": "Rearrange text using the selected cylinder-style grid, or restore its original order.",
+      "aliases": [
+        "Scytale"
+      ]
+    },
+    "text.select": {
+      "display_name": "Extract first or last characters",
+      "summary": "Take the first or last character of each word or nonempty line.",
+      "aliases": [
+        "Select characters by word or line"
+      ]
+    },
+    "number.constant_digits": {
+      "display_name": "Read digits of a constant",
+      "summary": "Select verified decimal digits of pi, e, the golden ratio or the square root of two.",
+      "aliases": [
+        "Select digits of a constant"
+      ]
+    },
+    "json.select": {
+      "display_name": "Select a JSON value",
+      "summary": "Select a field or array item by JSON Pointer while preserving its value type.",
+      "aliases": [
+        "Select field"
+      ]
+    },
+    "cipher.sequence_transposition": {
+      "display_name": "Sequence transposition",
+      "summary": "Rearrange letters using an explicit position sequence, or reverse that ordering.",
+      "aliases": [
+        "sequence transposition"
+      ]
+    },
+    "cipher.seriated_playfair": {
+      "display_name": "Seriated Playfair",
+      "summary": "Encode or decode grouped letter pairs using a Playfair square and the selected period.",
+      "aliases": [
+        "seriated Playfair"
+      ]
+    },
+    "binary.shift_left": {
+      "display_name": "Shift bits left",
+      "summary": "Move bits left within each selected unit, filling with zeros and discarding overflow.",
+      "aliases": []
+    },
+    "binary.shift_right": {
+      "display_name": "Shift bits right",
+      "summary": "Move bits right within each selected unit, filling with zeros.",
+      "aliases": []
+    },
+    "cipher.skip": {
+      "display_name": "Skip transposition",
+      "summary": "Rearrange text by reading positions at fixed skips, or reverse that ordering.",
+      "aliases": [
+        "skip transposition"
+      ]
+    },
+    "cipher.slidefair": {
+      "display_name": "Slidefair",
+      "summary": "Encode or decode pairs of letters using the selected Slidefair key settings.",
+      "aliases": []
+    },
+    "cipher.solitaire": {
+      "display_name": "Solitaire cipher",
+      "summary": "Encode or decode text using a key stream generated from the supplied deck of cards.",
+      "aliases": [
+        "Solitaire"
+      ]
+    },
+    "cipher.spiral": {
+      "display_name": "Spiral transposition",
+      "summary": "Rearrange text along a spiral grid route, or restore its original order.",
+      "aliases": [
+        "spiral transposition"
+      ]
+    },
+    "cipher.substitution": {
+      "display_name": "Substitution cipher",
+      "summary": "Replace letters using a supplied alphabet mapping, or reverse the mapping.",
+      "aliases": [
+        "substitution"
+      ]
+    },
+    "text.multiset.subtract": {
+      "display_name": "Subtract character counts",
+      "summary": "Remove one text's character counts from another and report any missing characters.",
+      "aliases": [
+        "Subtract character inventories"
+      ]
+    },
+    "binary.sub_wrapping": {
+      "display_name": "Subtract byte values",
+      "summary": "Subtract paired unsigned values and wrap results to the selected byte width.",
+      "aliases": [
+        "Subtract with wrapping"
+      ]
+    },
+    "investigation.triage": {
+      "display_name": "Suggest file checks",
+      "summary": "Suggest relevant file inspections from header evidence without running them automatically.",
+      "aliases": [
+        "Suggest file inspections"
+      ]
+    },
+    "binary.swap_endian": {
+      "display_name": "Swap byte order",
+      "summary": "Reverse bytes within each selected number-sized unit.",
+      "aliases": []
+    },
+    "audio.morse.transcribe": {
+      "display_name": "Read Morse timings",
+      "summary": "Convert supplied tone and silence intervals to Morse text using your timing settings.",
+      "aliases": [
+        "Transcribe Morse timing"
+      ]
+    },
+    "text.transform.masked": {
+      "display_name": "Transform selected characters",
+      "summary": "Apply a supported letter cipher to selected positions while keeping the rest of the text separate.",
+      "aliases": [
+        "Transform selected positions"
+      ]
+    },
+    "text.skip.keyed": {
+      "display_name": "Read text with repeating skips",
+      "summary": "Move through a ring of characters using a repeating sequence of step sizes.",
+      "aliases": [
+        "Traverse text with keyed steps"
+      ]
+    },
+    "cipher.tri_square": {
+      "display_name": "Tri-square cipher",
+      "summary": "Encode or decode letter groups using three keyed alphabet squares.",
+      "aliases": [
+        "Tri-square"
+      ]
+    },
+    "cipher.tridigital": {
+      "display_name": "Tridigital",
+      "summary": "Encode letters as digits, or list the possible letters for each digit using your Tridigital table.",
+      "aliases": []
+    },
+    "cipher.trifid": {
+      "display_name": "Trifid cipher",
+      "summary": "Mix three-dimensional letter coordinates to encode or decode text.",
+      "aliases": [
+        "Trifid"
+      ]
+    },
+    "cipher.trithemius": {
+      "display_name": "Trithemius cipher",
+      "summary": "Encode or decode letters with a progressively changing shift.",
+      "aliases": [
+        "Trithemius"
+      ]
+    },
+    "cipher.two_square": {
+      "display_name": "Two-square cipher",
+      "summary": "Encode or decode pairs of letters using two keyed alphabet squares.",
+      "aliases": [
+        "Two-square"
+      ]
+    },
+    "json.text": {
+      "display_name": "Read a JSON string as text",
+      "summary": "Use a JSON string as text without converting numbers or other value types.",
+      "aliases": [
+        "Use text value"
+      ]
+    },
+    "text.utf8": {
+      "display_name": "UTF-8 text and bytes",
+      "summary": "Convert text to UTF-8 bytes, or decode valid UTF-8 bytes as text.",
+      "aliases": [
+        "UTF-8"
+      ]
+    },
+    "pipeline.validate": {
+      "display_name": "Check a pipeline",
+      "summary": "Check operation versions, settings and connected value types without running the pipeline.",
+      "aliases": [
+        "Validate a pipeline"
+      ]
+    },
+    "blockchain.scalar.validate": {
+      "display_name": "Check a raw private key",
+      "summary": "Check whether raw bytes or hexadecimal represent a valid secp256k1 private key.",
+      "aliases": [
+        "Validate a private scalar"
+      ]
+    },
+    "recipe.validate": {
+      "display_name": "Check a recipe",
+      "summary": "Check the recipe format, versions and steps without running its operations.",
+      "aliases": [
+        "Validate a recipe"
+      ]
+    },
+    "blockchain.wif.validate": {
+      "display_name": "Check a WIF private key",
+      "summary": "Check the checksum, format and network information of a supplied WIF key.",
+      "aliases": [
+        "Validate a WIF key"
+      ]
+    },
+    "text.word_ladder.validate": {
+      "display_name": "Check a word ladder",
+      "summary": "Check that each step changes one character and all words belong to your dictionary.",
+      "aliases": [
+        "Validate a word ladder"
+      ]
+    },
+    "file.zip.validate": {
+      "display_name": "Check a ZIP candidate",
+      "summary": "Check whether supplied data satisfies the supported ZIP validation rules.",
+      "aliases": [
+        "Validate a ZIP candidate"
+      ]
+    },
+    "blockchain.candidates.validate": {
+      "display_name": "Check private key candidates",
+      "summary": "Validate a supplied list of private key candidates without generating keys or making network requests.",
+      "aliases": [
+        "Validate supplied key candidates"
+      ]
+    },
+    "cipher.vigenere": {
+      "display_name": "Vigenère cipher",
+      "summary": "Shift letters using a repeating keyword, or reverse those shifts to decode a message.",
+      "aliases": [
+        "Vigenère"
+      ]
+    },
+    "cipher.vigenere_multiplicative": {
+      "display_name": "Multiplicative Vigenère",
+      "summary": "Encode or decode letters using a repeating sequence of multiplicative key values.",
+      "aliases": [
+        "Vigenère–Multiplicative"
+      ]
+    },
+    "binary.xor_exact": {
+      "display_name": "XOR two byte sequences",
+      "summary": "Combine two equal-length byte sequences using XOR without repeating either input.",
+      "aliases": [
+        "XOR equal-length bytes"
+      ]
+    },
+    "binary.xor": {
+      "display_name": "XOR with a repeating key",
+      "summary": "Combine bytes with a repeating key using XOR; this is not secure encryption.",
+      "aliases": []
+    }
+  },
+  "operations": {
+    "cipher.book.decode": {
+      "tool_id": "cipher.book",
+      "display_name": "Decode book coordinates",
+      "summary": "Encode a message as positions in a reference text, or decode those positions using the same text.",
+      "aliases": [
+        "Decode with a book cipher"
+      ]
+    },
+    "cipher.book.encode": {
+      "tool_id": "cipher.book",
+      "display_name": "Encode book coordinates",
+      "summary": "Encode a message as positions in a reference text, or decode those positions using the same text.",
+      "aliases": [
+        "Encode with a book cipher"
+      ]
+    },
+    "cipher.caesar_box.decode": {
+      "tool_id": "cipher.caesar_box",
+      "display_name": "Decode Caesar Box",
+      "summary": "Rearrange text through a rectangular grid, or restore its original order.",
+      "aliases": [
+        "Decode with a Caesar box"
+      ]
+    },
+    "cipher.caesar_box.encode": {
+      "tool_id": "cipher.caesar_box",
+      "display_name": "Encode Caesar Box",
+      "summary": "Rearrange text through a rectangular grid, or restore its original order.",
+      "aliases": [
+        "Encode with a Caesar box"
+      ]
+    },
+    "cipher.rail_fence.decode": {
+      "tool_id": "cipher.rail_fence",
+      "display_name": "Decode Rail Fence cipher",
+      "summary": "Arrange letters in zigzag rows to encode a message, or restore the letters to their original order.",
+      "aliases": [
+        "Decode with a rail fence"
+      ]
+    },
+    "cipher.rail_fence.encode": {
+      "tool_id": "cipher.rail_fence",
+      "display_name": "Encode Rail Fence cipher",
+      "summary": "Arrange letters in zigzag rows to encode a message, or restore the letters to their original order.",
+      "aliases": [
+        "Encode with a rail fence"
+      ]
+    },
+    "cipher.running_key.decode": {
+      "tool_id": "cipher.running_key",
+      "display_name": "Decode Running-key cipher",
+      "summary": "Encode or decode a message using a reference key text at least as long as the required letters.",
+      "aliases": [
+        "Decode with a running key"
+      ]
+    },
+    "cipher.running_key.encode": {
+      "tool_id": "cipher.running_key",
+      "display_name": "Encode Running-key cipher",
+      "summary": "Encode or decode a message using a reference key text at least as long as the required letters.",
+      "aliases": [
+        "Encode with a running key"
+      ]
+    },
+    "cipher.straddling.decode": {
+      "tool_id": "cipher.straddling",
+      "display_name": "Decode Straddling checkerboard",
+      "summary": "Convert letters to digit codes using your checkerboard, or decode the digit sequence.",
+      "aliases": [
+        "Decode with a straddling checkerboard"
+      ]
+    },
+    "cipher.straddling.encode": {
+      "tool_id": "cipher.straddling",
+      "display_name": "Encode Straddling checkerboard",
+      "summary": "Convert letters to digit codes using your checkerboard, or decode the digit sequence.",
+      "aliases": [
+        "Encode with a straddling checkerboard"
+      ]
+    },
+    "cipher.turning_grille.decode": {
+      "tool_id": "cipher.turning_grille",
+      "display_name": "Decode Turning grille",
+      "summary": "Read or place letters through a grille mask as it turns across a grid.",
+      "aliases": [
+        "Decode with a turning grille"
+      ]
+    },
+    "cipher.turning_grille.encode": {
+      "tool_id": "cipher.turning_grille",
+      "display_name": "Encode Turning grille",
+      "summary": "Read or place letters through a grille mask as it turns across a grid.",
+      "aliases": [
+        "Encode with a turning grille"
+      ]
+    },
+    "symbol.a1z26.decode": {
+      "tool_id": "symbol.a1z26",
+      "display_name": "Decode A1Z26",
+      "summary": "Convert letters to their alphabet positions, from A=1 to Z=26, or decode those numbers.",
+      "aliases": []
+    },
+    "symbol.a1z26.encode": {
+      "tool_id": "symbol.a1z26",
+      "display_name": "Encode A1Z26",
+      "summary": "Convert letters to their alphabet positions, from A=1 to Z=26, or decode those numbers.",
+      "aliases": []
+    },
+    "number.add": {
+      "tool_id": "number.add",
+      "display_name": "Add two integers",
+      "summary": "Add two exact signed integers without converting or rounding the values.",
+      "aliases": [
+        "Add"
+      ]
+    },
+    "binary.add_wrapping": {
+      "tool_id": "binary.add_wrapping",
+      "display_name": "Add byte values",
+      "summary": "Add pairs of unsigned values and wrap results to the selected byte width.",
+      "aliases": [
+        "Add with wrapping"
+      ]
+    },
+    "cipher.adfgvx.decode": {
+      "tool_id": "cipher.adfgvx",
+      "display_name": "Decode ADFGVX",
+      "summary": "Encode or decode letters and digits using a keyed grid and column rearrangement.",
+      "aliases": [
+        "Decode with ADFGVX"
+      ]
+    },
+    "cipher.adfgvx.encode": {
+      "tool_id": "cipher.adfgvx",
+      "display_name": "Encode ADFGVX",
+      "summary": "Encode or decode letters and digits using a keyed grid and column rearrangement.",
+      "aliases": [
+        "Encode with ADFGVX"
+      ]
+    },
+    "cipher.adfgx.decode": {
+      "tool_id": "cipher.adfgx",
+      "display_name": "Decode ADFGX",
+      "summary": "Encode or decode letters using a keyed grid and column rearrangement.",
+      "aliases": [
+        "Decode with ADFGX"
+      ]
+    },
+    "cipher.adfgx.encode": {
+      "tool_id": "cipher.adfgx",
+      "display_name": "Encode ADFGX",
+      "summary": "Encode or decode letters using a keyed grid and column rearrangement.",
+      "aliases": [
+        "Encode with ADFGX"
+      ]
+    },
+    "cipher.affine.decode": {
+      "tool_id": "cipher.affine",
+      "display_name": "Decode Affine cipher",
+      "summary": "Transform letters using a multiplication and shift key, or reverse that transformation.",
+      "aliases": [
+        "Decode with Affine"
+      ]
+    },
+    "cipher.affine.encode": {
+      "tool_id": "cipher.affine",
+      "display_name": "Encode Affine cipher",
+      "summary": "Transform letters using a multiplication and shift key, or reverse that transformation.",
+      "aliases": [
+        "Encode with Affine"
+      ]
+    },
+    "cipher.amsco.decode": {
+      "tool_id": "cipher.amsco",
+      "display_name": "Decode AMSCO",
+      "summary": "Rearrange alternating groups of letters using a column key, or restore their order.",
+      "aliases": [
+        "Decode with AMSCO"
+      ]
+    },
+    "cipher.amsco.encode": {
+      "tool_id": "cipher.amsco",
+      "display_name": "Encode AMSCO",
+      "summary": "Rearrange alternating groups of letters using a column key, or restore their order.",
+      "aliases": [
+        "Encode with AMSCO"
+      ]
+    },
+    "image.decode": {
+      "tool_id": "image.decode",
+      "display_name": "Read image pixels",
+      "summary": "Read pixel data from a supported image file for further inspection or transformation.",
+      "aliases": [
+        "Decode an image"
+      ]
+    },
+    "image.encode": {
+      "tool_id": "image.encode",
+      "display_name": "Save as PNG",
+      "summary": "Turn image pixel data into a PNG file.",
+      "aliases": [
+        "Encode a PNG image"
+      ]
+    },
+    "logic.boolean.analyze": {
+      "tool_id": "logic.boolean.analyze",
+      "display_name": "Analyze a truth table",
+      "summary": "Evaluate all supported variable combinations and compare Boolean expressions when requested.",
+      "aliases": []
+    },
+    "probability.finite.analyze": {
+      "tool_id": "probability.finite.analyze",
+      "display_name": "Calculate finite probabilities",
+      "summary": "Analyze supplied outcomes and weights, including events, conditional probabilities and expectations.",
+      "aliases": [
+        "Analyze finite probabilities"
+      ]
+    },
+    "cipher.atbash": {
+      "tool_id": "cipher.atbash",
+      "display_name": "Atbash",
+      "summary": "Replace each letter with its opposite in the alphabet: A with Z, B with Y, and so on.",
+      "aliases": [
+        "Apply Atbash"
+      ]
+    },
+    "cipher.beaufort": {
+      "tool_id": "cipher.beaufort",
+      "display_name": "Beaufort",
+      "summary": "Apply the reciprocal Beaufort letter substitution using a repeating key.",
+      "aliases": [
+        "Apply Beaufort"
+      ]
+    },
+    "binary.and": {
+      "tool_id": "binary.and",
+      "display_name": "Bitwise AND",
+      "summary": "Keep bits that are set in both equal-length byte sequences.",
+      "aliases": [
+        "Apply bitwise AND"
+      ]
+    },
+    "binary.or": {
+      "tool_id": "binary.or",
+      "display_name": "Bitwise OR",
+      "summary": "Keep bits that are set in either of two equal-length byte sequences.",
+      "aliases": [
+        "Apply bitwise OR"
+      ]
+    },
+    "cipher.chacha12": {
+      "tool_id": "cipher.chacha12",
+      "display_name": "ChaCha12",
+      "summary": "Apply the ChaCha12 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply ChaCha12"
+      ]
+    },
+    "cipher.chacha20": {
+      "tool_id": "cipher.chacha20",
+      "display_name": "ChaCha20",
+      "summary": "Apply the ChaCha20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply ChaCha20"
+      ]
+    },
+    "cipher.chacha8": {
+      "tool_id": "cipher.chacha8",
+      "display_name": "ChaCha8",
+      "summary": "Apply the ChaCha8 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply ChaCha8"
+      ]
+    },
+    "cipher.vernam": {
+      "tool_id": "cipher.vernam",
+      "display_name": "Vernam cipher",
+      "summary": "Combine text with the supplied key using this educational Vernam cipher profile.",
+      "aliases": [
+        "Apply educational Vernam"
+      ]
+    },
+    "cipher.porta": {
+      "tool_id": "cipher.porta",
+      "display_name": "Porta",
+      "summary": "Transform letters using the Porta cipher and a repeating keyword.",
+      "aliases": [
+        "Apply Porta"
+      ]
+    },
+    "cipher.portax": {
+      "tool_id": "cipher.portax",
+      "display_name": "Portax",
+      "summary": "Transform pairs of letters using the Portax cipher and your key settings.",
+      "aliases": [
+        "Apply Portax"
+      ]
+    },
+    "cipher.rot13": {
+      "tool_id": "cipher.rot13",
+      "display_name": "ROT13",
+      "summary": "Rotate English letters by 13 places; applying it again restores the original text.",
+      "aliases": [
+        "Apply ROT13"
+      ]
+    },
+    "cipher.rot18": {
+      "tool_id": "cipher.rot18",
+      "display_name": "ROT18",
+      "summary": "Apply ROT13 to English letters and ROT5 to digits.",
+      "aliases": [
+        "Apply ROT18"
+      ]
+    },
+    "cipher.rot47": {
+      "tool_id": "cipher.rot47",
+      "display_name": "ROT47",
+      "summary": "Rotate printable ASCII characters by 47 places.",
+      "aliases": [
+        "Apply ROT47"
+      ]
+    },
+    "cipher.rot5": {
+      "tool_id": "cipher.rot5",
+      "display_name": "ROT5",
+      "summary": "Rotate digits by five places while leaving other characters unchanged.",
+      "aliases": [
+        "Apply ROT5"
+      ]
+    },
+    "cipher.salsa20_12": {
+      "tool_id": "cipher.salsa20_12",
+      "display_name": "Salsa20/12",
+      "summary": "Apply the 12-round Salsa20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply Salsa20/12"
+      ]
+    },
+    "cipher.salsa20": {
+      "tool_id": "cipher.salsa20",
+      "display_name": "Salsa20/20",
+      "summary": "Apply the 20-round Salsa20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply Salsa20/20"
+      ]
+    },
+    "cipher.xchacha20": {
+      "tool_id": "cipher.xchacha20",
+      "display_name": "XChaCha20",
+      "summary": "Apply the XChaCha20 byte transformation using your key, nonce and counter.",
+      "aliases": [
+        "Apply XChaCha20"
+      ]
+    },
+    "cipher.autokey.decode": {
+      "tool_id": "cipher.autokey",
+      "display_name": "Decode Autokey cipher",
+      "summary": "Encode or decode text with a key that grows from the message or ciphertext.",
+      "aliases": [
+        "Decode with Autokey"
+      ]
+    },
+    "cipher.autokey.encode": {
+      "tool_id": "cipher.autokey",
+      "display_name": "Encode Autokey cipher",
+      "summary": "Encode or decode text with a key that grows from the message or ciphertext.",
+      "aliases": [
+        "Encode with Autokey"
+      ]
+    },
+    "cipher.bacon.decode": {
+      "tool_id": "cipher.bacon",
+      "display_name": "Decode Bacon's cipher",
+      "summary": "Represent letters as groups of five symbols, or read those groups back as letters.",
+      "aliases": [
+        "Decode with Bacon"
+      ]
+    },
+    "cipher.bacon.encode": {
+      "tool_id": "cipher.bacon",
+      "display_name": "Encode Bacon's cipher",
+      "summary": "Represent letters as groups of five symbols, or read those groups back as letters.",
+      "aliases": [
+        "Encode with Bacon"
+      ]
+    },
+    "encoding.base32.decode": {
+      "tool_id": "encoding.base32",
+      "display_name": "Decode Base32",
+      "summary": "Encode bytes as Base32 text, or decode Base32 text back to bytes.",
+      "aliases": []
+    },
+    "encoding.base32.encode": {
+      "tool_id": "encoding.base32",
+      "display_name": "Encode Base32",
+      "summary": "Encode bytes as Base32 text, or decode Base32 text back to bytes.",
+      "aliases": []
+    },
+    "encoding.base58.decode": {
+      "tool_id": "encoding.base58",
+      "display_name": "Decode Base58",
+      "summary": "Encode bytes as Base58 text, or decode Base58 text back to bytes.",
+      "aliases": []
+    },
+    "encoding.base58.encode": {
+      "tool_id": "encoding.base58",
+      "display_name": "Encode Base58",
+      "summary": "Encode bytes as Base58 text, or decode Base58 text back to bytes.",
+      "aliases": []
+    },
+    "encoding.base58check.decode": {
+      "tool_id": "encoding.base58check",
+      "display_name": "Decode Base58Check",
+      "summary": "Encode bytes with a Base58Check checksum, or decode and verify a Base58Check value.",
+      "aliases": []
+    },
+    "encoding.base58check.encode": {
+      "tool_id": "encoding.base58check",
+      "display_name": "Encode Base58Check",
+      "summary": "Encode bytes with a Base58Check checksum, or decode and verify a Base58Check value.",
+      "aliases": []
+    },
+    "encoding.base64.decode": {
+      "tool_id": "encoding.base64",
+      "display_name": "Decode Base64",
+      "summary": "Encode bytes as Base64 text, or decode a Base64 message back to bytes.",
+      "aliases": []
+    },
+    "encoding.base64.encode": {
+      "tool_id": "encoding.base64",
+      "display_name": "Encode Base64",
+      "summary": "Encode bytes as Base64 text, or decode a Base64 message back to bytes.",
+      "aliases": []
+    },
+    "cipher.bazeries.decode": {
+      "tool_id": "cipher.bazeries",
+      "display_name": "Decode Bazeries cipher",
+      "summary": "Encode or decode text using the Bazeries grid, grouping and number key.",
+      "aliases": [
+        "Decode with Bazeries"
+      ]
+    },
+    "cipher.bazeries.encode": {
+      "tool_id": "cipher.bazeries",
+      "display_name": "Encode Bazeries cipher",
+      "summary": "Encode or decode text using the Bazeries grid, grouping and number key.",
+      "aliases": [
+        "Encode with Bazeries"
+      ]
+    },
+    "cipher.bifid.decode": {
+      "tool_id": "cipher.bifid",
+      "display_name": "Decode Bifid cipher",
+      "summary": "Mix letter coordinates from a Polybius grid to encode or decode text.",
+      "aliases": [
+        "Decode with Bifid"
+      ]
+    },
+    "cipher.bifid.encode": {
+      "tool_id": "cipher.bifid",
+      "display_name": "Encode Bifid cipher",
+      "summary": "Mix letter coordinates from a Polybius grid to encode or decode text.",
+      "aliases": [
+        "Encode with Bifid"
+      ]
+    },
+    "symbol.braille.decode": {
+      "tool_id": "symbol.braille",
+      "display_name": "Decode Braille dot masks",
+      "summary": "Convert bytes to Unicode Braille dot patterns or read their dot masks; this does not translate Braille language.",
+      "aliases": []
+    },
+    "symbol.braille.encode": {
+      "tool_id": "symbol.braille",
+      "display_name": "Encode Braille dot masks",
+      "summary": "Convert bytes to Unicode Braille dot patterns or read their dot masks; this does not translate Braille language.",
+      "aliases": []
+    },
+    "cipher.caesar.decode": {
+      "tool_id": "cipher.caesar",
+      "display_name": "Decode Caesar cipher",
+      "summary": "Shift letters by a chosen number of places, or reverse the shift.",
+      "aliases": [
+        "Decode with Caesar"
+      ]
+    },
+    "cipher.caesar.encode": {
+      "tool_id": "cipher.caesar",
+      "display_name": "Encode Caesar cipher",
+      "summary": "Shift letters by a chosen number of places, or reverse the shift.",
+      "aliases": [
+        "Encode with Caesar"
+      ]
+    },
+    "cipher.chaocipher.decode": {
+      "tool_id": "cipher.chaocipher",
+      "display_name": "Decode Chaocipher",
+      "summary": "Encode or decode a message using two alphabets that change after each letter.",
+      "aliases": [
+        "Decode with Chaocipher"
+      ]
+    },
+    "cipher.chaocipher.encode": {
+      "tool_id": "cipher.chaocipher",
+      "display_name": "Encode Chaocipher",
+      "summary": "Encode or decode a message using two alphabets that change after each letter.",
+      "aliases": [
+        "Encode with Chaocipher"
+      ]
+    },
+    "recipe.check": {
+      "tool_id": "recipe.check",
+      "display_name": "Check a recipe result",
+      "summary": "Run a recipe and compare its result with the exact typed expected value you supply.",
+      "aliases": []
+    },
+    "analysis.crib.verify": {
+      "tool_id": "analysis.crib.verify",
+      "display_name": "Check a known text fragment",
+      "summary": "Check whether an expected text fragment matches a candidate message.",
+      "aliases": [
+        "Check known plaintext"
+      ]
+    },
+    "cipher.columnar.decode": {
+      "tool_id": "cipher.columnar",
+      "display_name": "Decode Columnar transposition",
+      "summary": "Rearrange text by reading keyed columns, or restore the original order.",
+      "aliases": [
+        "Decode with columnar transposition"
+      ]
+    },
+    "cipher.columnar.encode": {
+      "tool_id": "cipher.columnar",
+      "display_name": "Encode Columnar transposition",
+      "summary": "Rearrange text by reading keyed columns, or restore the original order.",
+      "aliases": [
+        "Encode with columnar transposition"
+      ]
+    },
+    "image.bitwise": {
+      "tool_id": "image.bitwise",
+      "display_name": "Combine image pixels",
+      "summary": "Combine matching image samples with XOR, AND or OR.",
+      "aliases": [
+        "Combine images with bitwise operations"
+      ]
+    },
+    "image.pairs": {
+      "tool_id": "image.pairs",
+      "display_name": "Compare pairs of images",
+      "summary": "Compare or combine supplied image pairs and retain a separate result for each pair.",
+      "aliases": [
+        "Compare and combine image pairs"
+      ]
+    },
+    "esolang.brainfuck.compare": {
+      "tool_id": "esolang.brainfuck.compare",
+      "display_name": "Compare Brainfuck cell widths",
+      "summary": "Run a Brainfuck program with selected cell widths and compare its outcomes.",
+      "aliases": [
+        "Compare Brainfuck runs"
+      ]
+    },
+    "text.multiset.compare": {
+      "tool_id": "text.multiset.compare",
+      "display_name": "Compare character counts",
+      "summary": "Compare which characters occur in two texts and how many of each are present.",
+      "aliases": [
+        "Compare character inventories"
+      ]
+    },
+    "probability.dice.compare": {
+      "tool_id": "probability.dice.compare",
+      "display_name": "Compare dice rolls",
+      "summary": "Calculate exact win, tie and loss probabilities for two independent dice totals.",
+      "aliases": [
+        "Compare dice outcomes"
+      ]
+    },
+    "file.binary.compare": {
+      "tool_id": "file.binary.compare",
+      "display_name": "Compare file bytes",
+      "summary": "Compare file data byte by byte and report differences.",
+      "aliases": []
+    },
+    "image.compare": {
+      "tool_id": "image.compare",
+      "display_name": "Compare image pixels",
+      "summary": "Compare exact image samples and report differences, with an optional difference mask.",
+      "aliases": [
+        "Compare image samples"
+      ]
+    },
+    "analysis.frequency.compare": {
+      "tool_id": "analysis.frequency.compare",
+      "display_name": "Compare letter frequencies",
+      "summary": "Compare symbol counts with a reference frequency table you supply.",
+      "aliases": [
+        "Compare symbol frequencies"
+      ]
+    },
+    "text.unicode.compare": {
+      "tool_id": "text.unicode.compare",
+      "display_name": "Compare Unicode text",
+      "summary": "Compare exact characters and optionally inspect a separately labeled normalized view.",
+      "aliases": []
+    },
+    "video.frames.compare": {
+      "tool_id": "video.frames.compare",
+      "display_name": "Compare video frames",
+      "summary": "Compare selected supported video frames by their exact decoded pixel values.",
+      "aliases": []
+    },
+    "cipher.complete_columnar.decode": {
+      "tool_id": "cipher.complete_columnar",
+      "display_name": "Decode Complete columnar transposition",
+      "summary": "Encode or decode a transposition arranged into complete keyed columns.",
+      "aliases": [
+        "Decode with complete columnar transposition"
+      ]
+    },
+    "cipher.complete_columnar.encode": {
+      "tool_id": "cipher.complete_columnar",
+      "display_name": "Encode Complete columnar transposition",
+      "summary": "Encode or decode a transposition arranged into complete keyed columns.",
+      "aliases": [
+        "Encode with complete columnar transposition"
+      ]
+    },
+    "number.binomial": {
+      "tool_id": "number.binomial",
+      "display_name": "Count combinations",
+      "summary": "Calculate how many ways you can choose k items from n without regard to order.",
+      "aliases": [
+        "Compute a binomial coefficient"
+      ]
+    },
+    "probability.dice.sum": {
+      "tool_id": "probability.dice.sum",
+      "display_name": "Calculate dice-total probabilities",
+      "summary": "Calculate the exact distribution of totals for the weighted dice you supply.",
+      "aliases": [
+        "Compute a dice-sum distribution"
+      ]
+    },
+    "number.digital_root": {
+      "tool_id": "number.digital_root",
+      "display_name": "Calculate a digital root",
+      "summary": "Repeatedly add decimal digits until one digit remains.",
+      "aliases": [
+        "Compute a digital root"
+      ]
+    },
+    "number.gcd": {
+      "tool_id": "number.gcd",
+      "display_name": "Find the greatest common divisor",
+      "summary": "Find the largest positive divisor shared by two whole numbers, with explicit handling of zero.",
+      "aliases": [
+        "Compute a greatest common divisor"
+      ]
+    },
+    "number.mod_inverse": {
+      "tool_id": "number.mod_inverse",
+      "display_name": "Find a modular inverse",
+      "summary": "Find a value that multiplies your number to one under the selected modulus, when it exists.",
+      "aliases": [
+        "Compute a modular inverse"
+      ]
+    },
+    "number.mod_pow": {
+      "tool_id": "number.mod_pow",
+      "display_name": "Calculate a modular power",
+      "summary": "Raise an integer to a power and return its remainder under the selected modulus.",
+      "aliases": [
+        "Compute a modular power"
+      ]
+    },
+    "number.multinomial": {
+      "tool_id": "number.multinomial",
+      "display_name": "Count grouped arrangements",
+      "summary": "Count distinct arrangements of items divided into the supplied groups.",
+      "aliases": [
+        "Compute a multinomial coefficient"
+      ]
+    },
+    "number.extended_gcd": {
+      "tool_id": "number.extended_gcd",
+      "display_name": "Find Bézout coefficients",
+      "summary": "Find integer coefficients that express the greatest common divisor of two numbers.",
+      "aliases": [
+        "Compute Bézout coefficients"
+      ]
+    },
+    "hash.crc16_ibm3740": {
+      "tool_id": "hash.crc16_ibm3740",
+      "display_name": "CRC-16/IBM-3740",
+      "summary": "Calculate a CRC-16/IBM-3740 checksum for the supplied bytes.",
+      "aliases": [
+        "Compute CRC-16/IBM-3740"
+      ]
+    },
+    "hash.crc32": {
+      "tool_id": "hash.crc32",
+      "display_name": "CRC-32",
+      "summary": "Calculate a CRC-32 checksum for the supplied bytes.",
+      "aliases": [
+        "Compute CRC-32"
+      ]
+    },
+    "hash.crc32c": {
+      "tool_id": "hash.crc32c",
+      "display_name": "CRC-32C",
+      "summary": "Calculate a CRC-32C checksum for the supplied bytes.",
+      "aliases": [
+        "Compute CRC-32C"
+      ]
+    },
+    "hash.keccak256": {
+      "tool_id": "hash.keccak256",
+      "display_name": "Keccak-256",
+      "summary": "Calculate the Keccak-256 fingerprint of the supplied bytes; this is distinct from SHA3-256.",
+      "aliases": [
+        "Compute Keccak-256"
+      ]
+    },
+    "hash.md5": {
+      "tool_id": "hash.md5",
+      "display_name": "MD5",
+      "summary": "Calculate an MD5 fingerprint for compatibility checks; MD5 is not suitable for secure authentication.",
+      "aliases": [
+        "Compute MD5"
+      ]
+    },
+    "hash.ripemd160": {
+      "tool_id": "hash.ripemd160",
+      "display_name": "RIPEMD-160",
+      "summary": "Calculate the RIPEMD-160 fingerprint of the supplied bytes.",
+      "aliases": [
+        "Compute RIPEMD-160"
+      ]
+    },
+    "hash.sha1": {
+      "tool_id": "hash.sha1",
+      "display_name": "SHA-1",
+      "summary": "Calculate a legacy SHA-1 fingerprint; it is not suitable for collision-resistant security.",
+      "aliases": [
+        "Compute SHA-1"
+      ]
+    },
+    "hash.sha256": {
+      "tool_id": "hash.sha256",
+      "display_name": "SHA-256",
+      "summary": "Calculate the SHA-256 fingerprint of the supplied bytes.",
+      "aliases": [
+        "Compute SHA-256"
+      ]
+    },
+    "hash.sha512": {
+      "tool_id": "hash.sha512",
+      "display_name": "SHA-512",
+      "summary": "Calculate the SHA-512 fingerprint of the supplied bytes.",
+      "aliases": [
+        "Compute SHA-512"
+      ]
+    },
+    "text.word.values": {
+      "tool_id": "text.word.values",
+      "display_name": "Calculate word values",
+      "summary": "Calculate values for words using the character-value table and settings you choose.",
+      "aliases": [
+        "Compute word values"
+      ]
+    },
+    "bytes.concat": {
+      "tool_id": "bytes.concat",
+      "display_name": "Join byte sequences",
+      "summary": "Append one byte sequence to another without converting either to text.",
+      "aliases": [
+        "Concatenate bytes"
+      ]
+    },
+    "text.concat": {
+      "tool_id": "text.concat",
+      "display_name": "Join text",
+      "summary": "Join two text values with an optional separator while preserving their characters and line endings.",
+      "aliases": [
+        "Concatenate text"
+      ]
+    },
+    "cipher.condi.decode": {
+      "tool_id": "cipher.condi",
+      "display_name": "Decode Condi cipher",
+      "summary": "Encode or decode letters using a keyed alphabet and a shift that changes with the message.",
+      "aliases": [
+        "Decode with Condi"
+      ]
+    },
+    "cipher.condi.encode": {
+      "tool_id": "cipher.condi",
+      "display_name": "Encode Condi cipher",
+      "summary": "Encode or decode letters using a keyed alphabet and a shift that changes with the message.",
+      "aliases": [
+        "Encode with Condi"
+      ]
+    },
+    "number.alphabet.convert": {
+      "tool_id": "number.alphabet.convert",
+      "display_name": "Convert a custom number alphabet",
+      "summary": "Convert integer values between the digit alphabets and bases you choose.",
+      "aliases": [
+        "Convert a custom digit alphabet"
+      ]
+    },
+    "number.base.convert": {
+      "tool_id": "number.base.convert",
+      "display_name": "Convert number base",
+      "summary": "Convert a whole number between bases 2 through 36.",
+      "aliases": [
+        "Convert a number base"
+      ]
+    },
+    "image.grayscale": {
+      "tool_id": "image.grayscale",
+      "display_name": "Convert to grayscale",
+      "summary": "Reduce color pixels to grayscale while preserving their alpha channel.",
+      "aliases": []
+    },
+    "image.histogram": {
+      "tool_id": "image.histogram",
+      "display_name": "Count image colors",
+      "summary": "Count exact colors or selected channel combinations in an image.",
+      "aliases": []
+    },
+    "number.permutations": {
+      "tool_id": "number.permutations",
+      "display_name": "Count ordered selections",
+      "summary": "Calculate how many ordered selections of k items can be made from n items.",
+      "aliases": [
+        "Count permutations"
+      ]
+    },
+    "audio.spectrogram": {
+      "tool_id": "audio.spectrogram",
+      "display_name": "Calculate a spectrogram",
+      "summary": "Measure how audio frequencies change over successive time windows.",
+      "aliases": [
+        "Create a spectrogram"
+      ]
+    },
+    "image.crop": {
+      "tool_id": "image.crop",
+      "display_name": "Crop an image",
+      "summary": "Keep a rectangular region of pixels without resizing it.",
+      "aliases": []
+    },
+    "symbol.tokens.decode": {
+      "tool_id": "symbol.tokens",
+      "display_name": "Decode custom symbols",
+      "summary": "Convert text using your explicit symbol table, or decode its tokens with the same table.",
+      "aliases": []
+    },
+    "symbol.tokens.encode": {
+      "tool_id": "symbol.tokens",
+      "display_name": "Encode custom symbols",
+      "summary": "Convert text using your explicit symbol table, or decode its tokens with the same table.",
+      "aliases": []
+    },
+    "image.qr.decode": {
+      "tool_id": "image.qr.decode",
+      "display_name": "Read QR codes",
+      "summary": "Find supported QR codes in image data and return their payload bytes.",
+      "aliases": [
+        "Decode QR codes"
+      ]
+    },
+    "cipher.aes.decrypt_blocks": {
+      "tool_id": "cipher.aes.decrypt_blocks",
+      "display_name": "Decrypt AES blocks",
+      "summary": "Decrypt complete AES blocks with a supplied key; padding and message authentication are not included.",
+      "aliases": [
+        "Decrypt raw AES blocks"
+      ]
+    },
+    "blockchain.bitcoin.derive": {
+      "tool_id": "blockchain.bitcoin.derive",
+      "display_name": "Derive a Bitcoin address",
+      "summary": "Calculate a public Bitcoin address from a supplied private key, entirely offline.",
+      "aliases": []
+    },
+    "blockchain.ethereum.derive": {
+      "tool_id": "blockchain.ethereum.derive",
+      "display_name": "Derive an Ethereum address",
+      "summary": "Calculate a public Ethereum address from a supplied private key, entirely offline.",
+      "aliases": []
+    },
+    "graph.cycle": {
+      "tool_id": "graph.cycle",
+      "display_name": "Find a graph cycle",
+      "summary": "Check whether the supplied graph contains a cycle and report the result.",
+      "aliases": [
+        "Detect a graph cycle"
+      ]
+    },
+    "audio.dtmf.detect": {
+      "tool_id": "audio.dtmf.detect",
+      "display_name": "Find telephone keypad tones",
+      "summary": "Find candidate DTMF tones and their timing in audio, with uncertainty reported.",
+      "aliases": [
+        "Detect DTMF tones"
+      ]
+    },
+    "audio.morse.detect": {
+      "tool_id": "audio.morse.detect",
+      "display_name": "Find Morse tone timings",
+      "summary": "Find tone and silence intervals at a frequency you choose; this step does not decode letters.",
+      "aliases": [
+        "Detect Morse timing"
+      ]
+    },
+    "cipher.digrafid.decode": {
+      "tool_id": "cipher.digrafid",
+      "display_name": "Decode Digrafid",
+      "summary": "Encode or decode pairs of symbols using two keyed grids and a chosen period.",
+      "aliases": [
+        "Decode with Digrafid"
+      ]
+    },
+    "cipher.digrafid.encode": {
+      "tool_id": "cipher.digrafid",
+      "display_name": "Encode Digrafid",
+      "summary": "Encode or decode pairs of symbols using two keyed grids and a chosen period.",
+      "aliases": [
+        "Encode with Digrafid"
+      ]
+    },
+    "cipher.double_columnar.decode": {
+      "tool_id": "cipher.double_columnar",
+      "display_name": "Decode Double columnar transposition",
+      "summary": "Apply two keyed column rearrangements, or reverse them to recover text.",
+      "aliases": [
+        "Decode with double columnar transposition"
+      ]
+    },
+    "cipher.double_columnar.encode": {
+      "tool_id": "cipher.double_columnar",
+      "display_name": "Encode Double columnar transposition",
+      "summary": "Apply two keyed column rearrangements, or reverse them to recover text.",
+      "aliases": [
+        "Encode with double columnar transposition"
+      ]
+    },
+    "cipher.aes.encrypt_blocks": {
+      "tool_id": "cipher.aes.encrypt_blocks",
+      "display_name": "Encrypt AES blocks",
+      "summary": "Encrypt complete AES blocks with a supplied key; padding and message authentication are not included.",
+      "aliases": [
+        "Encrypt raw AES blocks"
+      ]
+    },
+    "analysis.period.estimate": {
+      "tool_id": "analysis.period.estimate",
+      "display_name": "Estimate a repeating key length",
+      "summary": "Compare evidence for possible key lengths in a repeating-key cipher.",
+      "aliases": [
+        "Estimate repeating-key periods"
+      ]
+    },
+    "logic.boolean.evaluate": {
+      "tool_id": "logic.boolean.evaluate",
+      "display_name": "Evaluate a Boolean expression",
+      "summary": "Calculate the result of a Boolean expression for the named variable values you supply.",
+      "aliases": []
+    },
+    "image.palette.expand": {
+      "tool_id": "image.palette.expand",
+      "display_name": "Expand PNG palette colors",
+      "summary": "Replace palette indexes with their corresponding RGBA pixel values.",
+      "aliases": [
+        "Expand a PNG palette"
+      ]
+    },
+    "investigation.report": {
+      "tool_id": "investigation.report",
+      "display_name": "Export an investigation report",
+      "summary": "Create a report with explicit choices about included results and redacted information.",
+      "aliases": []
+    },
+    "image.colors.export": {
+      "tool_id": "image.colors.export",
+      "display_name": "Export color masks",
+      "summary": "Create separate PNG masks or layers for exact colors in an image.",
+      "aliases": [
+        "Export color masks and layers"
+      ]
+    },
+    "image.pixels.export": {
+      "tool_id": "image.pixels.export",
+      "display_name": "Export pixel values",
+      "summary": "Export selected pixel samples with their channel and position information.",
+      "aliases": [
+        "Export pixel samples"
+      ]
+    },
+    "image.csv.export": {
+      "tool_id": "image.csv.export",
+      "display_name": "Export pixels as CSV",
+      "summary": "Write image coordinates and sample values as a CSV table.",
+      "aliases": [
+        "Export pixels to CSV"
+      ]
+    },
+    "blockchain.private.export": {
+      "tool_id": "blockchain.private.export",
+      "display_name": "Convert private key format",
+      "summary": "Convert a private key between bytes, hexadecimal and WIF; the output contains secret key data.",
+      "aliases": [
+        "Export private key material"
+      ]
+    },
+    "file.range.extract": {
+      "tool_id": "file.range.extract",
+      "display_name": "Extract a byte range",
+      "summary": "Copy a selected range of bytes from file data.",
+      "aliases": []
+    },
+    "web.har.asset": {
+      "tool_id": "web.har.asset",
+      "display_name": "Extract a saved web response",
+      "summary": "Read an embedded response body from a saved HAR file without downloading it.",
+      "aliases": [
+        "Extract an embedded HAR body"
+      ]
+    },
+    "image.bit_plane.extract": {
+      "tool_id": "image.bit_plane.extract",
+      "display_name": "Extract an image bit plane",
+      "summary": "Read one bit position from image samples to inspect patterns that may be hidden in that plane.",
+      "aliases": []
+    },
+    "image.channel.extract": {
+      "tool_id": "image.channel.extract",
+      "display_name": "Extract a color channel",
+      "summary": "Read a selected image channel as sample bytes and, when requested, a grayscale PNG.",
+      "aliases": [
+        "Extract an image channel"
+      ]
+    },
+    "web.html.asset": {
+      "tool_id": "web.html.asset",
+      "display_name": "Extract embedded HTML data",
+      "summary": "Read an inline asset or supported data URL from supplied HTML without fetching external content.",
+      "aliases": [
+        "Extract an inline HTML asset"
+      ]
+    },
+    "audio.bits.extract": {
+      "tool_id": "audio.bits.extract",
+      "display_name": "Extract bits from audio",
+      "summary": "Read selected bits from audio samples in the channel and order you choose.",
+      "aliases": [
+        "Extract audio bits"
+      ]
+    },
+    "text.extract": {
+      "tool_id": "text.extract",
+      "display_name": "Extract characters by position",
+      "summary": "Read characters at selected positions in the order you specify.",
+      "aliases": [
+        "Extract character positions"
+      ]
+    },
+    "text.josephus.extract": {
+      "tool_id": "text.josephus.extract",
+      "display_name": "Read text by elimination",
+      "summary": "Select characters using repeated Josephus-style counting and removal.",
+      "aliases": [
+        "Extract in Josephus order"
+      ]
+    },
+    "video.frames.extract": {
+      "tool_id": "video.frames.extract",
+      "display_name": "Extract JPEG frames from MOV",
+      "summary": "Read explicitly selected baseline JPEG frames from a supported MOV file.",
+      "aliases": []
+    },
+    "image.lsb.extract": {
+      "tool_id": "image.lsb.extract",
+      "display_name": "Extract low-order image bits",
+      "summary": "Read selected low-order bits from image pixels as bytes using explicit ordering settings.",
+      "aliases": [
+        "Extract least-significant bits"
+      ]
+    },
+    "video.audio.extract": {
+      "tool_id": "video.audio.extract",
+      "display_name": "Extract audio from MOV",
+      "summary": "Copy a supported raw PCM audio track from MOV to WAV without changing its sample bytes.",
+      "aliases": [
+        "Extract PCM audio from MOV"
+      ]
+    },
+    "audio.pcm.extract": {
+      "tool_id": "audio.pcm.extract",
+      "display_name": "Extract audio samples",
+      "summary": "Read raw PCM sample bytes and values from selected audio channels and ranges.",
+      "aliases": [
+        "Extract PCM samples"
+      ]
+    },
+    "text.word.extract": {
+      "tool_id": "text.word.extract",
+      "display_name": "Read positions inside words",
+      "summary": "Extract selected characters from each word, including positions counted from the end.",
+      "aliases": [
+        "Extract positions within words"
+      ]
+    },
+    "file.strings.extract": {
+      "tool_id": "file.strings.extract",
+      "display_name": "Find text in a file",
+      "summary": "Extract readable ASCII text and its locations from file data.",
+      "aliases": [
+        "Extract printable strings"
+      ]
+    },
+    "cipher.cardan.extract": {
+      "tool_id": "cipher.cardan.extract",
+      "display_name": "Read through a Cardan grille",
+      "summary": "Read the characters visible through the positions selected by a grille mask.",
+      "aliases": [
+        "Extract through a Cardan grille"
+      ]
+    },
+    "graph.shortest_path": {
+      "tool_id": "graph.shortest_path",
+      "display_name": "Find a shortest path",
+      "summary": "Find a shortest path between two nodes in the supplied graph.",
+      "aliases": []
+    },
+    "text.word_ladder.shortest": {
+      "tool_id": "text.word_ladder.shortest",
+      "display_name": "Find a word ladder",
+      "summary": "Find a shortest chain of one-character substitutions using your dictionary.",
+      "aliases": [
+        "Find a shortest word ladder"
+      ]
+    },
+    "graph.euler_trail": {
+      "tool_id": "graph.euler_trail",
+      "display_name": "Find a route through every edge",
+      "summary": "Find an Euler trail that visits each graph edge once, when one exists.",
+      "aliases": [
+        "Find an Euler trail"
+      ]
+    },
+    "text.anagram.search": {
+      "tool_id": "text.anagram.search",
+      "display_name": "Find anagrams",
+      "summary": "Find matching anagrams using the dictionary you supply.",
+      "aliases": []
+    },
+    "file.appended.detect": {
+      "tool_id": "file.appended.detect",
+      "display_name": "Find data after a file",
+      "summary": "Look for extra data following a recognized file boundary.",
+      "aliases": [
+        "Find appended data"
+      ]
+    },
+    "graph.components": {
+      "tool_id": "graph.components",
+      "display_name": "Find connected groups",
+      "summary": "Find connected components in the graph you supply.",
+      "aliases": [
+        "Find connected components"
+      ]
+    },
+    "file.signature.scan": {
+      "tool_id": "file.signature.scan",
+      "display_name": "Find embedded file signatures",
+      "summary": "Search file data for signatures that may mark embedded files.",
+      "aliases": [
+        "Find embedded signatures"
+      ]
+    },
+    "text.grid.factors": {
+      "tool_id": "text.grid.factors",
+      "display_name": "Find possible text grids",
+      "summary": "List rectangle dimensions that fit the length of your text exactly.",
+      "aliases": []
+    },
+    "symbol.semaphore.decode": {
+      "tool_id": "symbol.semaphore",
+      "display_name": "Decode flag semaphore",
+      "summary": "Convert letters to pairs of flag directions, or read explicit direction pairs as letters.",
+      "aliases": []
+    },
+    "symbol.semaphore.encode": {
+      "tool_id": "symbol.semaphore",
+      "display_name": "Encode flag semaphore",
+      "summary": "Convert letters to pairs of flag directions, or read explicit direction pairs as letters.",
+      "aliases": []
+    },
+    "cipher.four_square.decode": {
+      "tool_id": "cipher.four_square",
+      "display_name": "Decode Four-square cipher",
+      "summary": "Encode or decode pairs of letters using four alphabet squares.",
+      "aliases": [
+        "Decode with Four-square"
+      ]
+    },
+    "cipher.four_square.encode": {
+      "tool_id": "cipher.four_square",
+      "display_name": "Encode Four-square cipher",
+      "summary": "Encode or decode pairs of letters using four alphabet squares.",
+      "aliases": [
+        "Encode with Four-square"
+      ]
+    },
+    "cipher.fractionated_morse.decode": {
+      "tool_id": "cipher.fractionated_morse",
+      "display_name": "Decode Fractionated Morse",
+      "summary": "Combine Morse patterns with a keyed alphabet to encode or decode a message.",
+      "aliases": [
+        "Decode with fractionated Morse"
+      ]
+    },
+    "cipher.fractionated_morse.encode": {
+      "tool_id": "cipher.fractionated_morse",
+      "display_name": "Encode Fractionated Morse",
+      "summary": "Combine Morse patterns with a keyed alphabet to encode or decode a message.",
+      "aliases": [
+        "Encode with fractionated Morse"
+      ]
+    },
+    "number.pascal": {
+      "tool_id": "number.pascal",
+      "display_name": "Generate Pascal's triangle",
+      "summary": "Generate rows of Pascal's triangle with exact integer values.",
+      "aliases": [
+        "Generate Pascal rows"
+      ]
+    },
+    "text.combinations": {
+      "tool_id": "text.combinations",
+      "display_name": "Generate text combinations",
+      "summary": "Build every ordered combination from the groups of text fragments you supply.",
+      "aliases": [
+        "Generate string combinations"
+      ]
+    },
+    "cipher.grandpre.decode": {
+      "tool_id": "cipher.grandpre",
+      "display_name": "Decode Grandpré cipher",
+      "summary": "Replace letters with coordinates in a supplied letter grid, or read coordinates back as letters.",
+      "aliases": [
+        "Decode with Grandpré"
+      ]
+    },
+    "cipher.grandpre.encode": {
+      "tool_id": "cipher.grandpre",
+      "display_name": "Encode Grandpré cipher",
+      "summary": "Replace letters with coordinates in a supplied letter grid, or read coordinates back as letters.",
+      "aliases": [
+        "Encode with Grandpré"
+      ]
+    },
+    "cipher.gromark.decode": {
+      "tool_id": "cipher.gromark",
+      "display_name": "Decode Gromark",
+      "summary": "Encode or decode text using a mixed alphabet and a five-digit starting key.",
+      "aliases": [
+        "Decode with Gromark"
+      ]
+    },
+    "cipher.gromark.encode": {
+      "tool_id": "cipher.gromark",
+      "display_name": "Encode Gromark",
+      "summary": "Encode or decode text using a mixed alphabet and a five-digit starting key.",
+      "aliases": [
+        "Encode with Gromark"
+      ]
+    },
+    "cipher.gronsfeld.decode": {
+      "tool_id": "cipher.gronsfeld",
+      "display_name": "Decode Gronsfeld cipher",
+      "summary": "Shift letters using a repeating sequence of key digits, or reverse those shifts.",
+      "aliases": [
+        "Decode with Gronsfeld"
+      ]
+    },
+    "cipher.gronsfeld.encode": {
+      "tool_id": "cipher.gronsfeld",
+      "display_name": "Encode Gronsfeld cipher",
+      "summary": "Shift letters using a repeating sequence of key digits, or reverse those shifts.",
+      "aliases": [
+        "Encode with Gronsfeld"
+      ]
+    },
+    "encoding.hex.decode": {
+      "tool_id": "encoding.hex",
+      "display_name": "Decode hexadecimal",
+      "summary": "Convert bytes to hexadecimal text, or hexadecimal text back to bytes.",
+      "aliases": []
+    },
+    "encoding.hex.encode": {
+      "tool_id": "encoding.hex",
+      "display_name": "Encode hexadecimal",
+      "summary": "Convert bytes to hexadecimal text, or hexadecimal text back to bytes.",
+      "aliases": []
+    },
+    "cipher.hill.decode": {
+      "tool_id": "cipher.hill",
+      "display_name": "Decode Hill cipher",
+      "summary": "Encode or decode groups of letters using the supplied alphabet and key matrix.",
+      "aliases": [
+        "Decode with Hill"
+      ]
+    },
+    "cipher.hill.encode": {
+      "tool_id": "cipher.hill",
+      "display_name": "Encode Hill cipher",
+      "summary": "Encode or decode groups of letters using the supplied alphabet and key matrix.",
+      "aliases": [
+        "Encode with Hill"
+      ]
+    },
+    "cipher.homophonic.decode": {
+      "tool_id": "cipher.homophonic",
+      "display_name": "Decode Homophonic substitution",
+      "summary": "Map letters to explicit cipher tokens, allowing several tokens to represent one letter.",
+      "aliases": [
+        "Decode with homophonic substitution"
+      ]
+    },
+    "cipher.homophonic.encode": {
+      "tool_id": "cipher.homophonic",
+      "display_name": "Encode Homophonic substitution",
+      "summary": "Map letters to explicit cipher tokens, allowing several tokens to represent one letter.",
+      "aliases": [
+        "Encode with homophonic substitution"
+      ]
+    },
+    "file.signature.detect": {
+      "tool_id": "file.signature.detect",
+      "display_name": "Identify a file type",
+      "summary": "Compare header bytes with known file signatures.",
+      "aliases": [
+        "Identify a file signature"
+      ]
+    },
+    "image.dimensions": {
+      "tool_id": "image.dimensions",
+      "display_name": "Read image dimensions",
+      "summary": "Read the image width and height in pixels.",
+      "aliases": [
+        "Image dimensions"
+      ]
+    },
+    "image.csv.import": {
+      "tool_id": "image.csv.import",
+      "display_name": "Read pixels from CSV",
+      "summary": "Build image pixel data from a complete CSV grid and explicit image settings.",
+      "aliases": [
+        "Import pixels from CSV"
+      ]
+    },
+    "esolang.brainfuck.report": {
+      "tool_id": "esolang.brainfuck.report",
+      "display_name": "Inspect Brainfuck execution",
+      "summary": "Run a Brainfuck program and inspect its execution summary, tape and optional trace.",
+      "aliases": []
+    },
+    "web.har.inspect": {
+      "tool_id": "web.har.inspect",
+      "display_name": "Inspect a saved HAR file",
+      "summary": "Read request and response metadata already present in a saved HAR file.",
+      "aliases": []
+    },
+    "video.container.inspect": {
+      "tool_id": "video.container.inspect",
+      "display_name": "Read video file information",
+      "summary": "Read supported video container, track and timing information without decoding the video.",
+      "aliases": [
+        "Inspect a video container"
+      ]
+    },
+    "audio.wave.inspect": {
+      "tool_id": "audio.wave.inspect",
+      "display_name": "Read WAV information",
+      "summary": "Inspect WAV format information and file sections without decoding samples.",
+      "aliases": [
+        "Inspect a WAV container"
+      ]
+    },
+    "audio.spectrum": {
+      "tool_id": "audio.spectrum",
+      "display_name": "Measure audio frequencies",
+      "summary": "Calculate the frequency spectrum of selected audio samples.",
+      "aliases": [
+        "Inspect an audio spectrum"
+      ]
+    },
+    "file.exif.inspect": {
+      "tool_id": "file.exif.inspect",
+      "display_name": "Read EXIF information",
+      "summary": "Read supported EXIF metadata from supplied file data.",
+      "aliases": [
+        "Inspect EXIF metadata"
+      ]
+    },
+    "file.info.inspect": {
+      "tool_id": "file.info.inspect",
+      "display_name": "Read file information",
+      "summary": "Inspect basic file information and evidence from its header.",
+      "aliases": [
+        "Inspect file information"
+      ]
+    },
+    "audio.metadata.inspect": {
+      "tool_id": "audio.metadata.inspect",
+      "display_name": "Read FLAC information",
+      "summary": "Read FLAC stream information and text tags without decoding the audio.",
+      "aliases": [
+        "Inspect FLAC metadata"
+      ]
+    },
+    "file.hex.inspect": {
+      "tool_id": "file.hex.inspect",
+      "display_name": "View file bytes as hex",
+      "summary": "Inspect selected file bytes with their positions and hexadecimal values.",
+      "aliases": [
+        "Inspect hexadecimal bytes"
+      ]
+    },
+    "analysis.homophonic.inspect": {
+      "tool_id": "analysis.homophonic.inspect",
+      "display_name": "Inspect cipher tokens",
+      "summary": "Count and inspect the tokens used by a homophonic substitution cipher.",
+      "aliases": [
+        "Inspect homophonic tokens"
+      ]
+    },
+    "image.geometry.inspect": {
+      "tool_id": "image.geometry.inspect",
+      "display_name": "Check image dimensions and layout",
+      "summary": "Compare declared image dimensions with the raw pixel layout you specify.",
+      "aliases": [
+        "Inspect image geometry"
+      ]
+    },
+    "image.png.inspect": {
+      "tool_id": "image.png.inspect",
+      "display_name": "Inspect PNG file sections",
+      "summary": "Read PNG chunks, byte positions and checksum evidence without decoding pixels.",
+      "aliases": [
+        "Inspect PNG chunks"
+      ]
+    },
+    "web.html.inspect": {
+      "tool_id": "web.html.inspect",
+      "display_name": "Inspect saved HTML",
+      "summary": "Inspect HTML text, references and embedded-data ranges without rendering or running scripts.",
+      "aliases": []
+    },
+    "text.unicode.inspect": {
+      "tool_id": "text.unicode.inspect",
+      "display_name": "Inspect text characters",
+      "summary": "Inspect character categories, control characters and possible invisible characters.",
+      "aliases": [
+        "Inspect Unicode characters"
+      ]
+    },
+    "text.codepoints": {
+      "tool_id": "text.codepoints",
+      "display_name": "Read Unicode code points",
+      "summary": "List the Unicode numbers and original positions of text characters.",
+      "aliases": [
+        "Inspect Unicode code points"
+      ]
+    },
+    "image.raw.interpret": {
+      "tool_id": "image.raw.interpret",
+      "display_name": "Read raw image data",
+      "summary": "Interpret raw bytes as pixels using the dimensions, channels and row layout you specify.",
+      "aliases": [
+        "Interpret raw image bytes"
+      ]
+    },
+    "cipher.interrupted_key.decode": {
+      "tool_id": "cipher.interrupted_key",
+      "display_name": "Decode Interrupted-key Vigenère",
+      "summary": "Encode or decode Vigenère text with key restarts at the positions you specify.",
+      "aliases": [
+        "Decode with Interrupted Key"
+      ]
+    },
+    "cipher.interrupted_key.encode": {
+      "tool_id": "cipher.interrupted_key",
+      "display_name": "Encode Interrupted-key Vigenère",
+      "summary": "Encode or decode Vigenère text with key restarts at the positions you specify.",
+      "aliases": [
+        "Encode with Interrupted Key"
+      ]
+    },
+    "binary.not": {
+      "tool_id": "binary.not",
+      "display_name": "Invert bits",
+      "summary": "Flip every zero bit to one and every one bit to zero.",
+      "aliases": []
+    },
+    "image.invert": {
+      "tool_id": "image.invert",
+      "display_name": "Invert image colors",
+      "summary": "Invert selected image sample values, preserving transparency by default.",
+      "aliases": [
+        "Invert image samples"
+      ]
+    },
+    "image.colors.extract": {
+      "tool_id": "image.colors.extract",
+      "display_name": "Isolate a color",
+      "summary": "Keep selected exact colors as a mask or a transparent-background image layer.",
+      "aliases": [
+        "Isolate exact colors"
+      ]
+    },
+    "text.keyboard.coordinates.decode": {
+      "tool_id": "text.keyboard.coordinates",
+      "display_name": "Decode keyboard coordinates",
+      "summary": "Convert characters to row, column and layer positions on your keyboard layout, or read those positions.",
+      "aliases": []
+    },
+    "text.keyboard.coordinates.encode": {
+      "tool_id": "text.keyboard.coordinates",
+      "display_name": "Encode keyboard coordinates",
+      "summary": "Convert characters to row, column and layer positions on your keyboard layout, or read those positions.",
+      "aliases": []
+    },
+    "text.keyboard.shift.decode": {
+      "tool_id": "text.keyboard.shift",
+      "display_name": "Decode keyboard shifts",
+      "summary": "Move characters by a chosen key displacement on your keyboard layout, or reverse a valid mapping.",
+      "aliases": []
+    },
+    "text.keyboard.shift.encode": {
+      "tool_id": "text.keyboard.shift",
+      "display_name": "Encode keyboard shifts",
+      "summary": "Move characters by a chosen key displacement on your keyboard layout, or reverse a valid mapping.",
+      "aliases": []
+    },
+    "symbol.keypad.decode": {
+      "tool_id": "symbol.keypad",
+      "display_name": "Decode keypad groups",
+      "summary": "Convert letters to telephone-keypad groups, or inspect the letters those groups can represent.",
+      "aliases": []
+    },
+    "symbol.keypad.encode": {
+      "tool_id": "symbol.keypad",
+      "display_name": "Encode keypad groups",
+      "summary": "Convert letters to telephone-keypad groups, or inspect the letters those groups can represent.",
+      "aliases": []
+    },
+    "text.class.map": {
+      "tool_id": "text.class.map",
+      "display_name": "Group characters by class",
+      "summary": "Map characters to the explicit classes you define and retain their source positions.",
+      "aliases": [
+        "Map character classes"
+      ]
+    },
+    "symbol.clock.directions": {
+      "tool_id": "symbol.clock.directions",
+      "display_name": "Read clock-hand directions",
+      "summary": "Map a clock reading or explicit hand angles to compass directions, retaining boundary uncertainty.",
+      "aliases": [
+        "Map clock hands to directions"
+      ]
+    },
+    "number.maximum": {
+      "tool_id": "number.maximum",
+      "display_name": "Find the largest integer",
+      "summary": "Return the largest value in a supplied list of exact signed integers.",
+      "aliases": [
+        "Maximum"
+      ]
+    },
+    "audio.waveform.envelope": {
+      "tool_id": "audio.waveform.envelope",
+      "display_name": "Measure waveform levels",
+      "summary": "Find minimum and maximum sample levels across successive audio intervals.",
+      "aliases": [
+        "Measure a waveform envelope"
+      ]
+    },
+    "image.spatial.autocorrelation": {
+      "tool_id": "image.spatial.autocorrelation",
+      "display_name": "Measure repeating image patterns",
+      "summary": "Compare a selected image channel with shifted copies to measure repeated patterns.",
+      "aliases": [
+        "Measure spatial autocorrelation"
+      ]
+    },
+    "text.statistics": {
+      "tool_id": "text.statistics",
+      "display_name": "Count letters and text patterns",
+      "summary": "Measure character frequencies, repeated groups and other text statistics without identifying a cipher automatically.",
+      "aliases": [
+        "Measure text statistics"
+      ]
+    },
+    "text.word.lengths": {
+      "tool_id": "text.word.lengths",
+      "display_name": "Count characters in each word",
+      "summary": "Measure each word's character length while retaining its original position.",
+      "aliases": [
+        "Measure word lengths"
+      ]
+    },
+    "image.mirror": {
+      "tool_id": "image.mirror",
+      "display_name": "Flip an image",
+      "summary": "Mirror pixels horizontally or vertically.",
+      "aliases": [
+        "Mirror an image"
+      ]
+    },
+    "cipher.monome_dinome.decode": {
+      "tool_id": "cipher.monome_dinome",
+      "display_name": "Decode Monome-dinome",
+      "summary": "Encode or decode letters using a table of one- and two-digit codes.",
+      "aliases": [
+        "Decode with Monome-dinome"
+      ]
+    },
+    "cipher.monome_dinome.encode": {
+      "tool_id": "cipher.monome_dinome",
+      "display_name": "Encode Monome-dinome",
+      "summary": "Encode or decode letters using a table of one- and two-digit codes.",
+      "aliases": [
+        "Encode with Monome-dinome"
+      ]
+    },
+    "cipher.morbit.decode": {
+      "tool_id": "cipher.morbit",
+      "display_name": "Decode Morbit",
+      "summary": "Encode or decode paired Morse symbols using your digit key.",
+      "aliases": [
+        "Decode with Morbit"
+      ]
+    },
+    "cipher.morbit.encode": {
+      "tool_id": "cipher.morbit",
+      "display_name": "Encode Morbit",
+      "summary": "Encode or decode paired Morse symbols using your digit key.",
+      "aliases": [
+        "Encode with Morbit"
+      ]
+    },
+    "symbol.morse.decode": {
+      "tool_id": "symbol.morse",
+      "display_name": "Decode Morse code",
+      "summary": "Convert letters and digits to dots and dashes, or read Morse code as text.",
+      "aliases": []
+    },
+    "symbol.morse.encode": {
+      "tool_id": "symbol.morse",
+      "display_name": "Encode Morse code",
+      "summary": "Convert letters and digits to dots and dashes, or read Morse code as text.",
+      "aliases": []
+    },
+    "cipher.myszkowski.decode": {
+      "tool_id": "cipher.myszkowski",
+      "display_name": "Decode Myszkowski transposition",
+      "summary": "Rearrange letters using a keyword that can contain repeated letters, or reverse the rearrangement.",
+      "aliases": [
+        "Decode with Myszkowski"
+      ]
+    },
+    "cipher.myszkowski.encode": {
+      "tool_id": "cipher.myszkowski",
+      "display_name": "Encode Myszkowski transposition",
+      "summary": "Rearrange letters using a keyword that can contain repeated letters, or reverse the rearrangement.",
+      "aliases": [
+        "Encode with Myszkowski"
+      ]
+    },
+    "cipher.nicodemus.decode": {
+      "tool_id": "cipher.nicodemus",
+      "display_name": "Decode Nicodemus cipher",
+      "summary": "Combine Vigenère substitution with keyed column groups to encode or decode text.",
+      "aliases": [
+        "Decode with Nicodemus"
+      ]
+    },
+    "cipher.nicodemus.encode": {
+      "tool_id": "cipher.nicodemus",
+      "display_name": "Encode Nicodemus cipher",
+      "summary": "Combine Vigenère substitution with keyed column groups to encode or decode text.",
+      "aliases": [
+        "Encode with Nicodemus"
+      ]
+    },
+    "cipher.nihilist_substitution.decode": {
+      "tool_id": "cipher.nihilist_substitution",
+      "display_name": "Decode Nihilist substitution",
+      "summary": "Encode or decode text using numbered Polybius coordinates and an additive key.",
+      "aliases": [
+        "Decode with Nihilist substitution"
+      ]
+    },
+    "cipher.nihilist_substitution.encode": {
+      "tool_id": "cipher.nihilist_substitution",
+      "display_name": "Encode Nihilist substitution",
+      "summary": "Encode or decode text using numbered Polybius coordinates and an additive key.",
+      "aliases": [
+        "Encode with Nihilist substitution"
+      ]
+    },
+    "text.normalize": {
+      "tool_id": "text.normalize",
+      "display_name": "Normalize Unicode text",
+      "summary": "Convert text to a selected Unicode normalization form.",
+      "aliases": []
+    },
+    "cipher.cardan.overlay": {
+      "tool_id": "cipher.cardan.overlay",
+      "display_name": "Write through a Cardan grille",
+      "summary": "Place text at positions selected by a grille mask over supplied cover text.",
+      "aliases": [
+        "Overlay a Cardan grille"
+      ]
+    },
+    "text.integer": {
+      "tool_id": "text.integer",
+      "display_name": "Read an integer",
+      "summary": "Parse strictly formatted decimal text as an exact signed integer.",
+      "aliases": [
+        "Parse integer"
+      ]
+    },
+    "json.parse": {
+      "tool_id": "json.parse",
+      "display_name": "Read JSON",
+      "summary": "Parse JSON into typed data, reporting invalid or ambiguous documents.",
+      "aliases": [
+        "Parse JSON"
+      ]
+    },
+    "cipher.periodic_gromark.decode": {
+      "tool_id": "cipher.periodic_gromark",
+      "display_name": "Decode Periodic Gromark",
+      "summary": "Encode or decode text using a keyed alphabet and a periodically changing Gromark key.",
+      "aliases": [
+        "Decode with periodic Gromark"
+      ]
+    },
+    "cipher.periodic_gromark.encode": {
+      "tool_id": "cipher.periodic_gromark",
+      "display_name": "Encode Periodic Gromark",
+      "summary": "Encode or decode text using a keyed alphabet and a periodically changing Gromark key.",
+      "aliases": [
+        "Encode with periodic Gromark"
+      ]
+    },
+    "cipher.phillips.decode": {
+      "tool_id": "cipher.phillips",
+      "display_name": "Decode Phillips cipher",
+      "summary": "Encode or decode letters using the selected schedule of changing alphabet squares.",
+      "aliases": [
+        "Decode with Phillips"
+      ]
+    },
+    "cipher.phillips.encode": {
+      "tool_id": "cipher.phillips",
+      "display_name": "Encode Phillips cipher",
+      "summary": "Encode or decode letters using the selected schedule of changing alphabet squares.",
+      "aliases": [
+        "Encode with Phillips"
+      ]
+    },
+    "cipher.playfair.decode": {
+      "tool_id": "cipher.playfair",
+      "display_name": "Decode Playfair cipher",
+      "summary": "Encode or decode pairs of letters using a keyed square and explicit filler settings.",
+      "aliases": [
+        "Decode with Playfair"
+      ]
+    },
+    "cipher.playfair.encode": {
+      "tool_id": "cipher.playfair",
+      "display_name": "Encode Playfair cipher",
+      "summary": "Encode or decode pairs of letters using a keyed square and explicit filler settings.",
+      "aliases": [
+        "Encode with Playfair"
+      ]
+    },
+    "cipher.pollux.decode": {
+      "tool_id": "cipher.pollux",
+      "display_name": "Decode Pollux",
+      "summary": "Map Morse dots, dashes and gaps to your digit groups, or decode those digits.",
+      "aliases": [
+        "Decode with Pollux"
+      ]
+    },
+    "cipher.pollux.encode": {
+      "tool_id": "cipher.pollux",
+      "display_name": "Encode Pollux",
+      "summary": "Map Morse dots, dashes and gaps to your digit groups, or decode those digits.",
+      "aliases": [
+        "Encode with Pollux"
+      ]
+    },
+    "cipher.polybius.decode": {
+      "tool_id": "cipher.polybius",
+      "display_name": "Decode Polybius square",
+      "summary": "Convert letters to row-and-column coordinates in a supplied square, or read those coordinates.",
+      "aliases": [
+        "Decode with Polybius"
+      ]
+    },
+    "cipher.polybius.encode": {
+      "tool_id": "cipher.polybius",
+      "display_name": "Encode Polybius square",
+      "summary": "Convert letters to row-and-column coordinates in a supplied square, or read those coordinates.",
+      "aliases": [
+        "Encode with Polybius"
+      ]
+    },
+    "investigation.profile.plan": {
+      "tool_id": "investigation.profile.plan",
+      "display_name": "Preview file inspection steps",
+      "summary": "Show which checks an inspection profile would run and why some may be skipped.",
+      "aliases": [
+        "Preview an inspection profile"
+      ]
+    },
+    "cipher.progressive_key.decode": {
+      "tool_id": "cipher.progressive_key",
+      "display_name": "Decode Progressive-key Vigenère",
+      "summary": "Encode or decode Vigenère text with an extra shift that changes between key-length groups.",
+      "aliases": [
+        "Decode with Progressive Key"
+      ]
+    },
+    "cipher.progressive_key.encode": {
+      "tool_id": "cipher.progressive_key",
+      "display_name": "Encode Progressive-key Vigenère",
+      "summary": "Encode or decode Vigenère text with an extra shift that changes between key-length groups.",
+      "aliases": [
+        "Encode with Progressive Key"
+      ]
+    },
+    "cipher.quagmire.decode": {
+      "tool_id": "cipher.quagmire",
+      "display_name": "Decode Quagmire",
+      "summary": "Encode or decode text with the selected Quagmire alphabet and indicator-key settings.",
+      "aliases": [
+        "Decode with Quagmire"
+      ]
+    },
+    "cipher.quagmire.encode": {
+      "tool_id": "cipher.quagmire",
+      "display_name": "Encode Quagmire",
+      "summary": "Encode or decode text with the selected Quagmire alphabet and indicator-key settings.",
+      "aliases": [
+        "Encode with Quagmire"
+      ]
+    },
+    "cipher.ragbaby.decode": {
+      "tool_id": "cipher.ragbaby",
+      "display_name": "Decode Ragbaby cipher",
+      "summary": "Encode or decode letters using a keyed alphabet and shifts based on word and letter positions.",
+      "aliases": [
+        "Decode with Ragbaby"
+      ]
+    },
+    "cipher.ragbaby.encode": {
+      "tool_id": "cipher.ragbaby",
+      "display_name": "Encode Ragbaby cipher",
+      "summary": "Encode or decode letters using a keyed alphabet and shifts based on word and letter positions.",
+      "aliases": [
+        "Encode with Ragbaby"
+      ]
+    },
+    "analysis.affine.rank": {
+      "tool_id": "analysis.affine.rank",
+      "display_name": "Try Affine keys",
+      "summary": "Compare candidate Affine keys using the scoring model you supply.",
+      "aliases": [
+        "Rank Affine candidates"
+      ]
+    },
+    "analysis.caesar.rank": {
+      "tool_id": "analysis.caesar.rank",
+      "display_name": "Try Caesar shifts",
+      "summary": "Compare possible Caesar shifts using the scoring model you supply.",
+      "aliases": [
+        "Rank Caesar candidates"
+      ]
+    },
+    "analysis.transposition.rank": {
+      "tool_id": "analysis.transposition.rank",
+      "display_name": "Try transposition candidates",
+      "summary": "Compare the supplied letter rearrangements using your scoring settings.",
+      "aliases": [
+        "Rank transposition candidates"
+      ]
+    },
+    "analysis.vigenere.rank": {
+      "tool_id": "analysis.vigenere.rank",
+      "display_name": "Try Vigenère keys",
+      "summary": "Search and compare Vigenère key candidates using your language model and search settings.",
+      "aliases": [
+        "Rank Vigenère candidates"
+      ]
+    },
+    "image.pixels.read": {
+      "tool_id": "image.pixels.read",
+      "display_name": "Read pixels at coordinates",
+      "summary": "Read exact pixel values at the image coordinates you choose.",
+      "aliases": [
+        "Read exact pixels"
+      ]
+    },
+    "investigation.session.record": {
+      "tool_id": "investigation.session.record",
+      "display_name": "Record investigation steps",
+      "summary": "Record operation history and observations separately from your hypotheses.",
+      "aliases": [
+        "Record investigation provenance"
+      ]
+    },
+    "file.carve": {
+      "tool_id": "file.carve",
+      "display_name": "Recover a file section",
+      "summary": "Extract a selected range of bytes as a candidate file section.",
+      "aliases": [
+        "Recover a file range"
+      ]
+    },
+    "cipher.redefence.decode": {
+      "tool_id": "cipher.redefence",
+      "display_name": "Decode Redefence",
+      "summary": "Encode or decode a zigzag transposition with a keyed order for its rails.",
+      "aliases": [
+        "Decode with Redefence"
+      ]
+    },
+    "cipher.redefence.encode": {
+      "tool_id": "cipher.redefence",
+      "display_name": "Encode Redefence",
+      "summary": "Encode or decode a zigzag transposition with a keyed order for its rails.",
+      "aliases": [
+        "Encode with Redefence"
+      ]
+    },
+    "text.keyboard.remap": {
+      "tool_id": "text.keyboard.remap",
+      "display_name": "Change keyboard layout",
+      "summary": "Map characters by physical key positions between the explicit keyboard layouts you supply.",
+      "aliases": [
+        "Remap keyboard positions"
+      ]
+    },
+    "text.grid.render": {
+      "tool_id": "text.grid.render",
+      "display_name": "Arrange text in a grid",
+      "summary": "Place text in a grid using the chosen traversal and output settings.",
+      "aliases": [
+        "Render a text grid"
+      ]
+    },
+    "image.reorder": {
+      "tool_id": "image.reorder",
+      "display_name": "Reorder color channels",
+      "summary": "Change the order of image channels without changing their sample values.",
+      "aliases": [
+        "Reorder image channels"
+      ]
+    },
+    "investigation.replay": {
+      "tool_id": "investigation.replay",
+      "display_name": "Repeat an investigation",
+      "summary": "Verify the input and operation versions before repeating supported recorded runs.",
+      "aliases": [
+        "Replay an investigation"
+      ]
+    },
+    "audio.reverse": {
+      "tool_id": "audio.reverse",
+      "display_name": "Reverse audio",
+      "summary": "Reverse selected audio sample frames while keeping channels together.",
+      "aliases": [
+        "Reverse audio frames"
+      ]
+    },
+    "binary.reverse": {
+      "tool_id": "binary.reverse",
+      "display_name": "Reverse bytes",
+      "summary": "Reverse the order of bytes while keeping each byte unchanged.",
+      "aliases": []
+    },
+    "text.reverse": {
+      "tool_id": "text.reverse",
+      "display_name": "Reverse text",
+      "summary": "Reverse Unicode character values; combining marks and line endings are reversed too.",
+      "aliases": [
+        "Reverse text characters"
+      ]
+    },
+    "image.rotate": {
+      "tool_id": "image.rotate",
+      "display_name": "Rotate an image",
+      "summary": "Rotate pixels by a right angle without interpolation.",
+      "aliases": []
+    },
+    "binary.rotate_left": {
+      "tool_id": "binary.rotate_left",
+      "display_name": "Rotate bits left",
+      "summary": "Move bits left within each selected unit, wrapping them around at the edge.",
+      "aliases": []
+    },
+    "binary.rotate_right": {
+      "tool_id": "binary.rotate_right",
+      "display_name": "Rotate bits right",
+      "summary": "Move bits right within each selected unit, wrapping them around at the edge.",
+      "aliases": []
+    },
+    "cipher.route.decode": {
+      "tool_id": "cipher.route",
+      "display_name": "Decode Route transposition",
+      "summary": "Rearrange text by reading a grid along the selected route, or reverse that route.",
+      "aliases": [
+        "Decode with route transposition"
+      ]
+    },
+    "cipher.route.encode": {
+      "tool_id": "cipher.route",
+      "display_name": "Encode Route transposition",
+      "summary": "Rearrange text by reading a grid along the selected route, or reverse that route.",
+      "aliases": [
+        "Encode with route transposition"
+      ]
+    },
+    "esolang.brainfuck.execute": {
+      "tool_id": "esolang.brainfuck.execute",
+      "display_name": "Run Brainfuck",
+      "summary": "Execute a Brainfuck program with supplied input and bounded execution settings.",
+      "aliases": [
+        "Run a Brainfuck program"
+      ]
+    },
+    "pipeline.execute": {
+      "tool_id": "pipeline.execute",
+      "display_name": "Run a pipeline",
+      "summary": "Run a validated ordered pipeline with supplied inputs and optional intermediate results.",
+      "aliases": []
+    },
+    "recipe.execute": {
+      "tool_id": "recipe.execute",
+      "display_name": "Run a recipe",
+      "summary": "Run a validated recipe using explicitly supplied input values.",
+      "aliases": []
+    },
+    "investigation.profile.run": {
+      "tool_id": "investigation.profile.run",
+      "display_name": "Run a file inspection profile",
+      "summary": "Run the selected local inspection checks and record each outcome.",
+      "aliases": [
+        "Run an inspection profile"
+      ]
+    },
+    "cipher.enigma": {
+      "tool_id": "cipher.enigma",
+      "display_name": "Enigma",
+      "summary": "Transform a message using the selected Enigma rotors, starting positions and plugboard settings.",
+      "aliases": [
+        "Run Enigma I or M3"
+      ]
+    },
+    "analysis.language.score": {
+      "tool_id": "analysis.language.score",
+      "display_name": "Score text with a language model",
+      "summary": "Measure how well text matches a language model you supply; a score is not proof of a solution.",
+      "aliases": [
+        "Score candidate language"
+      ]
+    },
+    "cipher.scytale.decode": {
+      "tool_id": "cipher.scytale",
+      "display_name": "Decode Scytale cipher",
+      "summary": "Rearrange text using the selected cylinder-style grid, or restore its original order.",
+      "aliases": [
+        "Decode with Scytale"
+      ]
+    },
+    "cipher.scytale.encode": {
+      "tool_id": "cipher.scytale",
+      "display_name": "Encode Scytale cipher",
+      "summary": "Rearrange text using the selected cylinder-style grid, or restore its original order.",
+      "aliases": [
+        "Encode with Scytale"
+      ]
+    },
+    "text.select": {
+      "tool_id": "text.select",
+      "display_name": "Extract first or last characters",
+      "summary": "Take the first or last character of each word or nonempty line.",
+      "aliases": [
+        "Select characters by word or line"
+      ]
+    },
+    "number.constant_digits": {
+      "tool_id": "number.constant_digits",
+      "display_name": "Read digits of a constant",
+      "summary": "Select verified decimal digits of pi, e, the golden ratio or the square root of two.",
+      "aliases": [
+        "Select digits of a constant"
+      ]
+    },
+    "json.select": {
+      "tool_id": "json.select",
+      "display_name": "Select a JSON value",
+      "summary": "Select a field or array item by JSON Pointer while preserving its value type.",
+      "aliases": [
+        "Select field"
+      ]
+    },
+    "cipher.sequence_transposition.decode": {
+      "tool_id": "cipher.sequence_transposition",
+      "display_name": "Decode Sequence transposition",
+      "summary": "Rearrange letters using an explicit position sequence, or reverse that ordering.",
+      "aliases": [
+        "Decode with sequence transposition"
+      ]
+    },
+    "cipher.sequence_transposition.encode": {
+      "tool_id": "cipher.sequence_transposition",
+      "display_name": "Encode Sequence transposition",
+      "summary": "Rearrange letters using an explicit position sequence, or reverse that ordering.",
+      "aliases": [
+        "Encode with sequence transposition"
+      ]
+    },
+    "cipher.seriated_playfair.decode": {
+      "tool_id": "cipher.seriated_playfair",
+      "display_name": "Decode Seriated Playfair",
+      "summary": "Encode or decode grouped letter pairs using a Playfair square and the selected period.",
+      "aliases": [
+        "Decode with seriated Playfair"
+      ]
+    },
+    "cipher.seriated_playfair.encode": {
+      "tool_id": "cipher.seriated_playfair",
+      "display_name": "Encode Seriated Playfair",
+      "summary": "Encode or decode grouped letter pairs using a Playfair square and the selected period.",
+      "aliases": [
+        "Encode with seriated Playfair"
+      ]
+    },
+    "binary.shift_left": {
+      "tool_id": "binary.shift_left",
+      "display_name": "Shift bits left",
+      "summary": "Move bits left within each selected unit, filling with zeros and discarding overflow.",
+      "aliases": []
+    },
+    "binary.shift_right": {
+      "tool_id": "binary.shift_right",
+      "display_name": "Shift bits right",
+      "summary": "Move bits right within each selected unit, filling with zeros.",
+      "aliases": []
+    },
+    "cipher.skip.decode": {
+      "tool_id": "cipher.skip",
+      "display_name": "Decode Skip transposition",
+      "summary": "Rearrange text by reading positions at fixed skips, or reverse that ordering.",
+      "aliases": [
+        "Decode with skip transposition"
+      ]
+    },
+    "cipher.skip.encode": {
+      "tool_id": "cipher.skip",
+      "display_name": "Encode Skip transposition",
+      "summary": "Rearrange text by reading positions at fixed skips, or reverse that ordering.",
+      "aliases": [
+        "Encode with skip transposition"
+      ]
+    },
+    "cipher.slidefair.decode": {
+      "tool_id": "cipher.slidefair",
+      "display_name": "Decode Slidefair",
+      "summary": "Encode or decode pairs of letters using the selected Slidefair key settings.",
+      "aliases": [
+        "Decode with Slidefair"
+      ]
+    },
+    "cipher.slidefair.encode": {
+      "tool_id": "cipher.slidefair",
+      "display_name": "Encode Slidefair",
+      "summary": "Encode or decode pairs of letters using the selected Slidefair key settings.",
+      "aliases": [
+        "Encode with Slidefair"
+      ]
+    },
+    "cipher.solitaire.decode": {
+      "tool_id": "cipher.solitaire",
+      "display_name": "Decode Solitaire cipher",
+      "summary": "Encode or decode text using a key stream generated from the supplied deck of cards.",
+      "aliases": [
+        "Decode with Solitaire"
+      ]
+    },
+    "cipher.solitaire.encode": {
+      "tool_id": "cipher.solitaire",
+      "display_name": "Encode Solitaire cipher",
+      "summary": "Encode or decode text using a key stream generated from the supplied deck of cards.",
+      "aliases": [
+        "Encode with Solitaire"
+      ]
+    },
+    "cipher.spiral.decode": {
+      "tool_id": "cipher.spiral",
+      "display_name": "Decode Spiral transposition",
+      "summary": "Rearrange text along a spiral grid route, or restore its original order.",
+      "aliases": [
+        "Decode with spiral transposition"
+      ]
+    },
+    "cipher.spiral.encode": {
+      "tool_id": "cipher.spiral",
+      "display_name": "Encode Spiral transposition",
+      "summary": "Rearrange text along a spiral grid route, or restore its original order.",
+      "aliases": [
+        "Encode with spiral transposition"
+      ]
+    },
+    "cipher.substitution.decode": {
+      "tool_id": "cipher.substitution",
+      "display_name": "Decode Substitution cipher",
+      "summary": "Replace letters using a supplied alphabet mapping, or reverse the mapping.",
+      "aliases": [
+        "Decode with substitution"
+      ]
+    },
+    "cipher.substitution.encode": {
+      "tool_id": "cipher.substitution",
+      "display_name": "Encode Substitution cipher",
+      "summary": "Replace letters using a supplied alphabet mapping, or reverse the mapping.",
+      "aliases": [
+        "Encode with substitution"
+      ]
+    },
+    "text.multiset.subtract": {
+      "tool_id": "text.multiset.subtract",
+      "display_name": "Subtract character counts",
+      "summary": "Remove one text's character counts from another and report any missing characters.",
+      "aliases": [
+        "Subtract character inventories"
+      ]
+    },
+    "binary.sub_wrapping": {
+      "tool_id": "binary.sub_wrapping",
+      "display_name": "Subtract byte values",
+      "summary": "Subtract paired unsigned values and wrap results to the selected byte width.",
+      "aliases": [
+        "Subtract with wrapping"
+      ]
+    },
+    "investigation.triage": {
+      "tool_id": "investigation.triage",
+      "display_name": "Suggest file checks",
+      "summary": "Suggest relevant file inspections from header evidence without running them automatically.",
+      "aliases": [
+        "Suggest file inspections"
+      ]
+    },
+    "binary.swap_endian": {
+      "tool_id": "binary.swap_endian",
+      "display_name": "Swap byte order",
+      "summary": "Reverse bytes within each selected number-sized unit.",
+      "aliases": []
+    },
+    "audio.morse.transcribe": {
+      "tool_id": "audio.morse.transcribe",
+      "display_name": "Read Morse timings",
+      "summary": "Convert supplied tone and silence intervals to Morse text using your timing settings.",
+      "aliases": [
+        "Transcribe Morse timing"
+      ]
+    },
+    "text.transform.masked": {
+      "tool_id": "text.transform.masked",
+      "display_name": "Transform selected characters",
+      "summary": "Apply a supported letter cipher to selected positions while keeping the rest of the text separate.",
+      "aliases": [
+        "Transform selected positions"
+      ]
+    },
+    "text.skip.keyed": {
+      "tool_id": "text.skip.keyed",
+      "display_name": "Read text with repeating skips",
+      "summary": "Move through a ring of characters using a repeating sequence of step sizes.",
+      "aliases": [
+        "Traverse text with keyed steps"
+      ]
+    },
+    "cipher.tri_square.decode": {
+      "tool_id": "cipher.tri_square",
+      "display_name": "Decode Tri-square cipher",
+      "summary": "Encode or decode letter groups using three keyed alphabet squares.",
+      "aliases": [
+        "Decode with Tri-square"
+      ]
+    },
+    "cipher.tri_square.encode": {
+      "tool_id": "cipher.tri_square",
+      "display_name": "Encode Tri-square cipher",
+      "summary": "Encode or decode letter groups using three keyed alphabet squares.",
+      "aliases": [
+        "Encode with Tri-square"
+      ]
+    },
+    "cipher.tridigital.decode": {
+      "tool_id": "cipher.tridigital",
+      "display_name": "Decode Tridigital",
+      "summary": "Encode letters as digits, or list the possible letters for each digit using your Tridigital table.",
+      "aliases": [
+        "Decode with Tridigital"
+      ]
+    },
+    "cipher.tridigital.encode": {
+      "tool_id": "cipher.tridigital",
+      "display_name": "Encode Tridigital",
+      "summary": "Encode letters as digits, or list the possible letters for each digit using your Tridigital table.",
+      "aliases": [
+        "Encode with Tridigital"
+      ]
+    },
+    "cipher.trifid.decode": {
+      "tool_id": "cipher.trifid",
+      "display_name": "Decode Trifid cipher",
+      "summary": "Mix three-dimensional letter coordinates to encode or decode text.",
+      "aliases": [
+        "Decode with Trifid"
+      ]
+    },
+    "cipher.trifid.encode": {
+      "tool_id": "cipher.trifid",
+      "display_name": "Encode Trifid cipher",
+      "summary": "Mix three-dimensional letter coordinates to encode or decode text.",
+      "aliases": [
+        "Encode with Trifid"
+      ]
+    },
+    "cipher.trithemius.decode": {
+      "tool_id": "cipher.trithemius",
+      "display_name": "Decode Trithemius cipher",
+      "summary": "Encode or decode letters with a progressively changing shift.",
+      "aliases": [
+        "Decode with Trithemius"
+      ]
+    },
+    "cipher.trithemius.encode": {
+      "tool_id": "cipher.trithemius",
+      "display_name": "Encode Trithemius cipher",
+      "summary": "Encode or decode letters with a progressively changing shift.",
+      "aliases": [
+        "Encode with Trithemius"
+      ]
+    },
+    "cipher.two_square.decode": {
+      "tool_id": "cipher.two_square",
+      "display_name": "Decode Two-square cipher",
+      "summary": "Encode or decode pairs of letters using two keyed alphabet squares.",
+      "aliases": [
+        "Decode with Two-square"
+      ]
+    },
+    "cipher.two_square.encode": {
+      "tool_id": "cipher.two_square",
+      "display_name": "Encode Two-square cipher",
+      "summary": "Encode or decode pairs of letters using two keyed alphabet squares.",
+      "aliases": [
+        "Encode with Two-square"
+      ]
+    },
+    "json.text": {
+      "tool_id": "json.text",
+      "display_name": "Read a JSON string as text",
+      "summary": "Use a JSON string as text without converting numbers or other value types.",
+      "aliases": [
+        "Use text value"
+      ]
+    },
+    "text.utf8.decode": {
+      "tool_id": "text.utf8",
+      "display_name": "Decode UTF-8",
+      "summary": "Convert text to UTF-8 bytes, or decode valid UTF-8 bytes as text.",
+      "aliases": []
+    },
+    "text.utf8.encode": {
+      "tool_id": "text.utf8",
+      "display_name": "Encode UTF-8",
+      "summary": "Convert text to UTF-8 bytes, or decode valid UTF-8 bytes as text.",
+      "aliases": []
+    },
+    "pipeline.validate": {
+      "tool_id": "pipeline.validate",
+      "display_name": "Check a pipeline",
+      "summary": "Check operation versions, settings and connected value types without running the pipeline.",
+      "aliases": [
+        "Validate a pipeline"
+      ]
+    },
+    "blockchain.scalar.validate": {
+      "tool_id": "blockchain.scalar.validate",
+      "display_name": "Check a raw private key",
+      "summary": "Check whether raw bytes or hexadecimal represent a valid secp256k1 private key.",
+      "aliases": [
+        "Validate a private scalar"
+      ]
+    },
+    "recipe.validate": {
+      "tool_id": "recipe.validate",
+      "display_name": "Check a recipe",
+      "summary": "Check the recipe format, versions and steps without running its operations.",
+      "aliases": [
+        "Validate a recipe"
+      ]
+    },
+    "blockchain.wif.validate": {
+      "tool_id": "blockchain.wif.validate",
+      "display_name": "Check a WIF private key",
+      "summary": "Check the checksum, format and network information of a supplied WIF key.",
+      "aliases": [
+        "Validate a WIF key"
+      ]
+    },
+    "text.word_ladder.validate": {
+      "tool_id": "text.word_ladder.validate",
+      "display_name": "Check a word ladder",
+      "summary": "Check that each step changes one character and all words belong to your dictionary.",
+      "aliases": [
+        "Validate a word ladder"
+      ]
+    },
+    "file.zip.validate": {
+      "tool_id": "file.zip.validate",
+      "display_name": "Check a ZIP candidate",
+      "summary": "Check whether supplied data satisfies the supported ZIP validation rules.",
+      "aliases": [
+        "Validate a ZIP candidate"
+      ]
+    },
+    "blockchain.candidates.validate": {
+      "tool_id": "blockchain.candidates.validate",
+      "display_name": "Check private key candidates",
+      "summary": "Validate a supplied list of private key candidates without generating keys or making network requests.",
+      "aliases": [
+        "Validate supplied key candidates"
+      ]
+    },
+    "cipher.vigenere.decode": {
+      "tool_id": "cipher.vigenere",
+      "display_name": "Decode Vigenère cipher",
+      "summary": "Shift letters using a repeating keyword, or reverse those shifts to decode a message.",
+      "aliases": [
+        "Decode with Vigenère"
+      ]
+    },
+    "cipher.vigenere.encode": {
+      "tool_id": "cipher.vigenere",
+      "display_name": "Encode Vigenère cipher",
+      "summary": "Shift letters using a repeating keyword, or reverse those shifts to decode a message.",
+      "aliases": [
+        "Encode with Vigenère"
+      ]
+    },
+    "cipher.vigenere_multiplicative.decode": {
+      "tool_id": "cipher.vigenere_multiplicative",
+      "display_name": "Decode Multiplicative Vigenère",
+      "summary": "Encode or decode letters using a repeating sequence of multiplicative key values.",
+      "aliases": [
+        "Decode with Vigenère–Multiplicative"
+      ]
+    },
+    "cipher.vigenere_multiplicative.encode": {
+      "tool_id": "cipher.vigenere_multiplicative",
+      "display_name": "Encode Multiplicative Vigenère",
+      "summary": "Encode or decode letters using a repeating sequence of multiplicative key values.",
+      "aliases": [
+        "Encode with Vigenère–Multiplicative"
+      ]
+    },
+    "binary.xor_exact": {
+      "tool_id": "binary.xor_exact",
+      "display_name": "XOR two byte sequences",
+      "summary": "Combine two equal-length byte sequences using XOR without repeating either input.",
+      "aliases": [
+        "XOR equal-length bytes"
+      ]
+    },
+    "binary.xor": {
+      "tool_id": "binary.xor",
+      "display_name": "XOR with a repeating key",
+      "summary": "Combine bytes with a repeating key using XOR; this is not secure encryption.",
+      "aliases": []
+    }
+  }
+}

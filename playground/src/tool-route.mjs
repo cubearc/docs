@@ -11,7 +11,9 @@ export function resolveToolLink(hash, tools, mode = 'Decode') {
     key = decodeURIComponent(encodedKey);
     version = encodedVersion === undefined ? null : decodeURIComponent(encodedVersion);
   } catch { return { detailOpen: true, tool: null, action: null, routeError: 'This tool link is malformed. Return to All tools to choose an operation.' }; }
-  const tool = tools.find(tool => tool.actions.some(action => action.id === key)) ?? tools.find(tool => tool.key === key);
+  const legacy = tools.filter(tool => tool.legacyToolIds?.includes(key));
+  const tool = tools.find(tool => tool.actions.some(action => action.id === key)) ?? tools.find(tool => tool.key === key)
+    ?? legacy.find(tool => tool.actions.some(action => action.id.endsWith(`.${mode.toLowerCase()}`))) ?? legacy[0];
   if (!tool || extra.length) return { detailOpen: true, tool: null, action: null, routeError: 'This tool link is not in the current catalog. Return to All tools to choose an operation.' };
   const action = tool.actions.find(action => action.id === key) ?? tool.actions.find(action => action.id.endsWith(`.${mode.toLowerCase()}`)) ?? tool.actions[0];
   return {

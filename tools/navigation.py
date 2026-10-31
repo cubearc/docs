@@ -1,6 +1,8 @@
-"""Reader-facing names for the portal; operation contracts stay in Cube."""
+"""Explicit reader-facing presentation; canonical operation contracts stay in Cube."""
 
-import re
+import json
+from functools import lru_cache
+from pathlib import Path
 
 
 CATEGORIES = {
@@ -27,254 +29,52 @@ CATEGORIES = {
     "web": "Saved web content",
 }
 
-ENCODINGS = {
-    "base32": "Base32", "base58": "Base58", "base58check": "Base58Check",
-    "base64": "Base64", "hex": "hexadecimal",
-}
 
-HASHES = {
-    "crc16_ibm3740": "CRC-16/IBM-3740", "crc32": "CRC-32", "crc32c": "CRC-32C",
-    "keccak256": "Keccak-256", "md5": "MD5", "ripemd160": "RIPEMD-160",
-    "sha1": "SHA-1", "sha256": "SHA-256", "sha512": "SHA-512",
-}
-
-CIPHERS = {
-    "adfgvx": "ADFGVX", "adfgx": "ADFGX", "affine": "Affine", "amsco": "AMSCO",
-    "autokey": "Autokey", "bacon": "Bacon", "bazeries": "Bazeries", "bifid": "Bifid",
-    "book": "a book cipher", "caesar": "Caesar", "caesar_box": "a Caesar box",
-    "chaocipher": "Chaocipher", "columnar": "columnar transposition",
-    "complete_columnar": "complete columnar transposition", "condi": "Condi",
-    "digrafid": "Digrafid", "double_columnar": "double columnar transposition",
-    "four_square": "Four-square", "fractionated_morse": "fractionated Morse",
-    "grandpre": "Grandpré", "gromark": "Gromark", "gronsfeld": "Gronsfeld",
-    "hill": "Hill", "homophonic": "homophonic substitution",
-    "interrupted_key": "Interrupted Key", "progressive_key": "Progressive Key",
-    "vigenere_multiplicative": "Vigenère–Multiplicative",
-    "monome_dinome": "Monome-dinome", "morbit": "Morbit", "myszkowski": "Myszkowski",
-    "nicodemus": "Nicodemus", "nihilist_substitution": "Nihilist substitution",
-    "periodic_gromark": "periodic Gromark", "phillips": "Phillips", "playfair": "Playfair",
-    "pollux": "Pollux", "polybius": "Polybius", "quagmire": "Quagmire",
-    "ragbaby": "Ragbaby", "rail_fence": "a rail fence", "redefence": "Redefence",
-    "route": "route transposition", "running_key": "a running key", "scytale": "Scytale",
-    "sequence_transposition": "sequence transposition", "seriated_playfair": "seriated Playfair",
-    "skip": "skip transposition", "slidefair": "Slidefair", "solitaire": "Solitaire",
-    "spiral": "spiral transposition", "straddling": "a straddling checkerboard",
-    "substitution": "substitution", "tri_square": "Tri-square", "tridigital": "Tridigital",
-    "trifid": "Trifid", "trithemius": "Trithemius", "turning_grille": "a turning grille",
-    "two_square": "Two-square", "vigenere": "Vigenère",
-}
-
-TITLES = {
-    "cipher.aes.encrypt_blocks": "Encrypt raw AES blocks",
-    "cipher.aes.decrypt_blocks": "Decrypt raw AES blocks",
-    "cipher.chacha8": "Apply ChaCha8",
-    "cipher.chacha12": "Apply ChaCha12",
-    "cipher.chacha20": "Apply ChaCha20",
-    "cipher.xchacha20": "Apply XChaCha20",
-    "cipher.salsa20_12": "Apply Salsa20/12",
-    "cipher.salsa20": "Apply Salsa20/20",
-    "cipher.vernam": "Apply educational Vernam",
-    "analysis.affine.rank": "Rank Affine candidates",
-    "analysis.caesar.rank": "Rank Caesar candidates",
-    "analysis.crib.verify": "Check known plaintext",
-    "analysis.frequency.compare": "Compare symbol frequencies",
-    "analysis.homophonic.inspect": "Inspect homophonic tokens",
-    "analysis.language.score": "Score candidate language",
-    "analysis.period.estimate": "Estimate repeating-key periods",
-    "analysis.transposition.rank": "Rank transposition candidates",
-    "analysis.vigenere.rank": "Rank Vigenère candidates",
-    "audio.bits.extract": "Extract audio bits",
-    "audio.dtmf.detect": "Detect DTMF tones",
-    "audio.metadata.inspect": "Inspect FLAC metadata",
-    "audio.morse.detect": "Detect Morse timing",
-    "audio.morse.transcribe": "Transcribe Morse timing",
-    "audio.pcm.extract": "Extract PCM samples",
-    "audio.reverse": "Reverse audio frames",
-    "audio.spectrogram": "Create a spectrogram",
-    "audio.spectrum": "Inspect an audio spectrum",
-    "audio.wave.inspect": "Inspect a WAV container",
-    "audio.waveform.envelope": "Measure a waveform envelope",
-    "binary.add_wrapping": "Add with wrapping",
-    "binary.and": "Apply bitwise AND",
-    "binary.not": "Invert bits",
-    "binary.or": "Apply bitwise OR",
-    "binary.reverse": "Reverse bytes",
-    "binary.rotate_left": "Rotate bits left",
-    "binary.rotate_right": "Rotate bits right",
-    "binary.shift_left": "Shift bits left",
-    "binary.shift_right": "Shift bits right",
-    "binary.sub_wrapping": "Subtract with wrapping",
-    "binary.swap_endian": "Swap byte order",
-    "binary.xor": "XOR with a repeating key",
-    "binary.xor_exact": "XOR equal-length bytes",
-    "blockchain.bitcoin.derive": "Derive a Bitcoin address",
-    "blockchain.candidates.validate": "Validate supplied key candidates",
-    "blockchain.ethereum.derive": "Derive an Ethereum address",
-    "blockchain.private.export": "Export private key material",
-    "blockchain.scalar.validate": "Validate a private scalar",
-    "blockchain.wif.validate": "Validate a WIF key",
-    "cipher.atbash": "Apply Atbash",
-    "cipher.beaufort": "Apply Beaufort",
-    "cipher.enigma": "Run Enigma I or M3",
-    "cipher.cardan.extract": "Extract through a Cardan grille",
-    "cipher.cardan.overlay": "Overlay a Cardan grille",
-    "cipher.porta": "Apply Porta",
-    "cipher.portax": "Apply Portax",
-    "cipher.rot13": "Apply ROT13",
-    "cipher.rot18": "Apply ROT18",
-    "cipher.rot47": "Apply ROT47",
-    "cipher.rot5": "Apply ROT5",
-    "esolang.brainfuck.compare": "Compare Brainfuck runs",
-    "esolang.brainfuck.execute": "Run a Brainfuck program",
-    "esolang.brainfuck.report": "Inspect a Brainfuck run",
-    "file.appended.detect": "Find appended data",
-    "file.binary.compare": "Compare file bytes",
-    "file.carve": "Recover a file range",
-    "file.exif.inspect": "Inspect EXIF metadata",
-    "file.hex.inspect": "Inspect hexadecimal bytes",
-    "file.info.inspect": "Inspect file information",
-    "file.range.extract": "Extract a byte range",
-    "file.signature.detect": "Identify a file signature",
-    "file.signature.scan": "Find embedded signatures",
-    "file.strings.extract": "Extract printable strings",
-    "file.zip.validate": "Validate a ZIP candidate",
-    "graph.components": "Find connected components",
-    "graph.cycle": "Detect a graph cycle",
-    "graph.euler_trail": "Find an Euler trail",
-    "graph.shortest_path": "Find a shortest path",
-    "image.bit_plane.extract": "Extract an image bit plane",
-    "image.bitwise": "Combine images with bitwise operations",
-    "image.channel.extract": "Extract an image channel",
-    "image.colors.export": "Export color masks and layers",
-    "image.colors.extract": "Isolate exact colors",
-    "image.compare": "Compare image samples",
-    "image.crop": "Crop an image",
-    "image.csv.export": "Export pixels to CSV",
-    "image.csv.import": "Import pixels from CSV",
-    "image.decode": "Decode an image",
-    "image.encode": "Encode a PNG image",
-    "image.geometry.inspect": "Inspect image geometry",
-    "image.grayscale": "Convert to grayscale",
-    "image.histogram": "Count image colors",
-    "image.invert": "Invert image samples",
-    "image.lsb.extract": "Extract least-significant bits",
-    "image.mirror": "Mirror an image",
-    "image.pairs": "Compare and combine image pairs",
-    "image.palette.expand": "Expand a PNG palette",
-    "image.pixels.export": "Export pixel samples",
-    "image.pixels.read": "Read exact pixels",
-    "image.png.inspect": "Inspect PNG chunks",
-    "image.qr.decode": "Decode QR codes",
-    "image.raw.interpret": "Interpret raw image bytes",
-    "image.reorder": "Reorder image channels",
-    "image.rotate": "Rotate an image",
-    "image.spatial.autocorrelation": "Measure spatial autocorrelation",
-    "investigation.profile.plan": "Preview an inspection profile",
-    "investigation.profile.run": "Run an inspection profile",
-    "investigation.replay": "Replay an investigation",
-    "investigation.report": "Export an investigation report",
-    "investigation.session.record": "Record investigation provenance",
-    "investigation.triage": "Suggest file inspections",
-    "logic.boolean.analyze": "Analyze a truth table",
-    "logic.boolean.evaluate": "Evaluate a Boolean expression",
-    "number.alphabet.convert": "Convert a custom digit alphabet",
-    "number.base.convert": "Convert a number base",
-    "number.binomial": "Compute a binomial coefficient",
-    "number.constant_digits": "Select digits of a constant",
-    "number.digital_root": "Compute a digital root",
-    "number.extended_gcd": "Compute Bézout coefficients",
-    "number.gcd": "Compute a greatest common divisor",
-    "number.mod_inverse": "Compute a modular inverse",
-    "number.mod_pow": "Compute a modular power",
-    "number.multinomial": "Compute a multinomial coefficient",
-    "number.pascal": "Generate Pascal rows",
-    "number.permutations": "Count permutations",
-    "pipeline.execute": "Run a pipeline",
-    "pipeline.validate": "Validate a pipeline",
-    "probability.dice.compare": "Compare dice outcomes",
-    "probability.dice.sum": "Compute a dice-sum distribution",
-    "probability.finite.analyze": "Analyze finite probabilities",
-    "recipe.check": "Check a recipe result",
-    "recipe.execute": "Run a recipe",
-    "recipe.validate": "Validate a recipe",
-    "symbol.a1z26.decode": "Decode A1Z26",
-    "symbol.a1z26.encode": "Encode A1Z26",
-    "symbol.braille.decode": "Decode Braille dot masks",
-    "symbol.braille.encode": "Encode Braille dot masks",
-    "symbol.clock.directions": "Map clock hands to directions",
-    "symbol.keypad.decode": "Decode keypad groups",
-    "symbol.keypad.encode": "Encode keypad groups",
-    "symbol.morse.decode": "Decode Morse code",
-    "symbol.morse.encode": "Encode Morse code",
-    "symbol.semaphore.decode": "Decode flag semaphore",
-    "symbol.semaphore.encode": "Encode flag semaphore",
-    "symbol.tokens.decode": "Decode custom symbols",
-    "symbol.tokens.encode": "Encode custom symbols",
-    "text.anagram.search": "Find anagrams",
-    "text.class.map": "Map character classes",
-    "text.codepoints": "Inspect Unicode code points",
-    "text.combinations": "Generate string combinations",
-    "text.extract": "Extract character positions",
-    "text.grid.factors": "Find possible text grids",
-    "text.grid.render": "Render a text grid",
-    "text.josephus.extract": "Extract in Josephus order",
-    "text.keyboard.coordinates.decode": "Decode keyboard coordinates",
-    "text.keyboard.coordinates.encode": "Encode keyboard coordinates",
-    "text.keyboard.remap": "Remap keyboard positions",
-    "text.keyboard.shift.decode": "Decode keyboard shifts",
-    "text.keyboard.shift.encode": "Encode keyboard shifts",
-    "text.multiset.compare": "Compare character inventories",
-    "text.multiset.subtract": "Subtract character inventories",
-    "text.normalize": "Normalize Unicode text",
-    "text.reverse": "Reverse text characters",
-    "text.select": "Select characters by word or line",
-    "text.skip.keyed": "Traverse text with keyed steps",
-    "text.statistics": "Measure text statistics",
-    "text.transform.masked": "Transform selected positions",
-    "text.unicode.compare": "Compare Unicode text",
-    "text.unicode.inspect": "Inspect Unicode characters",
-    "text.utf8.decode": "Decode UTF-8",
-    "json.parse": "Parse JSON",
-    "json.select": "Select field",
-    "json.text": "Use text value",
-    "text.integer": "Parse integer",
-    "number.maximum": "Maximum",
-    "number.add": "Add",
-    "image.dimensions": "Image dimensions",
-    "text.concat": "Concatenate text",
-    "bytes.concat": "Concatenate bytes",
-    "text.utf8.encode": "Encode UTF-8",
-    "text.word.extract": "Extract positions within words",
-    "text.word.lengths": "Measure word lengths",
-    "text.word.values": "Compute word values",
-    "text.word_ladder.shortest": "Find a shortest word ladder",
-    "text.word_ladder.validate": "Validate a word ladder",
-    "video.audio.extract": "Extract PCM audio from MOV",
-    "video.container.inspect": "Inspect a video container",
-    "video.frames.compare": "Compare video frames",
-    "video.frames.extract": "Extract JPEG frames from MOV",
-    "web.har.asset": "Extract an embedded HAR body",
-    "web.har.inspect": "Inspect a saved HAR file",
-    "web.html.asset": "Extract an inline HTML asset",
-    "web.html.inspect": "Inspect saved HTML",
-}
+@lru_cache(maxsize=1)
+def presentation_source():
+    return json.loads(Path(__file__).with_name("tool-presentation.json").read_text())
 
 
 def operation_title(operation):
-    if operation in TITLES:
-        return TITLES[operation]
-    match = re.fullmatch(r"encoding\.([a-z0-9]+)\.(encode|decode)", operation)
-    if match and match[1] in ENCODINGS:
-        return f"{match[2].capitalize()} {ENCODINGS[match[1]]}"
-    match = re.fullmatch(r"cipher\.([a-z_]+)\.(encode|decode)", operation)
-    if match and match[1] in CIPHERS:
-        return f"{match[2].capitalize()} with {CIPHERS[match[1]]}"
-    if operation.startswith("hash.") and operation[5:] in HASHES:
-        return "Compute " + HASHES[operation[5:]]
-    raise ValueError(f"Add a reader-facing navigation title for {operation}")
+    try:
+        return presentation_source()["operations"][operation]["display_name"]
+    except KeyError:
+        raise ValueError(f"Add a reader-facing navigation title for {operation}") from None
+
+
+def operation_aliases(operation):
+    return presentation_source()["operations"][operation].get("aliases", [])
 
 
 def category_title(category):
     if category not in CATEGORIES:
         raise ValueError(f"Add a reader-facing category title for {category}")
     return CATEGORIES[category]
+
+
+def catalog_presentation(catalog):
+    """Require exact editorial coverage of the supplied canonical catalog."""
+    source = presentation_source()
+    operations = {row["operation"]: row for row in catalog["operations"]}
+    if len(operations) != len(catalog["operations"]) or source.get("format_version") != 1 or set(source["operations"]) != set(operations):
+        raise ValueError("Presentation operation IDs must match the canonical catalog exactly")
+    used = {}
+    for operation, entry in source["operations"].items():
+        tool_id = entry.get("tool_id")
+        if tool_id not in source["tools"]:
+            raise ValueError(f"Missing explicit tool presentation for {operation}")
+        category = operations[operation]["category"]
+        if tool_id in used and used[tool_id] != category:
+            raise ValueError(f"Tool {tool_id} groups different categories")
+        used[tool_id] = category
+    if set(used) != set(source["tools"]):
+        raise ValueError("Presentation contains tools without canonical operations")
+    for entry in [*source["tools"].values(), *source["operations"].values()]:
+        for field in ["display_name", "summary"]:
+            if not isinstance(entry.get(field), str) or not entry[field].strip():
+                raise ValueError(f"Presentation requires explicit {field}")
+        for field in ["aliases", "legacy_tool_ids"]:
+            values = entry.get(field, [])
+            if not isinstance(values, list) or any(not isinstance(value, str) or not value for value in values):
+                raise ValueError(f"Invalid presentation {field}")
+    return {**source, "categories": {category: category_title(category) for category in sorted(set(used.values()))}}
