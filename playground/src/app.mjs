@@ -1,5 +1,6 @@
 import { h, button, notify } from './dom.mjs';
 import { initializeRuntime } from './runtime.mjs';
+import { migrateFavorites } from './catalog.mjs';
 import { Session } from './session.mjs';
 import { PipelineDraft } from './pipeline.mjs';
 import { PipelineLibrary } from './library.mjs';
@@ -111,6 +112,7 @@ async function start() {
   main.replaceChildren(h('h1', {}, 'Cube Playground'), h('p', { role: 'status' }, 'Loading the local tools…'));
   try {
     runtime = await initializeRuntime();
+    state.favorites = migrateFavorites(state.favorites, runtime.tools);
     document.querySelector('#runtime-details').textContent = JSON.stringify({ build: runtime.sdk.build, limits: runtime.sdk.limits,
       catalogOperations: runtime.catalog.operations.length, directExecutors: runtime.sdk.executors.length, pipelineAdapters: runtime.sdk.pipelineAdapters.length }, null, 2);
     route();

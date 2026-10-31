@@ -13,7 +13,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 from check_links import LINK, check, prose, slug
-from navigation import category_title, operation_title
+from navigation import category_title, operation_aliases, operation_title
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY = re.compile(r"^(\s*)- \[([^\]]+)\]\(([^)]+)\)\s*$")
@@ -65,7 +65,8 @@ def operation_pages(cube):
 def present_operation(operation, content):
     title = operation_title(operation)
     body = content.partition("\n")[2].lstrip("\n")
-    return (f'<div id="{slug(operation)}"></div>\n\n# {title}\n\n'
+    aliases = "".join(f'<div id="{html.escape(slug(alias), quote=True)}"></div>\n' for alias in operation_aliases(operation) if slug(alias) != slug(title))
+    return (f'<div id="{slug(operation)}"></div>\n{aliases}\n# {title}\n\n'
             f'<span class="docs-operation-id">Operation ID: \x60{operation}\x60</span>\n\n'
             + body)
 

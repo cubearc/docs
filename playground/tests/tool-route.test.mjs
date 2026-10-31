@@ -21,3 +21,10 @@ test('exact links restore grouped actions and distinguish canonical operation ve
   }
   assert.deepEqual(resolveToolLink('#/tools', tools), { detailOpen: false, routeError: '' });
 });
+
+test('split image tools retain their old unversioned family link', () => {
+  const images = ['image.decode','image.encode'].map(id => ({ key:id, legacyToolIds:['image'], actions:[action(id)] }));
+  assert.equal(resolveToolLink('#/tools/image', images).action, 'image.decode');
+  assert.equal(resolveToolLink('#/tools/image', images, 'Encode').action, 'image.encode');
+  assert.equal(resolveToolLink('#/tools/image.encode/1', images).action, 'image.encode');
+});
