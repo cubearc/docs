@@ -18,6 +18,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     await page.locator('#tool-search').fill('number.constant_digits');
     await page.locator('[data-tool="number.constant_digits"]').click();
     await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await page.locator('#playground-options-constant').waitFor();
     assert.equal(await page.locator('#playground-options-constant').count(),1,'Tools with no input ports must open their actual options.');
     await page.locator('#playground-options-constant').selectOption('pi');
     await page.locator('#playground-options-count').fill('3');
