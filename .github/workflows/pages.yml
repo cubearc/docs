@@ -94,7 +94,7 @@ jobs:
           node playground/scripts/build.mjs --sdk "$sdk_tarball" --sdk-sha256 "$sdk_sha256" --cube-source ../sources/cube
           npm ci --ignore-scripts --no-audit --no-fund --prefix ../sources/cube/bindings/javascript
           ../sources/cube/bindings/javascript/node_modules/.bin/playwright install --with-deps chromium firefox webkit
-          node --test playground/tests/pipeline-import.integration.mjs
+          CUBE_CONFORMANCE_FIXTURES="$GITHUB_WORKSPACE/sources/cube/crates/cube-core/src/operations/contracts/conformance.json" node --test playground/tests/pipeline-import.integration.mjs playground/tests/runtime.integration.mjs
           for browser in chromium firefox webkit; do
             PLAYWRIGHT_MODULE="$GITHUB_WORKSPACE/sources/cube/bindings/javascript/node_modules/playwright" BROWSER_ENGINE="$browser" PLAYGROUND_A11Y_REPORT="$RUNNER_TEMP/playground-a11y-$browser.json" node --test playground/tests/browser.e2e.mjs
           done

@@ -16,6 +16,8 @@ export function mountPlayground(container, context) {
   const runButton = button('Run tools', () => run(), { class: 'primary', id: 'run-tools' });
   const status = h('p', { role: 'status', class: 'small muted' }, page.status);
   const selected = page.tool ? runtime.action(page.tool) : null;
+  const hasInput = !selected || selected.contract.inputs.length > 0;
+  const inputLabel = selected?.direct && !selected.pipeline && hasInput ? `${labelFor(selected.contract.inputs[0].name)} input` : 'Your input';
 
   function changed({ input } = {}) {
     page.controller?.abort();
@@ -142,6 +144,7 @@ export function mountPlayground(container, context) {
     return h('article', { class: 'panel result-card', 'data-result-operation': result.operation }, h('div', { class: 'row between' }, h('h3', {}, action?.title ?? 'Result'), h('span', { class: 'tag' }, `Round ${result.round}`)),
       result.earlierInput ? h('p', { class: 'warning small' }, 'From an earlier input or settings.') : null,
       names.length > 1 ? h('div', { class: 'field' }, h('label', { for: `output-${result.id}` }, 'Choose an output'), h('select', { id: `output-${result.id}`, onChange: event => { page.outputChoices[result.id] = event.target.value; page.redraw?.(); } }, h('option', { value: '' }, 'Choose an output'), names.map(name => h('option', { value: name, selected: name === selectedName }, `${labelFor(name)} (${result.outputs[name].type})`)))) : null,
+      action?.contract.inputs.length === 0 ? h('p', { class: 'small muted' }, 'Generated from options; no starting input was used.') : null,
       view, h('details', {}, h('summary', {}, 'Used settings'), h('pre', {}, JSON.stringify({ operation: result.operation, version: result.version, parameters: safeParameters, conversions: result.steps?.slice(0, -1) ?? result.conversions ?? [] }, null, 2))));
   }
 
@@ -164,11 +167,12 @@ export function mountPlayground(container, context) {
 
   const value = session.input;
   let inputControl;
-  if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': selected?.direct && !selected.pipeline ? `${labelFor(selected.contract.inputs[0].name)} input` : 'Your input', onInput: event => { try { changed({ input: { type: 'text', data: event.target.value } }); } catch (error) { notify(error.message); runButton.disabled = true; } } });
+  if (!hasInput) inputControl = null;
+  else if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': inputLabel, onInput: event => { try { changed({ input: { type: 'text', data: event.target.value } }); } catch (error) { notify(error.message); runButton.disabled = true; } } });
   else inputControl = h('div', { class: 'byte-input' }, h('strong', {}, page.sourceName ?? `${labelFor(value.type)} input`), h('p', { class: 'muted' }, `${bytesOf(value).toLocaleString()} bytes · ${value.type}`),
     value.type === 'bytes' ? button('Use as UTF-8 text', () => run({ ids: ['text.utf8.decode'], continueAfter: true })) : h('pre', {}, JSON.stringify(value.data, null, 2).slice(0, 2048)));
   const fileInput = h('input', { type: 'file', id: 'playground-file', hidden: true, onChange: event => setFile(event.target.files[0]) });
-  const inputMain = h('div', { class: 'input-main' }, h('label', { for: 'playground-input' }, selected?.direct && !selected.pipeline ? `${labelFor(selected.contract.inputs[0].name)} input` : 'Your input'), inputControl,
+  const inputMain = !hasInput ? h('div', { class: 'input-main' }, h('p', { class: 'muted' }, 'This tool uses the options below. No starting input is required.')) : h('div', { class: 'input-main' }, h('label', { for: 'playground-input' }, inputLabel), inputControl,
     h('div', { class: 'toolbar spacer' }, button('Paste', async () => { try { const text = await navigator.clipboard.readText(); changed({ input: { type: 'text', data: text } }); page.sourceName = null; render(); } catch { notify('Use your keyboard or system paste command in the text field.'); } }),
       button('Open file', () => fileInput.click()), button('Clear', () => { changed({ input: { type: 'text', data: '' } }); page.sourceName = null; render(); }), fileInput),
     h('p', { class: 'small muted' }, 'Up to 128 KiB. Choose a file to retain exact bytes, including line endings.'));
@@ -183,13 +187,13 @@ export function mountPlayground(container, context) {
     }) : [];
     append(inputOptions, h('h3', {}, selected.title), ...extra, ...(form ? [form] : []));
   }
-  append(inputOptions, h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.utf8, onChange: event => { page.utf8 = event.target.checked; changed(); } }), 'Use UTF-8 for text sent to byte tools'),
-    h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.auto, onChange: event => { page.auto = event.target.checked; changed(); } }), 'Update recently fast tools as I type'),
-    h('p', { class: 'small muted' }, 'Automatic updates require a measured fast run and an input of 4 KiB or less.'),
+  append(inputOptions, hasInput ? h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.utf8, onChange: event => { page.utf8 = event.target.checked; changed(); } }), 'Use UTF-8 for text sent to byte tools') : null,
+    hasInput ? h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.auto, onChange: event => { page.auto = event.target.checked; changed(); } }), 'Update recently fast tools as I type') : null,
+    hasInput ? h('p', { class: 'small muted' }, 'Automatic updates require a measured fast run and an input of 4 KiB or less.') : null,
     h('div', { class: 'toolbar' }, runButton, button('Stop', () => { clearTimeout(page.autoTimer); page.controller?.abort(); page.running = false; page.readingFile = null; page.status = 'Pending input and worker work stopped; the previous input is retained.'; page.redraw?.(); })), status,
-    button('Try an example', () => { changed({ input: { type: 'text', data: page.mode === 'Decode' ? 'SGVsbG8sIEN1YmUh' : 'Hello, Cube!' } }); page.tool = null; render(); }),
+    hasInput ? button('Try an example', () => { changed({ input: { type: 'text', data: page.mode === 'Decode' ? 'SGVsbG8sIEN1YmUh' : 'Hello, Cube!' } }); page.tool = null; render(); }) : null,
     selected ? button('Compare common tools', () => { page.tool = null; changed(); render(); }) : null);
-  replace(container, h('div', { class: 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),
+  replace(container, h('div', { class: 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, selected ? selected.description : page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),
     session.path.length ? h('div', { class: 'row spacer' }, h('span', { class: 'tag' }, `${session.path.length} chosen steps`), button('Save chosen sequence', () => fromSequence(session.path, session.originalInput, session.input.type))) : null),
     h('div', { class: 'section-jumps toolbar' }, h('a', { class: 'button', href: '#input-section' }, 'Input'), h('a', { class: 'button', href: '#results-section' }, 'Results')),
     h('div', { class: 'play-grid' }, h('section', { class: 'panel input-panel', id: 'input-section', tabindex: -1, 'aria-label': 'Input and options' },
