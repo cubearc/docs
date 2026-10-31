@@ -59,6 +59,52 @@ jobs:
           ref: ${{ steps.refs.outputs.recipes }}
           path: sources/recipes
           persist-credentials: false
+      - name: Discover the SDK at the reviewed Cube revision
+        id: sdk
+        run: |
+          if test -f ../sources/cube/bindings/javascript/package.json; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Test isolated application state and provenance
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --prefix playground
+          npm test --prefix playground
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        if: steps.sdk.outputs.available == 'true'
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Build the SDK from the recorded Cube revision
+        if: steps.sdk.outputs.available == 'true'
+        working-directory: sources/cube/bindings/javascript
+        run: |
+          cargo install wasm-bindgen-cli --version 0.2.129 --locked
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          mkdir -p "$RUNNER_TEMP/cube-sdk"
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/cube-sdk"
+      - name: Build and exercise the actual application package
+        if: steps.sdk.outputs.available == 'true'
+        run: |
+          sdk_tarball=$(find "$RUNNER_TEMP/cube-sdk" -name '*.tgz' -type f)
+          sdk_sha256=$(sha256sum "$sdk_tarball" | cut -d ' ' -f 1)
+          node playground/scripts/build.mjs --sdk "$sdk_tarball" --sdk-sha256 "$sdk_sha256" --cube-source ../sources/cube
+          npm ci --ignore-scripts --no-audit --no-fund --prefix ../sources/cube/bindings/javascript
+          ../sources/cube/bindings/javascript/node_modules/.bin/playwright install --with-deps chromium firefox webkit
+          node --test playground/tests/pipeline-import.integration.mjs
+          for browser in chromium firefox webkit; do
+            PLAYWRIGHT_MODULE="$GITHUB_WORKSPACE/sources/cube/bindings/javascript/node_modules/playwright" BROWSER_ENGINE="$browser" PLAYGROUND_A11Y_REPORT="$RUNNER_TEMP/playground-a11y-$browser.json" node --test playground/tests/browser.e2e.mjs
+          done
+      - name: Retain automated accessibility evidence
+        if: always() && steps.sdk.outputs.available == 'true'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: playground-accessibility
+          path: ${{ runner.temp }}/playground-a11y-*.json
+          if-no-files-found: warn
       - name: Test publishing and link-check failures
         run: python3 -m unittest discover -s tests -v
       - name: Check the authored Markdown
@@ -70,7 +116,12 @@ jobs:
       - name: Install pinned mdBook
         run: python3 tools/install_mdbook.py
       - name: Build and verify the recorded sources
-        run: python3 tools/site.py build --sources-root ../sources --locked
+        run: |
+          if test "${{ steps.sdk.outputs.available }}" = true; then
+            python3 tools/site.py build --sources-root ../sources --locked --playground playground/dist
+          else
+            python3 tools/site.py build --sources-root ../sources --locked
+          fi
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: docs/site
