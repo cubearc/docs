@@ -27,10 +27,10 @@ try {
 let runtime;
 let activeController;
 let section = 'playground';
-function beginRun() { activeController?.abort(); activeController = new AbortController(); return activeController; }
+function beginRun() { clearTimeout(state.playground.autoTimer); activeController?.abort(); activeController = new AbortController(); return activeController; }
 function navigate(next) { if (location.hash === `#/${next}`) route(); else location.hash = `#/${next}`; }
 function useTool(action) {
-  state.playground.controller?.abort(); state.playground.readingFile = null;
+  state.playground.controller?.abort(); clearTimeout(state.playground.autoTimer); state.playground.readingFile = null;
   state.playground.session.invalidate(); state.playground.revision++;
   state.playground.tool = action.id; state.playground.running = false;
   state.playground.status = 'Tool selected. Review its options, then run with your current input.';

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { verifyFileReadOrdering } from './support/file-ordering.mjs';
+import { verifyAutomaticSelection } from './support/automatic-selection.mjs';
 import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -322,6 +323,7 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await auditAccessibility('long-encode-results');
 
   await verifyFileReadOrdering(page, exportedDocument);
+  await verifyAutomaticSelection(context, origin);
 
   assert.deepEqual(accessibility.flatMap(snapshot => snapshot.violations.map(rule => ({ label: snapshot.label, ...rule }))), [], 'Automated accessibility violations must be resolved without disabling rules.');
   t.diagnostic(`axe-core ${accessibility[0]?.version}: ${accessibility.length} snapshots; ${accessibility.reduce((sum, snapshot) => sum + snapshot.incomplete.length, 0)} rule checks require manual review.`);

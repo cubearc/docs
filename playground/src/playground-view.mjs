@@ -186,7 +186,7 @@ export function mountPlayground(container, context) {
   append(inputOptions, h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.utf8, onChange: event => { page.utf8 = event.target.checked; changed(); } }), 'Use UTF-8 for text sent to byte tools'),
     h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.auto, onChange: event => { page.auto = event.target.checked; changed(); } }), 'Update recently fast tools as I type'),
     h('p', { class: 'small muted' }, 'Automatic updates require a measured fast run and an input of 4 KiB or less.'),
-    h('div', { class: 'toolbar' }, runButton, button('Stop', () => { page.controller?.abort(); page.running = false; page.readingFile = null; page.status = 'Pending input and worker work stopped; the previous input is retained.'; page.redraw?.(); })), status,
+    h('div', { class: 'toolbar' }, runButton, button('Stop', () => { clearTimeout(page.autoTimer); page.controller?.abort(); page.running = false; page.readingFile = null; page.status = 'Pending input and worker work stopped; the previous input is retained.'; page.redraw?.(); })), status,
     button('Try an example', () => { changed({ input: { type: 'text', data: page.mode === 'Decode' ? 'SGVsbG8sIEN1YmUh' : 'Hello, Cube!' } }); page.tool = null; render(); }),
     selected ? button('Compare common tools', () => { page.tool = null; changed(); render(); }) : null);
   replace(container, h('div', { class: 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),

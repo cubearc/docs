@@ -35,7 +35,9 @@ The first local limits are 128 KiB input, eight retained rounds, 24 results per
 round, 16 pins and four MiB retained result/provenance data. Runtime limits are
 separate and may be lower for a particular operation or transport. Errors and
 unavailable operations remain discoverable. No readability score claims a solve;
-encoding alternatives are equally relevant.
+encoding alternatives are equally relevant. Selecting another tool, stopping or
+starting an explicit run revokes queued automatic comparisons; it does not
+relabel earlier results as work from the new selection.
 
 ## Validate actual integration
 
