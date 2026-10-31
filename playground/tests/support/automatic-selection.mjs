@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 /** Real Wasm results; virtual time controls only the typing/debounce transition. */
 export async function verifyAutomaticSelection(context, origin) {
   const page = await context.newPage();
+  let controlledClock = false;
   try {
     await page.goto(`${origin}/docs/playground/`);
     await page.getByRole('heading', { name: 'Decode text', exact: true }).waitFor({ timeout: 45000 });
@@ -11,7 +12,7 @@ export async function verifyAutomaticSelection(context, origin) {
     await page.getByRole('button', { name: 'Run tools', exact: true }).click();
     await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
     assert.equal(await page.getByLabel('Encode Base64 contents', { exact: true }).textContent(), 'QQ==');
-    await page.clock.install();
+    await page.clock.install(); controlledClock = true;
     await page.clock.pauseAt(new Date(Date.now() + 1000));
     await page.getByLabel('Update recently fast tools as I type', { exact: true }).check();
     await page.locator('#playground-input').fill('B');
@@ -47,5 +48,5 @@ export async function verifyAutomaticSelection(context, origin) {
     await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Playground', exact: true }).click();
     assert.equal(await page.getByLabel('Encode Base64 contents', { exact: true }).textContent(), 'Qg==', 'An explicit pipeline run must revoke an older scheduled Playground update.');
 
-  } finally { await page.close(); }
+  } finally { if (controlledClock) await page.clock.resume(); await page.close(); }
 }

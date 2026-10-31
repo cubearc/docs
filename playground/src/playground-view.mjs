@@ -11,7 +11,7 @@ export function mountPlayground(container, context) {
   const { state, runtime, render, navigate, beginRun, fromSequence, isCurrentView } = context;
   const page = state.playground;
   const session = page.session;
-  const results = h('section', { id: 'results-section', 'aria-label': 'Results' });
+  const results = h('section', { id: 'results-section', 'aria-label': 'Results', tabindex: -1 });
   const inputOptions = h('div', { class: 'input-options' });
   const runButton = button('Run tools', () => run(), { class: 'primary', id: 'run-tools' });
   const status = h('p', { role: 'status', class: 'small muted' }, page.status);
@@ -164,7 +164,7 @@ export function mountPlayground(container, context) {
 
   const value = session.input;
   let inputControl;
-  if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': selected?.direct && !selected.pipeline ? `${labelFor(selected.contract.inputs[0].name)} input` : 'Your text', onInput: event => { try { changed({ input: { type: 'text', data: event.target.value } }); } catch (error) { notify(error.message); runButton.disabled = true; } } });
+  if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': selected?.direct && !selected.pipeline ? `${labelFor(selected.contract.inputs[0].name)} input` : 'Your input', onInput: event => { try { changed({ input: { type: 'text', data: event.target.value } }); } catch (error) { notify(error.message); runButton.disabled = true; } } });
   else inputControl = h('div', { class: 'byte-input' }, h('strong', {}, page.sourceName ?? `${labelFor(value.type)} input`), h('p', { class: 'muted' }, `${bytesOf(value).toLocaleString()} bytes · ${value.type}`),
     value.type === 'bytes' ? button('Use as UTF-8 text', () => run({ ids: ['text.utf8.decode'], continueAfter: true })) : h('pre', {}, JSON.stringify(value.data, null, 2).slice(0, 2048)));
   const fileInput = h('input', { type: 'file', id: 'playground-file', hidden: true, onChange: event => setFile(event.target.files[0]) });
