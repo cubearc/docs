@@ -27,6 +27,7 @@ try {
 let runtime;
 let activeController;
 let section = 'playground';
+let rendered = false;
 function beginRun() { clearTimeout(state.playground.autoTimer); activeController?.abort(); activeController = new AbortController(); return activeController; }
 function navigate(next) { if (location.hash === `#/${next}`) route(); else location.hash = `#/${next}`; }
 function useTool(action) {
@@ -76,13 +77,21 @@ function render() {
     },
   };
   ({ playground: mountPlayground, pipelines: mountPipelines, tools: mountTools }[section])(main, context);
+  rendered = true;
   for (const link of document.querySelectorAll('nav a')) {
     if (link.hash === `#/${section}`) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   }
 }
 function route() {
   if (!runtime) return;
-  if (location.hash && !location.hash.startsWith('#/')) return;
+  if (location.hash && !location.hash.startsWith('#/')) {
+    if (!rendered) {
+      section = ['#steps-section', '#pipeline-result'].includes(location.hash) ? 'pipelines' : 'playground';
+      render();
+      (document.getElementById(location.hash.slice(1)) ?? main).focus();
+    }
+    return;
+  }
   const [, requested] = location.hash.split('/');
   section = ['playground', 'pipelines', 'tools'].includes(requested) ? requested : 'playground';
   if (section === 'tools') {
@@ -98,6 +107,7 @@ function route() {
 }
 window.addEventListener('hashchange', route);
 async function start() {
+  rendered = false;
   main.replaceChildren(h('h1', {}, 'Cube Playground'), h('p', { role: 'status' }, 'Loading the local tools…'));
   try {
     runtime = await initializeRuntime();

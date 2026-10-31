@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { verifyFileReadOrdering } from './support/file-ordering.mjs';
 import { verifyAutomaticSelection } from './support/automatic-selection.mjs';
+import { verifyFragments } from './support/fragments.mjs';
 import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -124,8 +125,17 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await page.getByText('Pipeline saved in this browser.', { exact: true }).waitFor();
   await page.getByRole('button', { name: '← Saved pipelines', exact: true }).click();
   await page.getByText('Definition only', { exact: true }).waitFor();
+  const savedBefore = await page.evaluate(() => JSON.parse(localStorage.getItem('cubearc.playground.pipelines.v1')).entries[0]);
+  await page.getByRole('button', { name: 'Rename', exact: true }).click();
+  await page.getByLabel('Saved pipeline name', { exact: true }).fill('My decoding sequence');
+  await page.keyboard.press('Enter');
+  await page.getByRole('heading', { name: 'My decoding sequence', exact: true }).waitFor();
+  assert.equal(await page.evaluate(() => document.activeElement?.textContent), 'Rename');
+  const savedAfter = await page.evaluate(() => JSON.parse(localStorage.getItem('cubearc.playground.pipelines.v1')).entries[0]);
+  assert.deepEqual(savedAfter, { ...savedBefore, name: 'My decoding sequence' });
   await page.reload();
   await page.getByRole('button', { name: 'Open', exact: true }).waitFor({ timeout: 45000 });
+  await page.getByRole('heading', { name: 'My decoding sequence', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Open', exact: true }).click();
   await page.waitForFunction(() => document.querySelectorAll('[data-step]').length === 2);
   assert.equal(await page.locator('[data-step]').count(), 2, 'Reopening a normal saved pipeline must restore editable steps.');
@@ -324,6 +334,7 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
 
   await verifyFileReadOrdering(page, exportedDocument);
   await verifyAutomaticSelection(context, origin);
+  await verifyFragments(context, origin);
 
   assert.deepEqual(accessibility.flatMap(snapshot => snapshot.violations.map(rule => ({ label: snapshot.label, ...rule }))), [], 'Automated accessibility violations must be resolved without disabling rules.');
   t.diagnostic(`axe-core ${accessibility[0]?.version}: ${accessibility.length} snapshots; ${accessibility.reduce((sum, snapshot) => sum + snapshot.incomplete.length, 0)} rule checks require manual review.`);

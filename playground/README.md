@@ -81,7 +81,9 @@ focus after result filtering and moving, removing or restoring pipeline steps.
 Exact catalog links use `#/tools/<operation-id>/<operation-version>`. Old
 unversioned family links remain aliases. Opening a different operation version
 shows an explanation and disables execution until the user explicitly chooses
-the current version. Selection and action changes update the link; refresh keeps
+the current version. Mobile Input/Results and pipeline jump fragments also
+initialize a ready section when opened directly or refreshed; existing in-page
+jumps preserve the active draft. Selection and action changes update the link; refresh keeps
 the chosen grouped action. Unknown/malformed links provide a route back.
 
 ## Save and import pipelines

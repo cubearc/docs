@@ -89,6 +89,23 @@ export function mountPipelines(container, context) {
 
   const importInput = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onChange: event => importFile(event.target.files[0]) });
 
+  function savedEntry(entry) {
+    const title = h('h3', { tabindex: -1 }, entry.name);
+    const name = h('input', { id: `rename-${entry.id}`, value: entry.name, maxlength: 120, required: true });
+    const close = () => { form.hidden = true; rename.focus(); };
+    const form = h('form', { hidden: true, onSubmit: event => {
+      event.preventDefault();
+      safe(() => { page.library.rename(entry.id, name.value); entry.name = name.value; title.textContent = entry.name; close(); notify('Saved pipeline renamed.'); })();
+    } }, h('div', { class: 'field spacer' }, h('label', { for: name.id }, 'Saved pipeline name'), name),
+    h('div', { class: 'toolbar' }, h('button', { type: 'submit' }, 'Save name'), button('Cancel renaming', close)));
+    const rename = button('Rename', () => { name.value = entry.name; form.hidden = false; name.focus(); name.select(); });
+    return h('article', { class: 'separator' }, title,
+      h('p', { class: 'small muted' }, `${entry.input_data_json !== undefined ? 'Includes input data' : 'Definition only'}${entry.needs_parameters?.length ? ' · options omitted' : ''}`),
+      h('div', { class: 'toolbar' }, button('Open', safe(() => load(entry))), rename,
+        button('Export definition document', () => download(JSON.stringify(entry, null, 2), 'cube-pipeline.json', 'application/json')),
+        button('Remove saved copy', safe(() => { page.library.remove(entry.id); render(); }))), form);
+  }
+
   function libraryView() {
     let entries;
     try { entries = page.library.entries(); }
@@ -101,10 +118,7 @@ export function mountPipelines(container, context) {
     }
     return h('section', { class: 'panel' }, h('h2', {}, 'Saved in this browser'), h('p', { class: 'small muted' }, 'Definitions and optional input data are labeled separately. Loading never runs a pipeline.'),
       !entries.length ? h('p', {}, 'No saved pipelines yet. Build a sequence or import a Core recipe.') : null,
-      entries.map(entry => h('article', { class: 'separator' }, h('h3', {}, entry.name), h('p', { class: 'small muted' }, `${entry.input_data_json !== undefined ? 'Includes input data' : 'Definition only'}${entry.needs_parameters?.length ? ' · options omitted' : ''}`),
-        h('div', { class: 'toolbar' }, button('Open', safe(() => load(entry))),
-          button('Export definition document', () => download(JSON.stringify(entry, null, 2), 'cube-pipeline.json', 'application/json')),
-          button('Remove saved copy', safe(() => { page.library.remove(entry.id); render(); }))))));
+      entries.map(savedEntry));
   }
   const heading = h('div', { class: 'heading' }, h('h1', {}, 'Pipelines'), h('p', {}, 'Keep a useful sequence. See what each step changes.'));
   if (page.mode === 'library') {
@@ -151,7 +165,7 @@ export function mountPipelines(container, context) {
   const fileInput = h('input', { hidden: true, type: 'file', onChange: event => selectFile(event.target.files[0]) });
   const input = draft.advanced ? h('div', { class: 'panel' }, h('h2', {}, 'Exact imported definition'), h('details', {}, h('summary', {}, 'View preserved Core definition'), h('pre', {}, draft.describe().rawDefinition)),
     draft.info.input_slot ? h('div', { class: 'field' }, h('label', { for: 'pipeline-bindings' }, `Typed input bindings JSON (slot: ${draft.info.input_slot})`), h('textarea', { id: 'pipeline-bindings', rows: 6, value: draft.bindingsJson, onInput: event => safe(() => edit(() => draft.setBindings(event.target.value)))() }), h('p', { class: 'small muted' }, 'Use Core typed values: text data, or bytes with a Base64 data object. Bindings are parsed and validated by Core.')) : h('p', {}, 'This definition includes its own input data.')) :
-    h('section', { class: 'panel', 'aria-label': 'Starting input' }, h('h2', {}, 'Starting input'), currentInput.type === 'text' ? h('textarea', { id: 'pipeline-input', 'aria-label': 'Starting text', class: 'input-text', value: currentInput.data, onInput: event => safe(() => edit(() => draft.setInput({ type: 'text', data: event.target.value })))() }) : h('p', {}, `${currentInput.data.byteLength} exact bytes selected.`),
+    h('section', { class: 'panel', 'aria-label': 'Starting input' }, h('h2', {}, 'Starting input'), currentInput.type === 'text' ? h('textarea', { id: 'pipeline-input', 'aria-label': 'Starting input', class: 'input-text', value: currentInput.data, onInput: event => safe(() => edit(() => draft.setInput({ type: 'text', data: event.target.value })))() }) : h('p', {}, `${currentInput.data.byteLength} exact bytes selected.`),
       h('div', { class: 'toolbar' }, button('Open file', () => fileInput.click()), button('Use text input', () => { edit(() => draft.setInput({ type: 'text', data: '' })); render(); }), fileInput));
   const choices = runtime.tools.flatMap(tool => tool.actions).filter(action => action.pipeline).sort((a, b) => a.title.localeCompare(b.title));
   const addSelect = h('select', { id: 'add-step' }, choices.map(action => h('option', { value: action.id }, `${action.title} (${action.pipeline.input_type} → ${action.pipeline.output_type})`)));

@@ -20,3 +20,17 @@ test('corrupt or newer library data is preserved for recovery', () => {
   assert.equal(library.recovery(), '{broken');
   library.reset(); library.save(document('recovered')); assert.equal(library.entries().length, 1);
 });
+test('renaming preserves the saved identifier, exact definition and included input atomically', () => {
+  const storage = memory(); const library = new PipelineLibrary(storage);
+  const original = { ...document('Original'), input_data_json: '{"data":[0,255]}', needs_parameters: ['key'] };
+  const id = library.save(original);
+  library.rename(id, 'Renamed');
+  assert.deepEqual(library.entries(), [{ ...original, id, name: 'Renamed' }]);
+  const before = library.recovery();
+  for (const name of ['', '   ', 'x'.repeat(121), null]) assert.throws(() => library.rename(id, name));
+  assert.throws(() => library.rename('missing', 'Other'));
+  assert.equal(library.recovery(), before);
+  storage.setItem = () => { throw new Error('Storage full'); };
+  assert.throws(() => library.rename(id, 'Unsaved'), /Storage full/);
+  assert.equal(library.recovery(), before);
+});
