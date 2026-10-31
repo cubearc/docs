@@ -125,8 +125,17 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await page.getByText('Pipeline saved in this browser.', { exact: true }).waitFor();
   await page.getByRole('button', { name: '← Saved pipelines', exact: true }).click();
   await page.getByText('Definition only', { exact: true }).waitFor();
+  const savedBefore = await page.evaluate(() => JSON.parse(localStorage.getItem('cubearc.playground.pipelines.v1')).entries[0]);
+  await page.getByRole('button', { name: 'Rename', exact: true }).click();
+  await page.getByLabel('Saved pipeline name', { exact: true }).fill('My decoding sequence');
+  await page.keyboard.press('Enter');
+  await page.getByRole('heading', { name: 'My decoding sequence', exact: true }).waitFor();
+  assert.equal(await page.evaluate(() => document.activeElement?.textContent), 'Rename');
+  const savedAfter = await page.evaluate(() => JSON.parse(localStorage.getItem('cubearc.playground.pipelines.v1')).entries[0]);
+  assert.deepEqual(savedAfter, { ...savedBefore, name: 'My decoding sequence' });
   await page.reload();
   await page.getByRole('button', { name: 'Open', exact: true }).waitFor({ timeout: 45000 });
+  await page.getByRole('heading', { name: 'My decoding sequence', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Open', exact: true }).click();
   await page.waitForFunction(() => document.querySelectorAll('[data-step]').length === 2);
   assert.equal(await page.locator('[data-step]').count(), 2, 'Reopening a normal saved pipeline must restore editable steps.');

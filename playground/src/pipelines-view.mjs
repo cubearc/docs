@@ -89,6 +89,23 @@ export function mountPipelines(container, context) {
 
   const importInput = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onChange: event => importFile(event.target.files[0]) });
 
+  function savedEntry(entry) {
+    const title = h('h3', { tabindex: -1 }, entry.name);
+    const name = h('input', { id: `rename-${entry.id}`, value: entry.name, maxlength: 120, required: true });
+    const close = () => { form.hidden = true; rename.focus(); };
+    const form = h('form', { hidden: true, onSubmit: event => {
+      event.preventDefault();
+      safe(() => { page.library.rename(entry.id, name.value); entry.name = name.value; title.textContent = entry.name; close(); notify('Saved pipeline renamed.'); })();
+    } }, h('div', { class: 'field spacer' }, h('label', { for: name.id }, 'Saved pipeline name'), name),
+    h('div', { class: 'toolbar' }, h('button', { type: 'submit' }, 'Save name'), button('Cancel renaming', close)));
+    const rename = button('Rename', () => { name.value = entry.name; form.hidden = false; name.focus(); name.select(); });
+    return h('article', { class: 'separator' }, title,
+      h('p', { class: 'small muted' }, `${entry.input_data_json !== undefined ? 'Includes input data' : 'Definition only'}${entry.needs_parameters?.length ? ' · options omitted' : ''}`),
+      h('div', { class: 'toolbar' }, button('Open', safe(() => load(entry))), rename,
+        button('Export definition document', () => download(JSON.stringify(entry, null, 2), 'cube-pipeline.json', 'application/json')),
+        button('Remove saved copy', safe(() => { page.library.remove(entry.id); render(); }))), form);
+  }
+
   function libraryView() {
     let entries;
     try { entries = page.library.entries(); }
@@ -101,10 +118,7 @@ export function mountPipelines(container, context) {
     }
     return h('section', { class: 'panel' }, h('h2', {}, 'Saved in this browser'), h('p', { class: 'small muted' }, 'Definitions and optional input data are labeled separately. Loading never runs a pipeline.'),
       !entries.length ? h('p', {}, 'No saved pipelines yet. Build a sequence or import a Core recipe.') : null,
-      entries.map(entry => h('article', { class: 'separator' }, h('h3', {}, entry.name), h('p', { class: 'small muted' }, `${entry.input_data_json !== undefined ? 'Includes input data' : 'Definition only'}${entry.needs_parameters?.length ? ' · options omitted' : ''}`),
-        h('div', { class: 'toolbar' }, button('Open', safe(() => load(entry))),
-          button('Export definition document', () => download(JSON.stringify(entry, null, 2), 'cube-pipeline.json', 'application/json')),
-          button('Remove saved copy', safe(() => { page.library.remove(entry.id); render(); }))))));
+      entries.map(savedEntry));
   }
   const heading = h('div', { class: 'heading' }, h('h1', {}, 'Pipelines'), h('p', {}, 'Keep a useful sequence. See what each step changes.'));
   if (page.mode === 'library') {

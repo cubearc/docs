@@ -35,6 +35,14 @@ export class PipelineLibrary {
     this.#write([...entries, entry]);
     return entry.id;
   }
+  rename(id, name) {
+    if (typeof name !== 'string' || !name.trim() || name.length > 120) throw new Error('Use a pipeline name of 1 to 120 characters.');
+    const entries = this.entries();
+    const entry = entries.find(entry => entry.id === id);
+    if (!entry) throw new Error('This saved pipeline is no longer available.');
+    entry.name = name;
+    this.#write(entries);
+  }
   remove(id) { const entries = this.entries(); this.#write(entries.filter(entry => entry.id !== id)); }
   reset() { this.storage.removeItem(KEY); }
 }
