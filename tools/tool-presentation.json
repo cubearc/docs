@@ -1825,6 +1825,16 @@
         "Gravity Falls Bill Cipher",
         "Gnommish"
       ]
+    },
+    "analysis.substitution.solve": {
+      "display_name": "Solve substitution constraints",
+      "summary": "Search caller-defined substitution constraints and retain exact classes of possible keys.",
+      "aliases": []
+    },
+    "analysis.family.suggest": {
+      "display_name": "Suggest classical cipher families",
+      "summary": "Compare explicit letter evidence with finite rules and inspect compatible families and alternative explanations.",
+      "aliases": []
     }
   },
   "operations": {
@@ -4579,6 +4589,18 @@
         "Standard Galactic Alphabet",
         "SGA"
       ]
+    },
+    "analysis.substitution.solve": {
+      "tool_id": "analysis.substitution.solve",
+      "display_name": "Solve substitution constraints",
+      "summary": "Search caller-defined substitution constraints and retain exact classes of possible keys.",
+      "aliases": []
+    },
+    "analysis.family.suggest": {
+      "tool_id": "analysis.family.suggest",
+      "display_name": "Suggest classical cipher families",
+      "summary": "Compare explicit letter evidence with finite rules and inspect compatible families and alternative explanations.",
+      "aliases": []
     }
   }
 }

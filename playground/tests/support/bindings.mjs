@@ -1,3 +1,4 @@
+import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
 export async function verifyNewBindings(context,origin,audit = async () => {}) {
@@ -97,6 +98,31 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     await card.getByRole('combobox',{name:'Choose an output',exact:true}).selectOption('tokens');
     assert.deepEqual(JSON.parse(await card.locator('.viewer pre').textContent()),['hylian:r3c5']);
     await audit('symbolic-alphabet-ambiguity',page);
+
+    await page.reload();
+    for (const operation of ['analysis.substitution.solve','analysis.family.suggest']) {
+      await page.goto(`${origin}/docs/playground/#/tools/${operation}/1`);
+      const response=await page.request.get(`${origin}/docs/playground/tool-details/${operation}.json`);
+      assert.equal(response.status(),200);
+      const example=(await response.json()).example;
+      const title=operation==='analysis.substitution.solve'?'Solve substitution constraints':'Suggest classical cipher families';
+      await page.getByRole('heading',{name:title,exact:true}).waitFor();
+      await page.getByRole('button',{name:'Use tool',exact:true}).click();
+      const request=example.inputs.request;
+      await page.locator('#playground-input').fill(typeof request==='string'?request:JSON.stringify(request));
+      await page.getByRole('button',{name:'Run tools',exact:true}).click();
+      await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
+      const card=page.locator(`[data-result-operation="${operation}"]`);
+      assert.equal(await card.count(),1,await page.locator('#main').innerText());
+      const outputs=card.getByRole('combobox',{name:'Choose an output',exact:true});
+      if(await outputs.count()) await outputs.selectOption('report');
+      await card.getByText('Export',{exact:true}).click();
+      const [download]=await Promise.all([page.waitForEvent('download'),card.getByRole('button',{name:'Download selected view',exact:true}).click()]);
+      const report=JSON.parse(await readFile(await download.path(),'utf8'));
+      const expected=typeof example.outputs.report==='string'?JSON.parse(example.outputs.report):example.outputs.report;
+      assert.deepEqual(report,expected,operation+' actual browser form known answer');
+      await audit(`classical-${operation.split('.')[1]}`,page);
+    }
 
   } finally { await page.close(); }
 }
