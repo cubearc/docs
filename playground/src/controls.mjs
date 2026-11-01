@@ -59,9 +59,11 @@ export async function parametersFor(runtime, action, raw, options = {}, original
   const result = {};
   for (const field of fieldsFor(action)) {
     if (!Object.hasOwn(raw, field.name) && Object.hasOwn(original, field.name)) { result[field.name] = snapshot(original[field.name]); continue; }
-    const value = Object.hasOwn(raw, field.name) ? raw[field.name] : field.default;
     const kind = field.constraints.type;
-    if (value === null || value === undefined || (value === '' && !['unsigned_list', 'text_list', 'boolean'].includes(kind))) {
+    const schema = action.contract.parameters.properties?.[field.name];
+    const emptyText = field.required && kind === 'text' && schema?.type === 'string' && (schema.minLength ?? 0) === 0;
+    const value = Object.hasOwn(raw, field.name) ? raw[field.name] : field.default ?? (emptyText ? '' : null);
+    if (value === null || value === undefined || (value === '' && !emptyText && !['unsigned_list', 'text_list', 'boolean'].includes(kind))) {
       if (field.required && !options.allowMissing) { const error = new Error(`Add ${labelFor(field.name).toLowerCase()} to use this tool.`); error.code = 'missing_parameter'; error.parameter = field.name; throw error; }
       continue;
     }

@@ -36,5 +36,22 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     }
     await page.getByRole('button',{name:'Compare common tools',exact:true}).click();
     assert.equal(await page.locator('#playground-input').inputValue(),'1:1,2:1','Navigation through an options-only tool preserves the previous text.');
+    await page.goto(`${origin}/docs/playground/#/tools/cipher.vic.encode/1`);
+    await page.getByRole('heading',{name:'VIC (English 2010)',exact:true}).waitFor();
+    const response = await page.request.get(`${origin}/docs/playground/tool-details/cipher.vic.encode.json`);
+    assert.equal(response.status(),200);
+    const example = (await response.json()).example;
+    assert.equal(example.parameters.padding,'');
+    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await page.locator('#playground-input').fill(example.inputs.text);
+    for (const [name,value] of Object.entries(example.parameters)) await page.locator(`#playground-options-${name}`).fill(String(value));
+    await page.getByRole('button',{name:'Run tools',exact:true}).click();
+    await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
+    assert.equal(await page.locator('[data-result-operation="cipher.vic.encode"]').count(),1,await page.locator('#results-section').textContent());
+    const vic = page.locator('[data-result-operation="cipher.vic.encode"] .viewer pre');
+    await vic.first().waitFor({timeout:30000});
+    assert.equal(await vic.first().textContent(),example.outputs.text,'The complete VIC source answer accepts explicit empty padding through the actual form.');
+    await audit('vic-explicit-empty-padding',page);
+
   } finally { await page.close(); }
 }
