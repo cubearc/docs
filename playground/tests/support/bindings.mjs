@@ -53,7 +53,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     assert.equal(await vic.first().textContent(),example.outputs.text,'The complete VIC source answer accepts explicit empty padding through the actual form.');
     await audit('vic-explicit-empty-padding',page);
 
-    for (const operation of ['cipher.prime_number.encode','cipher.prime_multiplication.decode','symbol.solresol.encode']) {
+    for (const operation of ['cipher.prime_number.encode','cipher.prime_multiplication.decode','symbol.solresol.encode','symbol.alphabet.encode','symbol.alphabet.decode']) {
       await page.goto(`${origin}/docs/playground/#/tools/${operation}/1`);
       const response=await page.request.get(`${origin}/docs/playground/tool-details/${operation}.json`);
       assert.equal(response.status(),200);
@@ -69,7 +69,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       }
       await page.getByRole('button',{name:'Run tools',exact:true}).click();
       await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
-      const output=operation==='cipher.prime_multiplication.decode'?'groups':'tokens';
+      const output=operation==='cipher.prime_multiplication.decode'?'groups':operation==='symbol.alphabet.decode'?'readings':'tokens';
       assert.equal(await page.locator(`[data-result-operation="${operation}"]`).count(),1,await page.locator('#main').innerText());
       await page.locator(`[data-result-operation="${operation}"]`).getByRole('combobox',{name:'Choose an output',exact:true}).selectOption(output);
       const result=page.locator(`[data-result-operation="${operation}"] .viewer pre`).first();
@@ -77,6 +77,26 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       assert.deepEqual(JSON.parse(await result.textContent()),JSON.parse(example.outputs[output]),operation+' actual required-profile form answer');
       await audit(`puzzle-profile-${operation.split('.')[1]}`,page);
     }
+
+
+    // The previous cases fill the bounded eight-round history; start a fresh session.
+    await page.reload();
+    await page.goto(`${origin}/docs/playground/#/tools/symbol.alphabet.decode/1`);
+    await page.waitForFunction(()=>document.querySelector('#tool-action')?.value==='symbol.alphabet.decode');
+    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await page.locator('#playground-input').fill('["hylian:r3c5"]');
+    const profile=page.locator('#playground-options-profile');
+    const choices=await profile.locator('option').evaluateAll(options=>options.map(option=>option.value).filter(Boolean));
+    assert.equal(new Set(choices).size,23,'Every qualified profile is available through the actual required-profile control.');
+    await profile.selectOption('hylian_skyward_dcode_v1');
+    await page.getByRole('button',{name:'Run tools',exact:true}).click();
+    await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
+    const card=page.locator('[data-result-operation="symbol.alphabet.decode"]');
+    await card.getByRole('combobox',{name:'Choose an output',exact:true}).selectOption('readings');
+    assert.deepEqual(JSON.parse(await card.locator('.viewer pre').textContent()),[{token_index:0,alternatives:['D','W']}]);
+    await card.getByRole('combobox',{name:'Choose an output',exact:true}).selectOption('tokens');
+    assert.deepEqual(JSON.parse(await card.locator('.viewer pre').textContent()),['hylian:r3c5']);
+    await audit('symbolic-alphabet-ambiguity',page);
 
   } finally { await page.close(); }
 }

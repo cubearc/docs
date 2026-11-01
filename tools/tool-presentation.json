@@ -1795,6 +1795,36 @@
       "display_name": "Triliteral code",
       "summary": "Encode an ordered alphabet as exact three-trit words, or decode assigned words while preserving leading zero trits.",
       "aliases": []
+    },
+    "symbol.alphabet": {
+      "display_name": "Dated symbolic alphabets",
+      "summary": "Encode exact units with a cited alphabet table, or read symbolic tokens with their original positions.",
+      "aliases": [
+        "Aurebesh",
+        "Standard Galactic Alphabet",
+        "Pigpen",
+        "Rosicrucian",
+        "Tic-Tac-Toe",
+        "Templars",
+        "Betamaze",
+        "Clock",
+        "Birds on a Wire",
+        "Dancing Men",
+        "Theban",
+        "Malachim",
+        "Celestial",
+        "Alphabet of the Magi",
+        "Alphabetum Kaldeorum",
+        "Enochian",
+        "Moon",
+        "Al Bhed",
+        "Hylian",
+        "Sheikah",
+        "Daedric",
+        "Futurama Alien Alphabet",
+        "Gravity Falls Bill Cipher",
+        "Gnommish"
+      ]
     }
   },
   "operations": {
@@ -4529,6 +4559,26 @@
       "display_name": "Decode Triliteral code",
       "summary": "Encode an ordered alphabet as exact three-trit words, or decode assigned words while preserving leading zero trits.",
       "aliases": []
+    },
+    "symbol.alphabet.encode": {
+      "tool_id": "symbol.alphabet",
+      "display_name": "Encode a dated symbolic alphabet",
+      "summary": "Encode exact units with a cited alphabet table, or read symbolic tokens with their original positions.",
+      "aliases": [
+        "Aurebesh",
+        "Standard Galactic Alphabet",
+        "SGA"
+      ]
+    },
+    "symbol.alphabet.decode": {
+      "tool_id": "symbol.alphabet",
+      "display_name": "Decode a dated symbolic alphabet",
+      "summary": "Encode exact units with a cited alphabet table, or read symbolic tokens with their original positions.",
+      "aliases": [
+        "Aurebesh",
+        "Standard Galactic Alphabet",
+        "SGA"
+      ]
     }
   }
 }
