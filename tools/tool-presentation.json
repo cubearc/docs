@@ -1718,6 +1718,14 @@
     "cipher.great_cipher": {
       "display_name": "Great Cipher of 1691",
       "summary": "Read or encode the Grand Chiffre de 1691 using the published Bazeries table."
+    },
+    "cipher.bellaso": {
+      "display_name": "Bellaso (1553)",
+      "summary": "Apply the fixed 1553 reciprocal table with your canonical countersign.",
+      "aliases": [
+        "Apply Bellaso",
+        "Bellaso 1553"
+      ]
     }
   },
   "operations": {
@@ -4275,6 +4283,15 @@
       "display_name": "Decode Great Cipher of 1691",
       "tool_id": "cipher.great_cipher",
       "summary": "Read or encode the Grand Chiffre de 1691 using the published Bazeries table."
+    },
+    "cipher.bellaso": {
+      "tool_id": "cipher.bellaso",
+      "display_name": "Bellaso (1553)",
+      "summary": "Apply the fixed 1553 reciprocal table with your canonical countersign.",
+      "aliases": [
+        "Apply Bellaso",
+        "Bellaso 1553"
+      ]
     }
   }
 }
