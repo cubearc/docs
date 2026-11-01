@@ -1726,6 +1726,30 @@
         "Apply Bellaso",
         "Bellaso 1553"
       ]
+    },
+    "cipher.cadenus": {
+      "display_name": "Cadenus",
+      "summary": "Permute complete 25-row blocks using your explicit keyword and pad evidence."
+    },
+    "cipher.swagman": {
+      "display_name": "Swagman",
+      "summary": "Route text columns through your 4–8 Latin-square key."
+    },
+    "cipher.nihilist_transposition": {
+      "display_name": "Nihilist Transposition",
+      "summary": "Permute square rows and columns using an explicit key convention and readout."
+    },
+    "cipher.ubchi": {
+      "display_name": "Ubchi",
+      "summary": "Apply the same Columnar key twice with your exact nulls between passes."
+    },
+    "cipher.cm_bifid": {
+      "display_name": "CM Bifid",
+      "summary": "Fractionate coordinates between two independently supplied I/J squares."
+    },
+    "cipher.vic": {
+      "display_name": "VIC (English 2010)",
+      "summary": "Use the fixed English VIC profile with your exact key, split, indicator and pad evidence."
     }
   },
   "operations": {
@@ -4292,6 +4316,66 @@
         "Apply Bellaso",
         "Bellaso 1553"
       ]
+    },
+    "cipher.cadenus.encode": {
+      "tool_id": "cipher.cadenus",
+      "display_name": "Encode Cadenus",
+      "summary": "Permute complete 25-row blocks using your explicit keyword and pad evidence."
+    },
+    "cipher.cadenus.decode": {
+      "tool_id": "cipher.cadenus",
+      "display_name": "Decode Cadenus",
+      "summary": "Permute complete 25-row blocks using your explicit keyword and pad evidence."
+    },
+    "cipher.swagman.encode": {
+      "tool_id": "cipher.swagman",
+      "display_name": "Encode Swagman",
+      "summary": "Route text columns through your 4–8 Latin-square key."
+    },
+    "cipher.swagman.decode": {
+      "tool_id": "cipher.swagman",
+      "display_name": "Decode Swagman",
+      "summary": "Route text columns through your 4–8 Latin-square key."
+    },
+    "cipher.nihilist_transposition.encode": {
+      "tool_id": "cipher.nihilist_transposition",
+      "display_name": "Encode Nihilist Transposition",
+      "summary": "Permute square rows and columns using an explicit key convention and readout."
+    },
+    "cipher.nihilist_transposition.decode": {
+      "tool_id": "cipher.nihilist_transposition",
+      "display_name": "Decode Nihilist Transposition",
+      "summary": "Permute square rows and columns using an explicit key convention and readout."
+    },
+    "cipher.ubchi.encode": {
+      "tool_id": "cipher.ubchi",
+      "display_name": "Encode Ubchi",
+      "summary": "Apply the same Columnar key twice with your exact nulls between passes."
+    },
+    "cipher.ubchi.decode": {
+      "tool_id": "cipher.ubchi",
+      "display_name": "Decode Ubchi",
+      "summary": "Apply the same Columnar key twice with your exact nulls between passes."
+    },
+    "cipher.cm_bifid.encode": {
+      "tool_id": "cipher.cm_bifid",
+      "display_name": "Encode CM Bifid",
+      "summary": "Fractionate coordinates between two independently supplied I/J squares."
+    },
+    "cipher.cm_bifid.decode": {
+      "tool_id": "cipher.cm_bifid",
+      "display_name": "Decode CM Bifid",
+      "summary": "Fractionate coordinates between two independently supplied I/J squares."
+    },
+    "cipher.vic.encode": {
+      "tool_id": "cipher.vic",
+      "display_name": "Encode VIC (English 2010)",
+      "summary": "Use the fixed English VIC profile with your exact key, split, indicator and pad evidence."
+    },
+    "cipher.vic.decode": {
+      "tool_id": "cipher.vic",
+      "display_name": "Decode VIC (English 2010)",
+      "summary": "Use the fixed English VIC profile with your exact key, split, indicator and pad evidence."
     }
   }
 }
