@@ -3,13 +3,30 @@ import { snapshot } from './data.mjs';
 
 export const labelFor = name => name.replaceAll('_', ' ').replace(/^./, value => value.toUpperCase());
 
+function parameterSchema(root, schema = {}) {
+  const visited = new Set();
+  while (schema.$ref) {
+    const { $ref, ...siblings } = schema;
+    if (!$ref.startsWith('#/$defs/') || visited.has($ref)) throw new Error('Unsupported parameter schema reference.');
+    visited.add($ref);
+    const name = $ref.slice('#/$defs/'.length).replaceAll('~1', '/').replaceAll('~0', '~');
+    const target = root.$defs?.[name];
+    if (!target || typeof target !== 'object') throw new Error('Missing parameter schema definition.');
+    schema = { ...target, ...siblings };
+  }
+  return schema;
+}
+
 export function fieldsFor(action) {
   if (action.pipeline) return action.pipeline.parameters;
-  return Object.entries(action.contract.parameters.properties ?? {}).map(([name, schema]) => ({
-    name, description: schema.description ?? '', required: action.contract.parameters.required?.includes(name) ?? false,
-    default: action.direct?.parameters?.[name] ?? schema.default ?? null,
-    constraints: { type: schema.type === 'boolean' ? 'boolean' : schema.enum?.every(Number.isInteger) ? 'unsigned_choices' : schema.enum ? 'text' : schema.type === 'integer' ? 'integer' : schema.type === 'string' ? 'text' : 'json', choices: schema.enum ?? [] },
-  }));
+  return Object.entries(action.contract.parameters.properties ?? {}).map(([name, source]) => {
+    const schema = parameterSchema(action.contract.parameters, source);
+    return {
+      name, description: schema.description ?? '', required: action.contract.parameters.required?.includes(name) ?? false,
+      default: action.direct?.parameters?.[name] ?? schema.default ?? null,
+      constraints: { type: schema.type === 'boolean' ? 'boolean' : schema.enum?.every(Number.isInteger) ? 'unsigned_choices' : schema.enum ? 'text' : schema.type === 'integer' ? 'integer' : schema.type === 'string' ? 'text' : 'json', choices: schema.enum ?? [] },
+    };
+  });
 }
 
 function displayValue(value, kind) {
@@ -60,8 +77,8 @@ export async function parametersFor(runtime, action, raw, options = {}, original
   for (const field of fieldsFor(action)) {
     if (!Object.hasOwn(raw, field.name) && Object.hasOwn(original, field.name)) { result[field.name] = snapshot(original[field.name]); continue; }
     const kind = field.constraints.type;
-    const schema = action.contract.parameters.properties?.[field.name];
-    const emptyText = field.required && kind === 'text' && schema?.type === 'string' && (schema.minLength ?? 0) === 0;
+    const schema = parameterSchema(action.contract.parameters, action.contract.parameters.properties?.[field.name]);
+    const emptyText = field.required && kind === 'text' && schema.type === 'string' && (schema.minLength ?? 0) === 0 && (!schema.enum || schema.enum.includes(''));
     const value = Object.hasOwn(raw, field.name) ? raw[field.name] : field.default ?? (emptyText ? '' : null);
     if (value === null || value === undefined || (value === '' && !emptyText && !['unsigned_list', 'text_list', 'boolean'].includes(kind))) {
       if (field.required && !options.allowMissing) { const error = new Error(`Add ${labelFor(field.name).toLowerCase()} to use this tool.`); error.code = 'missing_parameter'; error.parameter = field.name; throw error; }
