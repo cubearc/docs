@@ -1750,6 +1750,51 @@
     "cipher.vic": {
       "display_name": "VIC (English 2010)",
       "summary": "Use the fixed English VIC profile with your exact key, split, indicator and pad evidence."
+    },
+    "cipher.numbered_key": {
+      "display_name": "Numbered Key (ACA)",
+      "summary": "Construct a numbered repeated-key table and encode letters, or read exact tokens with the complete table.",
+      "aliases": []
+    },
+    "cipher.headlines": {
+      "display_name": "Headlines (ACA)",
+      "summary": "Encode or decode five headlines with an explicit hat, keyword and five-letter setting.",
+      "aliases": []
+    },
+    "cipher.key_phrase": {
+      "display_name": "Key Phrase (ACA)",
+      "summary": "Replace letters through a repeated-letter phrase, or inspect all possible original letters without guessing.",
+      "aliases": []
+    },
+    "cipher.arnold": {
+      "display_name": "Arnold paged word code",
+      "summary": "Encode presegmented words as page, line and word positions in supplied pages, or read those exact positions.",
+      "aliases": []
+    },
+    "symbol.solresol": {
+      "display_name": "Solresol monosyllables (Gajewski 1902)",
+      "summary": "Encode the seven source-defined French monosyllable entries, or inspect every original gloss of a syllable.",
+      "aliases": []
+    },
+    "cipher.prime_number": {
+      "display_name": "Indexed prime code",
+      "summary": "Assign consecutive bounded primes to an explicit alphabet and read exact decimal tokens back as letters.",
+      "aliases": []
+    },
+    "cipher.prime_multiplication": {
+      "display_name": "Prime-product multiset",
+      "summary": "Multiply assigned primes for supplied groups, or recover letter counts and canonical order without guessing the original order.",
+      "aliases": []
+    },
+    "cipher.modulo": {
+      "display_name": "Affine residue code",
+      "summary": "Encode an explicit alphabet through a coprime affine modular mapping, or decode its exact residue tokens.",
+      "aliases": []
+    },
+    "cipher.triliteral": {
+      "display_name": "Triliteral code",
+      "summary": "Encode an ordered alphabet as exact three-trit words, or decode assigned words while preserving leading zero trits.",
+      "aliases": []
     }
   },
   "operations": {
@@ -4376,6 +4421,114 @@
       "tool_id": "cipher.vic",
       "display_name": "Decode VIC (English 2010)",
       "summary": "Use the fixed English VIC profile with your exact key, split, indicator and pad evidence."
+    },
+    "cipher.numbered_key.encode": {
+      "tool_id": "cipher.numbered_key",
+      "display_name": "Encode Numbered Key (ACA)",
+      "summary": "Construct a numbered repeated-key table and encode letters, or read exact tokens with the complete table.",
+      "aliases": []
+    },
+    "cipher.numbered_key.decode": {
+      "tool_id": "cipher.numbered_key",
+      "display_name": "Decode Numbered Key (ACA)",
+      "summary": "Construct a numbered repeated-key table and encode letters, or read exact tokens with the complete table.",
+      "aliases": []
+    },
+    "cipher.headlines.encode": {
+      "tool_id": "cipher.headlines",
+      "display_name": "Encode Headlines (ACA)",
+      "summary": "Encode or decode five headlines with an explicit hat, keyword and five-letter setting.",
+      "aliases": []
+    },
+    "cipher.headlines.decode": {
+      "tool_id": "cipher.headlines",
+      "display_name": "Decode Headlines (ACA)",
+      "summary": "Encode or decode five headlines with an explicit hat, keyword and five-letter setting.",
+      "aliases": []
+    },
+    "cipher.key_phrase.encode": {
+      "tool_id": "cipher.key_phrase",
+      "display_name": "Encode Key Phrase (ACA)",
+      "summary": "Replace letters through a repeated-letter phrase, or inspect all possible original letters without guessing.",
+      "aliases": []
+    },
+    "cipher.key_phrase.decode": {
+      "tool_id": "cipher.key_phrase",
+      "display_name": "Decode Key Phrase (ACA)",
+      "summary": "Replace letters through a repeated-letter phrase, or inspect all possible original letters without guessing.",
+      "aliases": []
+    },
+    "cipher.arnold.encode": {
+      "tool_id": "cipher.arnold",
+      "display_name": "Encode Arnold paged word code",
+      "summary": "Encode presegmented words as page, line and word positions in supplied pages, or read those exact positions.",
+      "aliases": []
+    },
+    "cipher.arnold.decode": {
+      "tool_id": "cipher.arnold",
+      "display_name": "Decode Arnold paged word code",
+      "summary": "Encode presegmented words as page, line and word positions in supplied pages, or read those exact positions.",
+      "aliases": []
+    },
+    "symbol.solresol.encode": {
+      "tool_id": "symbol.solresol",
+      "display_name": "Encode Solresol monosyllables (Gajewski 1902)",
+      "summary": "Encode the seven source-defined French monosyllable entries, or inspect every original gloss of a syllable.",
+      "aliases": []
+    },
+    "symbol.solresol.decode": {
+      "tool_id": "symbol.solresol",
+      "display_name": "Decode Solresol monosyllables (Gajewski 1902)",
+      "summary": "Encode the seven source-defined French monosyllable entries, or inspect every original gloss of a syllable.",
+      "aliases": []
+    },
+    "cipher.prime_number.encode": {
+      "tool_id": "cipher.prime_number",
+      "display_name": "Encode Indexed prime code",
+      "summary": "Assign consecutive bounded primes to an explicit alphabet and read exact decimal tokens back as letters.",
+      "aliases": []
+    },
+    "cipher.prime_number.decode": {
+      "tool_id": "cipher.prime_number",
+      "display_name": "Decode Indexed prime code",
+      "summary": "Assign consecutive bounded primes to an explicit alphabet and read exact decimal tokens back as letters.",
+      "aliases": []
+    },
+    "cipher.prime_multiplication.encode": {
+      "tool_id": "cipher.prime_multiplication",
+      "display_name": "Encode Prime-product multiset",
+      "summary": "Multiply assigned primes for supplied groups, or recover letter counts and canonical order without guessing the original order.",
+      "aliases": []
+    },
+    "cipher.prime_multiplication.decode": {
+      "tool_id": "cipher.prime_multiplication",
+      "display_name": "Decode Prime-product multiset",
+      "summary": "Multiply assigned primes for supplied groups, or recover letter counts and canonical order without guessing the original order.",
+      "aliases": []
+    },
+    "cipher.modulo.encode": {
+      "tool_id": "cipher.modulo",
+      "display_name": "Encode Affine residue code",
+      "summary": "Encode an explicit alphabet through a coprime affine modular mapping, or decode its exact residue tokens.",
+      "aliases": []
+    },
+    "cipher.modulo.decode": {
+      "tool_id": "cipher.modulo",
+      "display_name": "Decode Affine residue code",
+      "summary": "Encode an explicit alphabet through a coprime affine modular mapping, or decode its exact residue tokens.",
+      "aliases": []
+    },
+    "cipher.triliteral.encode": {
+      "tool_id": "cipher.triliteral",
+      "display_name": "Encode Triliteral code",
+      "summary": "Encode an ordered alphabet as exact three-trit words, or decode assigned words while preserving leading zero trits.",
+      "aliases": []
+    },
+    "cipher.triliteral.decode": {
+      "tool_id": "cipher.triliteral",
+      "display_name": "Decode Triliteral code",
+      "summary": "Encode an ordered alphabet as exact three-trit words, or decode assigned words while preserving leading zero trits.",
+      "aliases": []
     }
   }
 }

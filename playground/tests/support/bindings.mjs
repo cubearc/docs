@@ -53,5 +53,30 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     assert.equal(await vic.first().textContent(),example.outputs.text,'The complete VIC source answer accepts explicit empty padding through the actual form.');
     await audit('vic-explicit-empty-padding',page);
 
+    for (const operation of ['cipher.prime_number.encode','cipher.prime_multiplication.decode','symbol.solresol.encode']) {
+      await page.goto(`${origin}/docs/playground/#/tools/${operation}/1`);
+      const response=await page.request.get(`${origin}/docs/playground/tool-details/${operation}.json`);
+      assert.equal(response.status(),200);
+      const example=(await response.json()).example;
+      await page.waitForFunction(operation=>document.querySelector('#tool-action')?.value===operation,operation);
+      await page.getByRole('button',{name:'Use tool',exact:true}).click();
+      const input=Object.values(example.inputs)[0];
+      await page.locator('#playground-input').fill(typeof input==='string'?input:JSON.stringify(input));
+      for (const [name,value] of Object.entries(example.parameters)) {
+        const field=page.locator(`#playground-options-${name}`);
+        if(await field.evaluate(element=>element.tagName)==='SELECT') await field.selectOption(String(value));
+        else await field.fill(typeof value==='object'?JSON.stringify(value):String(value));
+      }
+      await page.getByRole('button',{name:'Run tools',exact:true}).click();
+      await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
+      const output=operation==='cipher.prime_multiplication.decode'?'groups':'tokens';
+      assert.equal(await page.locator(`[data-result-operation="${operation}"]`).count(),1,await page.locator('#main').innerText());
+      await page.locator(`[data-result-operation="${operation}"]`).getByRole('combobox',{name:'Choose an output',exact:true}).selectOption(output);
+      const result=page.locator(`[data-result-operation="${operation}"] .viewer pre`).first();
+      await result.waitFor({timeout:30000});
+      assert.deepEqual(JSON.parse(await result.textContent()),JSON.parse(example.outputs[output]),operation+' actual required-profile form answer');
+      await audit(`puzzle-profile-${operation.split('.')[1]}`,page);
+    }
+
   } finally { await page.close(); }
 }
