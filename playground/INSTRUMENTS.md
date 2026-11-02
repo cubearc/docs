@@ -66,10 +66,16 @@ presentation entry creates a new executor or pipeline adapter.
 
 `src/instruments/shell.mjs` adapts the existing Playground/session state to lazy
 renderers. Canonical input/options stay in the Playground. Presentation selection,
-zoom, layout and trace cursors stay separate. Each accepted run retains its
+zoom, layout and trace cursors stay separate. Named scroll surfaces retain pan
+across inspection, parameter edits and tab changes; primary source replacements
+reset their viewport scope. Focus is restored to stable controls, with an explicit
+fallback when a control disappears or becomes unavailable. Each accepted run retains its
 input/settings snapshot. The Session bounds accepted evidence to four MiB;
 auxiliary media caches have their own four-MiB retention ceiling, clear obsolete
-source buffers and dispose resources when leaving the instrument.
+source buffers and dispose resources when leaving the instrument. Each auxiliary
+view retains its producing selection/settings; a later pixel read or export cannot
+relabel older masks, layers or spectra. Supplied PCM keeps its exact absolute
+frame origin, with bounded relative coordinates used only for drawing.
 
 `scripts/instrument-assets.mjs` projects factual definitions from the matching
 Cube checkout and checks them using that exact installed Wasm. It supplies
@@ -94,8 +100,11 @@ CUBE_CONFORMANCE_FIXTURES=/absolute/path/to/cube/crates/cube-core/src/operations
   node --test playground/tests/instruments.integration.mjs
 ```
 
-Run each browser family suite separately so its evidence/report files have distinct
-destinations (replace `workbench` with `symbol`, `mechanism` or `media`):
+Run the complete browser check through `npm run test:browser --prefix playground`
+with the environment shown in `README.md`; the runner isolates each suite’s
+evidence and includes the original catalog/pipeline tests. For a focused family
+check, use distinct destinations (replace `workbench` with `symbol`, `mechanism`
+or `media`):
 
 ```sh
 PLAYWRIGHT_MODULE=/absolute/path/to/cube/bindings/javascript/node_modules/playwright \
@@ -108,8 +117,14 @@ The suites serve localhost under `/docs/playground/` and execute the packed
 Wasm/worker. They check known answers, invalid recovery, configuration sync,
 selection without execution, earlier evidence, exact exports, keyboard/focus,
 responsive layouts and automated accessibility rules. Inspect the screenshots and
-retained incomplete accessibility checks. Run the original `browser.e2e.mjs` too
-for catalog, routes, favorites, pipelines, persistence and delayed-file regressions.
+retained incomplete accessibility checks. The focused `workbench-focus.e2e.mjs`, `mechanism-regressions.e2e.mjs`,
+`media-continuation.e2e.mjs` and Chromium-only `symbol-accessibility.e2e.mjs`
+cover keyboard focus/pan, exact invalid drafts, disposal and per-view provenance.
+The accessibility inspection includes actual Chromium accessibility-tree names
+and DOM bounds; it does not qualify native screen-reader behavior.
+
+When running individual files, include `browser.e2e.mjs` for catalog, routes,
+favorites, pipelines, persistence and delayed-file regressions.
 
 Use the repository-locked browser harness/binaries when available. Record missing
 bundles and separately identify any compatibility run with a matching cached

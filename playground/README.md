@@ -122,6 +122,27 @@ initialize a ready section when opened directly or refreshed; existing in-page
 jumps preserve the active draft. Selection and action changes update the link; refresh keeps
 the chosen grouped action. Unknown/malformed links provide a route back.
 
+## Run the complete browser checks
+
+After building, run every browser suite with separate logs, screenshots and
+accessibility reports. The runner includes the original catalog/pipeline checks
+and the visual-instrument regressions; one suite cannot overwrite another's
+report. Repeat with `BROWSER_ENGINE=firefox` and `webkit`:
+
+```sh
+PLAYWRIGHT_MODULE=/absolute/path/to/cube/bindings/javascript/node_modules/playwright \
+BROWSER_ENGINE=chromium \
+PLAYGROUND_A11Y_REPORT=/absolute/path/to/evidence/chromium/report.json \
+  npm run test:browser --prefix playground
+```
+
+Use the locked Playwright package to install its exact browser revisions if they
+are missing. `PLAYWRIGHT_BROWSERS_PATH` may select a task-local browser directory.
+The runner checks the built application; use individual tests for diagnostic
+source overrides or case filters. The Pages workflow runs the complete suite in
+all three engines and retains each report and screenshot directory. This is a
+local/CI validation path; publishing still follows the authorization above.
+
 ## Save and import pipelines
 
 The primary editor is an ordered Core Recipe, preserving explicit typed

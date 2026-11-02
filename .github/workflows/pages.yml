@@ -94,16 +94,16 @@ jobs:
           node playground/scripts/build.mjs --sdk "$sdk_tarball" --sdk-sha256 "$sdk_sha256" --cube-source ../sources/cube
           npm ci --ignore-scripts --no-audit --no-fund --prefix ../sources/cube/bindings/javascript
           ../sources/cube/bindings/javascript/node_modules/.bin/playwright install --with-deps chromium firefox webkit
-          CUBE_CONFORMANCE_FIXTURES="$GITHUB_WORKSPACE/sources/cube/crates/cube-core/src/operations/contracts/conformance.json" node --test playground/tests/pipeline-import.integration.mjs playground/tests/runtime.integration.mjs
+          CUBE_CONFORMANCE_FIXTURES="$GITHUB_WORKSPACE/sources/cube/crates/cube-core/src/operations/contracts/conformance.json" node --test playground/tests/pipeline-import.integration.mjs playground/tests/runtime.integration.mjs playground/tests/instruments.integration.mjs
           for browser in chromium firefox webkit; do
-            PLAYWRIGHT_MODULE="$GITHUB_WORKSPACE/sources/cube/bindings/javascript/node_modules/playwright" BROWSER_ENGINE="$browser" PLAYGROUND_A11Y_REPORT="$RUNNER_TEMP/playground-a11y-$browser.json" node --test playground/tests/browser.e2e.mjs
+            PLAYWRIGHT_MODULE="$GITHUB_WORKSPACE/sources/cube/bindings/javascript/node_modules/playwright" BROWSER_ENGINE="$browser" PLAYGROUND_A11Y_REPORT="$RUNNER_TEMP/playground-browser-evidence/$browser/report.json" npm run test:browser --prefix playground
           done
-      - name: Retain automated accessibility evidence
+      - name: Retain automated browser evidence
         if: always() && steps.sdk.outputs.available == 'true'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: playground-accessibility
-          path: ${{ runner.temp }}/playground-a11y-*.json
+          name: playground-browser-evidence
+          path: ${{ runner.temp }}/playground-browser-evidence/
           if-no-files-found: warn
       - name: Test publishing and link-check failures
         run: python3 -m unittest discover -s tests -v
