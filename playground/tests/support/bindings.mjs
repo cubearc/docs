@@ -125,7 +125,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       await audit(`classical-${operation.split('.')[1]}`,page);
     }
 
-    for (const machine of ['m94','jefferson','m138a','wheatstone','kryha','alberti','lorenz']) {
+    for (const machine of ['m94','jefferson','m138a','wheatstone','kryha','alberti','lorenz','hagelin']) {
       // Each device starts a fresh bounded history and uses its real named settings input.
       await page.reload();
       for (const direction of ['encode','decode']) {
@@ -156,7 +156,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
           const actual=await card.locator('.viewer pre').first().textContent();
           assert.deepEqual(name==='final_index'?actual:JSON.parse(actual),expected,`${operation} ${name}`);
         }
-        if(direction==='encode'&&['wheatstone','kryha','alberti','lorenz'].includes(machine)) await audit(`mechanical-${machine}`,page);
+        if(direction==='encode'&&['wheatstone','kryha','alberti','lorenz','hagelin'].includes(machine)) await audit(`mechanical-${machine}`,page);
       }
     }
 

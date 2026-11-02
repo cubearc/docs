@@ -1905,6 +1905,28 @@
       "display_name": "Decipher Lorenz five-bit codes",
       "summary": "Decipher unpacked five-bit codes with an explicit SZ40, SZ42a or SZ42b profile and continuation state.",
       "aliases": []
+    },
+    "cipher.hagelin.encode": {
+      "display_name": "Encipher Hagelin pin-and-lug profiles",
+      "summary": "Encipher prepared text with an explicit C-36, C-38, M-209, C-52 C2 or later CX-52M-27 configuration.",
+      "aliases": [
+        "C-36",
+        "C-38",
+        "M-209",
+        "C-52",
+        "CX-52"
+      ]
+    },
+    "cipher.hagelin.decode": {
+      "display_name": "Decipher Hagelin pin-and-lug profiles",
+      "summary": "Decipher prepared text with an explicit C-36, C-38, M-209, C-52 C2 or later CX-52M-27 configuration.",
+      "aliases": [
+        "C-36",
+        "C-38",
+        "M-209",
+        "C-52",
+        "CX-52"
+      ]
     }
   },
   "operations": {
@@ -4755,6 +4777,30 @@
       "display_name": "Decipher Lorenz five-bit codes",
       "summary": "Decipher unpacked five-bit codes with an explicit SZ40, SZ42a or SZ42b profile and continuation state.",
       "aliases": []
+    },
+    "cipher.hagelin.encode": {
+      "tool_id": "cipher.hagelin.encode",
+      "display_name": "Encipher Hagelin pin-and-lug profiles",
+      "summary": "Encipher prepared text with an explicit C-36, C-38, M-209, C-52 C2 or later CX-52M-27 configuration.",
+      "aliases": [
+        "C-36",
+        "C-38",
+        "M-209",
+        "C-52",
+        "CX-52"
+      ]
+    },
+    "cipher.hagelin.decode": {
+      "tool_id": "cipher.hagelin.decode",
+      "display_name": "Decipher Hagelin pin-and-lug profiles",
+      "summary": "Decipher prepared text with an explicit C-36, C-38, M-209, C-52 C2 or later CX-52M-27 configuration.",
+      "aliases": [
+        "C-36",
+        "C-38",
+        "M-209",
+        "C-52",
+        "CX-52"
+      ]
     }
   }
 }
