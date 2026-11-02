@@ -212,10 +212,18 @@ export function mountPlayground(container, context) {
   async function loadExample() {
     const revision = page.revision;
     const id = selected.id;
+    const profile = presentationFor(selected, page.parameters[id])?.profile;
+    // Share primary-input read ownership so Stop and newer file selections
+    // revoke a pending example without claiming that Core computation finished.
+    const request = page.readingFile = { kind: 'example', revision, session };
+    page.secondaryReading = null;
+    page.status = 'Loading the Core example…'; page.redraw?.();
+    const current = () => page.readingFile === request && page.revision === revision && page.tool === id;
     try {
       const details = await runtime.toolDetails(selected);
-      if (page.revision !== revision || page.tool !== id) return;
-      const values = details.example;
+      const values = profile ? (await runtime.instrumentData()).profileExamples?.[id]?.[profile] : details.example;
+      if (!current()) return;
+      if (!values || profile && values.operation_version !== selected.contract.operation_version) throw new Error('The Core example for this profile is unavailable. Your input and settings are retained.');
       const names = selected.contract.inputs.map(port => port.name);
       const primary = names[0];
       const representation = selected.direct.inputs[primary];
@@ -224,7 +232,7 @@ export function mountPlayground(container, context) {
         const raw = JSON.parse(values.inputs[primary]);
         input = {type:'bytes',data:representation === 'byte_array' ? Uint8Array.from(raw) : (await runtime.call('execute',[{operation:'encoding.base64.decode',version:1,inputs:{input:raw.base64}}])).output};
       }
-      if (page.revision !== revision || page.tool !== id) return;
+      if (!current()) return;
       const raw = Object.fromEntries(Object.entries(values.parameters).map(([name,value]) => {
         const field = selected.contract.parameters.properties?.[name];
         return [name, field?.type === 'boolean' ? JSON.parse(value) : value];
@@ -236,11 +244,12 @@ export function mountPlayground(container, context) {
         else if (kind === 'byte_array') extra[name] = (await runtime.call('execute',[{operation:'encoding.base64.encode',version:1,inputs:{input:Uint8Array.from(JSON.parse(values.inputs[name]))}}])).output;
         else extra[name] = values.inputs[name];
       }
-      if (page.revision !== revision || page.tool !== id) return;
+      if (!current()) return;
       page.parameters[id] = raw;
       page.extraInputs[id] = extra;
       changed({input}); page.sourceName = 'Core conformance example'; page.status = 'Synthetic Core example loaded. Run to produce your own result.'; render();
-    } catch(error) { page.status=error.message; page.redraw?.(); }
+    } catch(error) { if (current()) { page.status=error.message; page.redraw?.(); } }
+    finally { if (page.readingFile === request) { page.readingFile = null; page.redraw?.(); } }
   }
   function selectAction(id) {
     const next = runtime.action(id);

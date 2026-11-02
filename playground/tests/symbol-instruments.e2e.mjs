@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { resolve, extname, dirname } from 'node:path';
+import { instrumentBrowser } from './support/instrument-browser.mjs';
 
 const require = createRequire(import.meta.url);
 const engine = process.env.BROWSER_ENGINE ?? 'chromium';
@@ -222,4 +223,94 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
     await capture('morse');
   });
   assert.deepEqual(errors, [], 'No uncaught browser errors');
+});
+
+
+test('Pigpen Core examples preserve the selected profile in both directions', { timeout: 90000 }, async t => {
+  const {context,base} = await instrumentBrowser(t);
+  const page = await context.newPage();
+  await page.goto(base+'#/tools');
+  await page.getByText('Visual instruments · 20 workbenches',{exact:true}).click({timeout:45000});
+  await page.locator('[data-open-instrument="pigpen"]').click();
+  const units = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',' '];
+  for (const operation of ['symbol.alphabet.encode','symbol.alphabet.decode']) {
+    if (operation.endsWith('.decode')) await page.locator('#instrument-action').selectOption(operation);
+    const before = await page.evaluate(()=>window.instrumentCalls);
+    await page.locator('#load-core-example').click();
+    await page.getByText('Synthetic Core example loaded. Run to produce your own result.',{exact:true}).waitFor();
+    assert.equal(await page.locator('#playground-options-profile').inputValue(),'pigpen_haverhill_pairs_v1','Loading an example must retain the visual profile');
+    assert.equal(await page.locator('[data-instrument="pigpen"]').count(),1);
+    assert.equal(await page.evaluate(()=>window.instrumentCalls),before,'Loading sample data does not execute it');
+    const input = JSON.parse(await page.locator('#playground-input').inputValue());
+    if (operation.endsWith('.encode')) assert.deepEqual(input,units);
+    else { assert.equal(input[0],'grid:ES'); assert.equal(input[1],'grid:ES:dot'); assert.equal(input.at(-1),' '); }
+    await page.locator('#run-tools').click();
+    await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
+    const card = page.locator(`[data-result-operation="${operation}"]`).last();
+    await card.waitFor();
+    await card.locator('select[id^="output-"]').selectOption(operation.endsWith('.encode')?'tokens':'readings');
+    assert.equal(await card.locator('.viewer pre').count(),1,await card.textContent());
+    const result = JSON.parse(await card.locator('.viewer pre').textContent());
+    if(operation.endsWith('.encode')) { assert.equal(result.length,units.length); assert.equal(result[0],'grid:ES'); assert.equal(result[1],'grid:ES:dot'); }
+    else assert.deepEqual(result,units.map((unit,token_index)=>({token_index,alternatives:[unit]})));
+    if(evidence) { await mkdir(evidence,{recursive:true});await page.screenshot({path:`${evidence}/pigpen-example-${operation.endsWith('.encode')?'encode':'decode'}.png`,fullPage:true}); }
+  }
+  let resume, seen;
+  const held = new Promise(resolve => { seen = resolve; });
+  await page.route('**/tool-details/symbol.alphabet.decode.json', async route => {
+    await new Promise(resolve => { resume = resolve; seen(); });
+    await route.continue();
+  });
+  const calls = await page.evaluate(()=>window.instrumentCalls);
+  await page.locator('#load-core-example').click(); await held;
+  const edited = '["grid:ES:dot"]';
+  await page.locator('#playground-input').fill(edited);
+  const response = page.waitForResponse(response => response.url().endsWith('/tool-details/symbol.alphabet.decode.json'));
+  resume(); await (await response).finished();
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.equal(await page.locator('#playground-input').inputValue(),edited,'A delayed example cannot replace a newer edit');
+  assert.equal(await page.locator('#playground-options-profile').inputValue(),'pigpen_haverhill_pairs_v1');
+  assert.equal(await page.evaluate(()=>window.instrumentCalls),calls);
+  await page.unroute('**/tool-details/symbol.alphabet.decode.json');
+  let rejectRead, reached;
+  const pendingFailure = new Promise(resolve => { reached = resolve; });
+  await page.route('**/tool-details/symbol.alphabet.decode.json', async route => {
+    await new Promise(resolve => { rejectRead = resolve; reached(); });
+    await route.fulfill({status:503,body:'Metadata unavailable'});
+  });
+  await page.locator('#load-core-example').click(); await pendingFailure;
+  await page.locator('#playground-input').fill('["grid:SW"]');
+  const status = await page.locator('.input-options > [role="status"]').textContent();
+  const failureResponse = page.waitForResponse(response => response.url().endsWith('/tool-details/symbol.alphabet.decode.json'));
+  rejectRead(); await (await failureResponse).finished();
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.equal(await page.locator('.input-options > [role="status"]').textContent(),status,'A failed obsolete example read must not replace current feedback');
+  assert.equal(await page.locator('#playground-input').inputValue(),'["grid:SW"]');
+  await page.close();
+});
+
+test('Stop revokes a pending example before it can replace current input',{timeout:45000},async t=>{
+ const {context,base}=await instrumentBrowser(t);const page=await context.newPage();
+ await page.goto(base+'#/tools');await page.getByText('Visual instruments · 20 workbenches',{exact:true}).click({timeout:30000});
+ await page.locator('[data-open-instrument="pigpen"]').click();
+ await page.locator('[data-instrument="pigpen"] button').first().waitFor();
+ await page.locator('#playground-input').fill('["B"]');
+ let release,seen;const held=new Promise(resolve=>{seen=resolve;});
+ await page.route('**/tool-details/symbol.alphabet.encode.json',async route=>{await new Promise(resolve=>{release=resolve;seen();});await route.continue();});
+ const before=await page.evaluate(()=>window.instrumentCalls);
+ await page.locator('#load-core-example').click();await held;
+ assert.equal(await page.locator('#run-tools').isDisabled(),true,'Run waits for the pending input');
+ await page.getByRole('button',{name:'Stop',exact:true}).click();
+ const status=await page.locator('.input-options > [role="status"]').textContent();
+ const response=page.waitForResponse(response=>response.url().endsWith('/tool-details/symbol.alphabet.encode.json'));
+ release();await(await response).finished();await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ assert.equal(await page.locator('#playground-input').inputValue(),'["B"]','Stop must revoke the pending input replacement');
+ assert.equal(await page.locator('.input-options > [role="status"]').textContent(),status);
+ assert.equal(await page.locator('#run-tools').isEnabled(),true);
+ await page.unroute('**/tool-details/symbol.alphabet.encode.json');
+ await page.locator('#load-core-example').click();
+ await page.getByText('Synthetic Core example loaded. Run to produce your own result.',{exact:true}).waitFor();
+ assert.deepEqual(JSON.parse(await page.locator('#playground-input').inputValue()),[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',' ']);
+ assert.equal(await page.evaluate(()=>window.instrumentCalls),before,'Stop/retry does not run the selected operation');
+ await page.close();
 });

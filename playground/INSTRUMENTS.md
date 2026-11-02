@@ -80,7 +80,10 @@ frame origin, with bounded relative coordinates used only for drawing.
 `scripts/instrument-assets.mjs` projects factual definitions from the matching
 Cube checkout and checks them using that exact installed Wasm. It supplies
 canonical keyboard geometry, square/profile data, semaphore pairs and Braille
-patterns to renderers. Core remains responsible for every transformation,
+patterns to renderers. Profile-specific examples come from the matching Core
+vectors and are checked in both directions through the installed SDK. Loading an
+example retains the selected presentation profile; obsolete metadata responses
+cannot replace newer input or feedback. Core remains responsible for every transformation,
 interpreter, Fourier analysis and byte comparison.
 
 Visual inspection is bounded without changing the original data: book indexing
@@ -120,6 +123,12 @@ responsive layouts and automated accessibility rules. Inspect the screenshots an
 retained incomplete accessibility checks. The focused `workbench-focus.e2e.mjs`, `mechanism-regressions.e2e.mjs`,
 `media-continuation.e2e.mjs` and Chromium-only `symbol-accessibility.e2e.mjs`
 cover keyboard focus/pan, exact invalid drafts, disposal and per-view provenance.
+`instrument-targets.e2e.mjs` also loads examples through all twenty launchers and
+measures enabled HTML targets (including the [SC2.5.8 spacing exception](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html)) and application
+containment at 390/320 CSS pixels,
+without executing an operation on viewport changes. This is browser geometry
+evidence, separate from physical touch-device qualification.
+
 The accessibility inspection includes actual Chromium accessibility-tree names
 and DOM bounds; it does not qualify native screen-reader behavior.
 

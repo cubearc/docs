@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join,resolve,dirname} from 'node:path';
+import {writeInstrumentAssets,profileExamplesFor} from '../scripts/instrument-assets.mjs';
 import {createCube} from '../.build/runtime/node_modules/@cubearc/cube/dist/node.mjs';
 import {Runtime} from '../dist/runtime.mjs';
 import {toolsFor} from '../src/catalog.mjs';
@@ -35,4 +38,41 @@ test('canonical drawing assets match installed source and known mappings',async(
  assert.equal(data.layouts.qwertz.entries.find(e=>e.key===data.layouts.qwerty.entries.find(e=>e.symbol==='Y').key&&e.layer==='shift').symbol,'Z');
  assert.equal(data.braille[0xa5],'\u28a5');assert.equal(data.squares.polybius.aliases[0],'J=I');
  assert.deepEqual(data.semaphore[0],{unit:'A',token:'S,SW'});
+});
+
+// The general alphabet conformance fixture uses another profile. Loading an
+// example inside Pigpen must retain the selected canonical Haverhill profile.
+test('Pigpen profile examples preserve the selected profile for encode and decode',async t=>{
+ const source=resolve(dirname(fixturePath),'../../../../..');
+ const vectors=JSON.parse(await readFile(join(source,'crates/cube-core/src/symbols/alphabet/vectors.json'),'utf8'));
+ const vector=vectors.find(row=>row.profile==='pigpen_haverhill_pairs_v1');
+ const output=await mkdtemp(join(tmpdir(),'cube-profile-examples-'));
+ t.after(()=>rm(output,{recursive:true,force:true}));
+ await writeInstrumentAssets(cube,source,output);
+ const assets=JSON.parse(await readFile(join(output,'instrument-data.json'),'utf8'));
+ for(const [operation,inputName,input]of [['symbol.alphabet.encode','units',vector.units],['symbol.alphabet.decode','tokens',vector.tokens]]){
+  const example=assets.profileExamples?.[operation]?.[vector.profile];
+  assert.ok(example,`${operation}: selected Pigpen profile must have its own Core-vector example`);
+  assert.equal(example.operation_version,1);
+  assert.deepEqual(Object.keys(example.inputs),[inputName]);
+  assert.equal(typeof example.inputs[inputName],'string');
+  assert.deepEqual(JSON.parse(example.inputs[inputName]),input);
+  assert.deepEqual(example.parameters,{profile:vector.profile});
+  assert.deepEqual(JSON.parse(example.outputs.tokens),vector.tokens);
+  const action={...runtime.action(operation),pipeline:null};
+  const actual=await runtime.perform(action,{type:'text',data:example.inputs[inputName]},example.parameters);
+  assert.deepEqual(Object.fromEntries(Object.entries(actual.outputs).map(([name,value])=>[name,value.data])),Object.fromEntries(Object.entries(example.outputs).map(([name,value])=>[name,JSON.parse(value)])));
+  if(operation.endsWith('.decode'))assert.deepEqual(actual.outputs.readings.data,vector.units.map((unit,token_index)=>({token_index,alternatives:[unit]})));
+ }
+});
+
+test('profile-example projection rejects vector disagreement and ambiguous source identity',async()=>{
+ const source=resolve(dirname(fixturePath),'../../../../..');
+ const vectors=JSON.parse(await readFile(join(source,'crates/cube-core/src/symbols/alphabet/vectors.json'),'utf8'));
+ const vector=vectors.find(row=>row.profile==='pigpen_haverhill_pairs_v1');
+ const corrupted=structuredClone(vector);
+ corrupted.tokens[0]='grid:SW';
+ assert.throws(()=>profileExamplesFor(cube,[corrupted]),/encode example disagrees with its canonical vector/);
+ assert.throws(()=>profileExamplesFor(cube,[]),/one canonical Pigpen profile vector/);
+ assert.throws(()=>profileExamplesFor(cube,[vector,vector]),/one canonical Pigpen profile vector/);
 });
