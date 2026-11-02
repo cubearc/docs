@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 export async function verifyNewBindings(context,origin,audit = async () => {}) {
   const page=await context.newPage();
+  const names=JSON.parse(await readFile(new URL('../../../tools/tool-presentation.json',import.meta.url),'utf8'));
   try {
     await page.goto(`${origin}/docs/playground/#/tools`);
     await page.locator('#tool-search').waitFor({timeout:45000});
@@ -122,6 +123,37 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       const expected=typeof example.outputs.report==='string'?JSON.parse(example.outputs.report):example.outputs.report;
       assert.deepEqual(report,expected,operation+' actual browser form known answer');
       await audit(`classical-${operation.split('.')[1]}`,page);
+    }
+
+    for (const machine of ['m94','jefferson','m138a','wheatstone','kryha','alberti']) {
+      // Each device starts a fresh bounded history and uses its real named settings input.
+      await page.reload();
+      for (const direction of ['encode','decode']) {
+        const operation=`cipher.${machine}.${direction}`;
+        await page.goto(`${origin}/docs/playground/#/tools/${operation}/1`);
+        const response=await page.request.get(`${origin}/docs/playground/tool-details/${operation}.json`);
+        assert.equal(response.status(),200);
+        const example=(await response.json()).example;
+        await page.getByRole('heading',{name:names.tools[operation].display_name,exact:true}).waitFor();
+        await page.getByRole('button',{name:'Use tool',exact:true}).click();
+        await page.locator('#playground-input').fill(example.inputs.text);
+        const settings=example.inputs.settings;
+        await page.locator('#extra-settings').fill(typeof settings==='string'?settings:JSON.stringify(settings));
+        await page.getByRole('button',{name:'Run tools',exact:true}).click();
+        await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
+        const card=page.locator(`[data-result-operation="${operation}"]`);
+        assert.equal(await card.count(),1,operation+': '+await page.locator('#results-section').textContent());
+        const outputs=card.getByRole('combobox',{name:'Choose an output',exact:true});
+        if(await outputs.count()) await outputs.selectOption('text');
+        assert.equal(await card.locator('.viewer pre').first().textContent(),example.outputs.text,operation);
+        for (const name of Object.keys(example.outputs).filter(name=>name!=='text')) {
+          await outputs.selectOption(name);
+          const expected=typeof example.outputs[name]==='string'&&name!=='final_index'?JSON.parse(example.outputs[name]):example.outputs[name];
+          const actual=await card.locator('.viewer pre').first().textContent();
+          assert.deepEqual(name==='final_index'?actual:JSON.parse(actual),expected,`${operation} ${name}`);
+        }
+        if(direction==='encode'&&['wheatstone','kryha','alberti'].includes(machine)) await audit(`mechanical-${machine}`,page);
+      }
     }
 
   } finally { await page.close(); }

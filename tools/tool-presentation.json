@@ -1835,6 +1835,66 @@
       "display_name": "Suggest classical cipher families",
       "summary": "Compare explicit letter evidence with finite rules and inspect compatible families and alternative explanations.",
       "aliases": []
+    },
+    "cipher.m94.encode": {
+      "display_name": "Encipher with M-94",
+      "summary": "Encipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.m94.decode": {
+      "display_name": "Decipher with M-94",
+      "summary": "Decipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.jefferson.encode": {
+      "display_name": "Encipher with Jefferson wheels",
+      "summary": "Encipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.jefferson.decode": {
+      "display_name": "Decipher with Jefferson wheels",
+      "summary": "Decipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.m138a.encode": {
+      "display_name": "Encipher with M-138-A strips",
+      "summary": "Encipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.m138a.decode": {
+      "display_name": "Decipher with M-138-A strips",
+      "summary": "Decipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.wheatstone.encode": {
+      "display_name": "Encipher with Wheatstone cryptograph",
+      "summary": "Encipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.wheatstone.decode": {
+      "display_name": "Decipher with Wheatstone cryptograph",
+      "summary": "Decipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.kryha.encode": {
+      "display_name": "Encipher with Kryha 17-sector profile",
+      "summary": "Encipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.kryha.decode": {
+      "display_name": "Decipher with Kryha 17-sector profile",
+      "summary": "Decipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.alberti.encode": {
+      "display_name": "Encipher with Alberti disk",
+      "summary": "Encipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.alberti.decode": {
+      "display_name": "Decipher with Alberti disk",
+      "summary": "Decipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
     }
   },
   "operations": {
@@ -4600,6 +4660,78 @@
       "tool_id": "analysis.family.suggest",
       "display_name": "Suggest classical cipher families",
       "summary": "Compare explicit letter evidence with finite rules and inspect compatible families and alternative explanations.",
+      "aliases": []
+    },
+    "cipher.m94.encode": {
+      "tool_id": "cipher.m94.encode",
+      "display_name": "Encipher with M-94",
+      "summary": "Encipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.m94.decode": {
+      "tool_id": "cipher.m94.decode",
+      "display_name": "Decipher with M-94",
+      "summary": "Decipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.jefferson.encode": {
+      "tool_id": "cipher.jefferson.encode",
+      "display_name": "Encipher with Jefferson wheels",
+      "summary": "Encipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.jefferson.decode": {
+      "tool_id": "cipher.jefferson.decode",
+      "display_name": "Decipher with Jefferson wheels",
+      "summary": "Decipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.m138a.encode": {
+      "tool_id": "cipher.m138a.encode",
+      "display_name": "Encipher with M-138-A strips",
+      "summary": "Encipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.m138a.decode": {
+      "tool_id": "cipher.m138a.decode",
+      "display_name": "Decipher with M-138-A strips",
+      "summary": "Decipher prepared text using explicit wheel or strip settings and selected rows.",
+      "aliases": []
+    },
+    "cipher.wheatstone.encode": {
+      "tool_id": "cipher.wheatstone.encode",
+      "display_name": "Encipher with Wheatstone cryptograph",
+      "summary": "Encipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.wheatstone.decode": {
+      "tool_id": "cipher.wheatstone.decode",
+      "display_name": "Decipher with Wheatstone cryptograph",
+      "summary": "Decipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.kryha.encode": {
+      "tool_id": "cipher.kryha.encode",
+      "display_name": "Encipher with Kryha 17-sector profile",
+      "summary": "Encipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.kryha.decode": {
+      "tool_id": "cipher.kryha.decode",
+      "display_name": "Decipher with Kryha 17-sector profile",
+      "summary": "Decipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.alberti.encode": {
+      "tool_id": "cipher.alberti.encode",
+      "display_name": "Encipher with Alberti disk",
+      "summary": "Encipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.alberti.decode": {
+      "tool_id": "cipher.alberti.decode",
+      "display_name": "Decipher with Alberti disk",
+      "summary": "Decipher prepared historical text and return the alignment needed to continue.",
       "aliases": []
     }
   }
