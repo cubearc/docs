@@ -5,3 +5,5 @@
 .instrument .media-raster-frame{position:relative;display:block;max-width:none}.instrument .media-pixel-marker{position:absolute;border:2px solid var(--blue);box-shadow:inset 0 0 0 1px white;pointer-events:none;min-width:3px;min-height:3px}
 .instrument .media-axis-scale{display:flex;justify-content:space-between;gap:1rem;font-size:.875rem;font-family:ui-monospace,monospace;padding:.5rem 0;color:var(--ink)}
 .instrument .media-workspace button{overflow-wrap:anywhere;max-width:100%}.instrument .media-png-map button>span{min-width:0;max-width:100%}.instrument .media-workspace .toolbar{min-width:0;max-width:100%}
+.instrument .media-field>label{margin:0}
+.instrument-png .media-table td:first-child>button{white-space:nowrap;overflow-wrap:normal;min-width:max-content;max-width:none}

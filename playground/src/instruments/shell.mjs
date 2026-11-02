@@ -17,22 +17,41 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
   let data;
   let evidence;
   function record() { return evidence; }
-  function refresh() {
+  function rememberScroll() {
+    const inputRevision=page.inputRevision ?? 0;
+    if (ui.scrollInputRevision !== inputRevision) {
+      ui.scrollInputRevision=inputRevision; ui.scrollPositions={}; return;
+    }
+    if (surface.hidden) return;
+    ui.scrollPositions ??= {};
+    for (const node of host.querySelectorAll('[data-instrument-scroll]')) ui.scrollPositions[node.dataset.instrumentScroll]={left:node.scrollLeft,top:node.scrollTop};
+  }
+  function restoreScroll() {
+    if (surface.hidden) return;
+    for (const node of host.querySelectorAll('[data-instrument-scroll]')) {
+      const position=ui.scrollPositions?.[node.dataset.instrumentScroll];
+      if (position) { node.scrollLeft=position.left; node.scrollTop=position.top; }
+    }
+  }
+  function refresh({ focusId, fallbackFocusId, captureScroll = true } = {}) {
     if (disposed) return;
+    if (captureScroll) rememberScroll();
     cleanup?.(); cleanup = undefined;
     evidence=page.session.latest(action.id);
     redrawForm?.();
     warning.textContent = record()?.earlierInput ? 'This result belongs to earlier input or settings. The instrument retains its producing evidence.' : '';
     if (!module || !data) return;
     const active = host.contains(document.activeElement) ? document.activeElement : null;
-    const focus = active?.id;
+    const focus = focusId ?? active?.id;
     const selection = active && 'selectionStart' in active ? [active.selectionStart, active.selectionEnd] : null;
     try {
       cleanup = module.mountInstrument(host, api);
+      restoreScroll();
       if (focus) {
-        const next = host.querySelector(`#${CSS.escape(focus)}`);
+        let next = host.querySelector(`#${CSS.escape(focus)}`);
+        if ((!next || next.disabled) && fallbackFocusId) next = host.querySelector(`#${CSS.escape(fallbackFocusId)}`);
         next?.focus({ preventScroll: true });
-        if (selection && next?.setSelectionRange && (next.tagName === 'TEXTAREA' || ['text','search','url','tel','password'].includes(next.type))) next.setSelectionRange(...selection);
+        if (selection && next?.id === active?.id && next?.setSelectionRange && (next.tagName === 'TEXTAREA' || ['text','search','url','tel','password'].includes(next.type))) next.setSelectionRange(...selection);
       }
     } catch (error) { replace(host, h('p', { role: 'alert', class: 'error' }, error.message), button('Retry visual view', refresh)); }
   }
@@ -45,10 +64,12 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     param: name => parameters()[name] ?? fieldsFor(action).find(field => field.name === name)?.default,
     extra: name => extra()[name] ?? '',
     setInput,
-    setText: text => setInput({ type: 'text', data: text }),
+    setText: text => setInput({ type: 'text', data: text }, {preservePresentation:true}),
     setParam(name, value) { Object.defineProperty(parameters(), name, {value,enumerable:true,configurable:true,writable:true}); changed(); },
     setExtra(name, value) { Object.defineProperty(extra(), name, {value,enumerable:true,configurable:true,writable:true}); changed(); },
     revision: () => page.revision,
+    isCurrent: (revision = page.revision) => !disposed && page.tool === action.id && revision === page.revision,
+    choices: name => fieldsFor(action).find(field => field.name === name)?.constraints.choices ?? [],
     result: () => Object.fromEntries(Object.entries(record()?.outputs ?? {}).map(([name,value]) => [name,value.data])),
     stale: () => Boolean(record()?.earlierInput),
     snapshot: () => snapshot(record()?.snapshot ?? null),
@@ -80,5 +101,5 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     module = renderer; data = assets; refresh();
   }).catch(error => { if (!disposed) replace(host, h('p', {role:'alert',class:'error'},error.message)); });
   host.append(h('p', {role:'status',class:'muted'},'Loading this instrument…'));
-  return { surface, refresh, dispose() { disposed = true; cleanup?.(); module?.disposeInstrument?.(api); page.auxiliary?.abort(); page.secondaryReading = null; state.close(); } };
+  return { surface, refresh, rememberScroll, dispose() { rememberScroll(); disposed = true; cleanup?.(); module?.disposeInstrument?.(api); page.auxiliary?.abort(); page.secondaryReading = null; state.close(); } };
 }

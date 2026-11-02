@@ -244,7 +244,7 @@ function pigpen(host, api) {
   replace(host, h('div', { class: 'row between' }, h('p', {}, h('strong', {}, 'Pigpen · Haverhill paired cells')), profile?.source_url ? h('a', { href: profile.source_url, target: '_blank', rel: 'noreferrer' }, 'Profile reference') : null),
     note(PIGPEN), !active ? h('div', {}, warn('This visual palette uses the Haverhill paired profile. Select it explicitly before composing with this palette.'), button('Use Haverhill profile', () => { api.setParam('profile', PIGPEN); api.refresh(); })) : null,
     h('div', { class: 'pigpen-palette', role: 'group', 'aria-label': 'Haverhill glyph palette' }, entries.map((item, index) => button(h('span', {}, pigpenGlyph(item.codes[0]), h('span', { class: 'pigpen-unit' }, item.alternatives[0] === ' ' ? 'Space' : item.alternatives[0])), () => { api.ui.palette = index; api.refresh(); },
-      { 'aria-pressed': String((api.ui.palette ?? 0) === index), 'aria-label': `${item.alternatives.join(' or ')}: ${item.codes.join(', ')}`, title: item.codes[0] }))),
+      { 'aria-pressed': String((api.ui.palette ?? 0) === index), 'aria-label': `${item.alternatives.map(value => value === ' ' ? 'Space' : value).join(' or ')}: ${item.codes.map(value => value === ' ' ? 'space token' : value).join(', ')}`, title: item.codes[0] }))),
     token ? h('div', { class: 'symbol-selected' }, pigpenGlyph(token), h('div', {}, h('strong', {}, unit === ' ' ? 'Space' : unit), h('code', {}, token),
       h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: token.endsWith(':dot'), disabled: token === ' ', onChange: event => chooseDot(event.target.checked) }), 'With dot'))) : warn('Canonical Pigpen profile data is unavailable.'),
     h('div', { class: 'toolbar' }, button('Add glyph', () => update(isDecode(api) ? token : unit), { disabled: !sequence || !active || !entry }),
@@ -255,7 +255,7 @@ function pigpen(host, api) {
       api.ui.selection = visible.start + local;
       const idx = entries.findIndex(item => item.codes[0] === tokenFor(value)); if (idx >= 0) api.ui.palette = idx;
       api.refresh();
-    }, { 'aria-pressed': String(api.ui.selection === visible.start + local), 'aria-label': `Inspect input position ${visible.start + local}: ${value}` }))),
+    }, { 'aria-pressed': String(api.ui.selection === visible.start + local), 'aria-label': `Inspect input position ${visible.start + local}: ${value === ' ' ? 'Space' : value}` }))),
     windowControls(api, 'sequenceStart', sequence?.length ?? 0),
     note('Selection inspects; Add and Replace edit the exact input list. Grid sides follow N/E/S/W walls; wedge names identify the occupied sector of the X. The Core result retains profile provenance.'));
 }
@@ -295,7 +295,7 @@ function braille(host, api) {
   replace(host, note('Byte masks, not language transcription. Dot numbers follow rows 1–4 / 2–5 / 3–6 / 7–8; bit n−1 controls dot n.'),
     h('div', { class: 'braille-workbench' }, h('div', { class: 'braille-cell', role: 'group', 'aria-label': 'Eight-dot byte editor' }, brailleDots(mask).map(dot => button(h('span', {}, h('span', { class: 'braille-dot', 'aria-hidden': 'true' }), h('small', {}, dot.number)), () => edit(mask ^ (1 << (dot.number - 1))),
       { id: `visual-braille-dot-${dot.number}`, 'aria-pressed': String(dot.active), 'aria-label': `Dot ${dot.number}, ${dot.active ? 'on' : 'off'}`, disabled: !values || chart.length !== 256 }))),
-      h('div', {}, h('div', { class: 'braille-unicode', 'aria-label': 'Unicode cell' }, chart[mask] ?? 'Run to inspect'), h('p', {}, `U+${chart[mask]?.codePointAt(0).toString(16).toUpperCase() ?? '—'}`),
+      h('div', {}, h('div', { class: 'braille-unicode', role: 'img', 'aria-label': chart[mask] ? `Unicode cell U+${chart[mask].codePointAt(0).toString(16).toUpperCase()}` : 'Unicode cell unavailable' }, chart[mask] ?? 'Run to inspect'), h('p', {}, `U+${chart[mask]?.codePointAt(0).toString(16).toUpperCase() ?? '—'}`),
         numberField(16, 'Byte (hexadecimal)', mask.toString(16).toUpperCase().padStart(2, '0')), numberField(2, 'Byte (binary, most significant bit first)', mask.toString(2).padStart(8, '0')),
         note(`Active dots: ${brailleDots(mask).filter(dot => dot.active).map(dot => dot.number).sort((a, b) => a - b).join(', ') || 'none'}`))),
     api.ui.maskError ? warn(api.ui.maskError) : null,

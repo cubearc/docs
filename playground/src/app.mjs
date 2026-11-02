@@ -12,7 +12,7 @@ import { resolveToolLink } from './tool-route.mjs';
 
 const main = document.querySelector('#main');
 const state = {
-  playground: { session: new Session(), mode: 'Decode', tool: null, parameters: {}, extraInputs: {}, revision: 0,
+  playground: { session: new Session(), mode: 'Decode', tool: null, parameters: {}, extraInputs: {}, revision: 0, inputRevision: 0,
     running: false, errors: [], status: 'Ready. Paste text or choose a file.', pendingNext: false, filter: 'all', showRound: null,
     outputChoices: {}, viewChoices: {}, utf8: true, auto: false, fast: new Map(), sourceName: null },
   catalog: { query: '', category: '', favoritesOnly: false, shown: 50, tool: null, action: null, detailOpen: false },
@@ -73,7 +73,7 @@ function render() {
     clearSession() {
       if (!confirm('Clear the current Playground history and pins? Saved pipelines will remain.')) return;
       state.playground.controller?.abort(); clearTimeout(state.playground.autoTimer);
-      state.playground.session = new Session(); state.playground.revision++; state.playground.running = false; state.playground.readingFile = null; state.playground.secondaryReading = null;
+      state.playground.session = new Session(); state.playground.revision++; state.playground.inputRevision++; state.playground.running = false; state.playground.readingFile = null; state.playground.secondaryReading = null;
       state.playground.errors = []; state.playground.pendingNext = false; state.playground.sourceName = null;
       state.playground.outputChoices = {}; state.playground.viewChoices = {}; state.playground.presentation = undefined; state.playground.status = 'Session cleared.'; render();
     },

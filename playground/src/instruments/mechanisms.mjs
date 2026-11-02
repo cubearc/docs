@@ -5,9 +5,15 @@ import { h, button, replace } from '../dom.mjs';
 export const ALBERTI_RINGS = Object.freeze({ outer: 'ABCDEFGILMNOPQRSTVXZ1234', inner: 'c&bmdgpfznxyutoskerlhaiq' });
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ROTORS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+const CARD_DRAG = 'application/x-cubearc-solitaire-card';
 const parse = (value, fallback) => { if (typeof value !== 'string') return value ?? fallback; try { return JSON.parse(value); } catch { return fallback; } };
 const list = value => { const parsed = parse(value, []); return Array.isArray(parsed) ? parsed : []; };
-const setting = api => { const value = parse(api.extra('settings'), {}); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; };
+const setting = api => {
+  const value = parse(api.extra('settings'), null);
+  if (value && typeof value === 'object' && !Array.isArray(value)) return value;
+  const draft = activeSettingsDraft(api);
+  return draft ? {...parse(draft.base, {}), [draft.name]: null} : {};
+};
 const output = api => api.result() ?? {};
 const int = value => /^(0|[1-9]\d*)$/.test(String(value)) ? Number(value) : NaN;
 const change = (api, run) => { run(); api.refresh(); };
@@ -15,9 +21,14 @@ const note = text => h('p', { class: 'small muted' }, text);
 const warning = problems => problems.length ? h('div', { class: 'warning', role: 'status' }, h('strong', {}, 'Review configuration'), h('ul', {}, problems.map(message => h('li', {}, message)))) : null;
 const jsonParam = (api, name, value) => api.setParam(name, JSON.stringify(value));
 function field(label, id, control) { return h('div', { class: 'field' }, h('label', { for: id }, label), control); }
-function select(id, value, options, onChange, label = id) {
-  const all = value !== undefined && value !== '' && !options.includes(value) ? [value, ...options] : options;
-  return h('select', { id, 'aria-label': label, onChange: event => onChange(event.target.value) }, h('option', { value: '', selected: value === undefined || value === '' }, 'Choose…'), all.map(row => h('option', { value: row, selected: row === value }, row)));
+function disclosure(api, key, title, ...contents) {
+  api.ui.disclosures ??= {};
+  return h('details', {open: Boolean(api.ui.disclosures[key]), onToggle: event => { api.ui.disclosures[key] = event.currentTarget.open; }}, h('summary', {id: `mechanism-${key}`}, title), ...contents);
+}
+function select(id, value, options, onChange, label) {
+  const missing = value === undefined || value === null || value === '';
+  const all = !missing && !options.includes(value) ? [value, ...options] : options;
+  return h('select', { id, 'aria-label': label, onChange: event => onChange(event.target.value) }, h('option', { value: '', selected: missing }, 'Choose…'), all.map(row => h('option', { value: row, selected: row === value }, row)));
 }
 export function settingsForEdit(raw) {
   const source = typeof raw === 'string' ? raw : JSON.stringify(raw ?? {});
@@ -28,12 +39,90 @@ export function settingsForEdit(raw) {
   return JSON.parse(source || '{}');
 }
 
+/** Slice top-level JSON values; parsing checks syntax but never supplies edited data. */
+export function rawJsonMembers(raw, kind) {
+  const source = typeof raw === 'string' ? raw : JSON.stringify(raw);
+  const parsed = JSON.parse(source);
+  const object = kind === 'object';
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) === object) throw new Error(`Use a JSON ${object ? 'object' : 'array'}.`);
+  const members = [];
+  let depth = 0;
+  let key = null;
+  let start = null;
+  const close = object ? '}' : ']';
+  for (const token of source.matchAll(/"(?:\\.|[^"\\])*"|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}\[\]:,]/g)) {
+    const value = token[0];
+    if (depth === 1) {
+      if (value === ',' || value === close) {
+        if (start !== null) members.push({key: object ? key : members.length, source: source.slice(start, token.index).trim()});
+        key = null; start = null;
+      } else if (object && key === null && value.startsWith('"')) key = JSON.parse(value);
+      else if (object && value === ':') start = token.index + 1;
+      else if (!object && start === null) start = token.index;
+    }
+    if (value === '{' || value === '[') depth++;
+    if (value === '}' || value === ']') depth--;
+  }
+  return members;
+}
+
+export function replaceSettingsFieldJson(raw, name, value) {
+  JSON.parse(value);
+  return settingsDocumentWithField(raw, name, value);
+}
+function settingsDocumentWithField(raw, name, value) {
+  const fields = rawJsonMembers(raw?.trim() ? raw : '{}', 'object');
+  const next = fields.filter(field => field.key !== name);
+  next.push({key: name, source: value});
+  return `{${next.map(field => `${JSON.stringify(field.key)}:${field.source}`).join(',')}}`;
+}
+
+function activeSettingsDraft(api) {
+  const drafts = api.ui.settingsDrafts ??= {};
+  const raw = api.extra('settings');
+  const existing = drafts[api.action.id];
+  if (existing?.document === raw) return existing;
+  if (existing) { delete drafts[api.action.id]; if (api.ui.importError === existing.error) api.ui.importError = ''; }
+  const matching = Object.values(drafts).find(draft => draft.document === raw);
+  if (matching) { drafts[api.action.id] = {...matching}; return drafts[api.action.id]; }
+  return null;
+}
+function settingsField(api, name, fallback = '[]') {
+  const draft = activeSettingsDraft(api);
+  if (draft?.name === name) return draft.source;
+  if (draft) return rawJsonMembers(draft.base?.trim() ? draft.base : '{}', 'object').findLast(field => field.key === name)?.source ?? fallback;
+  try { return rawJsonMembers(api.extra('settings'), 'object').findLast(field => field.key === name)?.source ?? fallback; }
+  catch { return fallback; }
+}
+
 function patchSettings(api, patch) {
-  let current;
-  try { current = settingsForEdit(api.extra('settings')); } catch (error) { api.ui.settingsError = error.message; api.ui.settingsErrorField = 'settings'; api.ui.settingsErrorRaw = api.extra('settings'); return; }
+  const draft = activeSettingsDraft(api);
+  if (draft) { api.ui.settingsError = `Repair the ${draft.name.replaceAll('_', ' ')} JSON field before editing other settings.`; api.ui.settingsErrorField = 'settings'; api.ui.settingsErrorRaw = api.extra('settings'); return; }
+  let next = api.extra('settings');
+  try {
+    for (const [name, value] of Object.entries(patch)) {
+      const source = JSON.stringify(value);
+      settingsForEdit(source);
+      next = replaceSettingsFieldJson(next, name, source);
+    }
+  } catch (error) { api.ui.settingsError = error.message; api.ui.settingsErrorField = 'settings'; api.ui.settingsErrorRaw = api.extra('settings'); return; }
   api.ui.settingsError = '';
-  if (!current || typeof current !== 'object' || Array.isArray(current)) return;
-  api.setExtra('settings', JSON.stringify({ ...current, ...patch }, null, 2));
+  api.setExtra('settings', next);
+}
+function patchSettingsArray(api, name, source) {
+  const draft = activeSettingsDraft(api);
+  if (draft && draft.name !== name) { api.ui.importError = `Repair the ${draft.name.replaceAll('_', ' ')} JSON field first.`; api.refresh(); return; }
+  try {
+    const base = draft?.base ?? api.extra('settings');
+    const document = settingsDocumentWithField(base, name, source);
+    let error = '';
+    try { rawJsonMembers(source, 'array'); } catch { error = `Use a JSON array for ${name.replaceAll('_', ' ')}. The entered text is retained until you repair this field.`; }
+    if (error) api.ui.settingsDrafts[api.action.id] = {name, source, base, document, error};
+    else delete api.ui.settingsDrafts[api.action.id];
+    api.ui.importError = error;
+    api.setExtra('settings', document);
+  } catch (error) { api.ui.importError = error.message; }
+  api.refresh();
 }
 function settingsWarning(api) {
   const raw = api.ui.settingsErrorField === 'settings' ? api.extra('settings') : api.param(api.ui.settingsErrorField);
@@ -42,11 +131,15 @@ function settingsWarning(api) {
 }
 function setListItem(api, name, index, value, length = 3) {
   let values;
-  try { values = list(settingsForEdit(api.param(name) ?? [])); } catch(error) { api.ui.settingsError = error.message; api.ui.settingsErrorField = name; api.ui.settingsErrorRaw = api.param(name); return; }
+  const source = name === 'rings' ? String(value).trim() || 'null' : JSON.stringify(value);
+  try {
+    JSON.parse(source);
+    values = rawJsonMembers(api.param(name) ?? [], 'array').map(row => row.source);
+  } catch(error) { api.ui.settingsError = error.message; api.ui.settingsErrorField = name; api.ui.settingsErrorRaw = api.param(name); return; }
   api.ui.settingsError = '';
-  const next = Array.from({ length }, (_, i) => values[i] ?? '');
-  next[index] = value;
-  jsonParam(api, name, next);
+  const next = Array.from({ length }, (_, i) => values[i] ?? (name === 'rings' ? 'null' : '""'));
+  next[index] = source;
+  api.setParam(name, `[${next.join(',')}]`);
 }
 
 export function deckStatus(deck) {
@@ -91,7 +184,7 @@ function traceCursor(api, trace) {
   api.ui.traceCursor = Math.max(-1, Math.min(trace.length - 1, cursor));
   return api.ui.traceCursor;
 }
-function traceControls(api, trace, describe) {
+function traceControls(api, trace, describe, noSelection = 'No recorded step selected. Editable initial settings are shown above.') {
   if (!trace.length) return note('No recorded trace. Enable trace before running to inspect actual Core states.');
   const cursor = Math.max(-1, Math.min(trace.length - 1, api.ui.traceCursor ?? -1));
   const step = direction => change(api, () => { api.ui.playing = false; api.ui.traceCursor = Math.max(-1, Math.min(trace.length - 1, cursor + direction)); });
@@ -99,7 +192,7 @@ function traceControls(api, trace, describe) {
     h('div', { class: 'toolbar' }, button('Previous state', () => step(-1), { id: 'mechanism-trace-previous', disabled: cursor < 0 }), button('Next state', () => step(1), { id: 'mechanism-trace-next', disabled: cursor >= trace.length - 1 }),
       button(api.ui.playing ? 'Pause playback' : 'Play recorded trace', () => change(api, () => { api.ui.playing = !api.ui.playing; if (cursor >= trace.length - 1) api.ui.traceCursor = -1; }), { id: 'mechanism-trace-play', 'aria-pressed': String(Boolean(api.ui.playing)) })),
     field('Recorded state', 'mechanism-trace-cursor', h('input', { id: 'mechanism-trace-cursor', type: 'range', min: -1, max: trace.length - 1, value: cursor, onInput: event => change(api, () => { api.ui.traceCursor = Number(event.target.value); api.ui.playing = false; }) })),
-    note(cursor < 0 ? 'Initial configuration. No dispatch selected.' : `${cursor + 1} / ${trace.length} · ${describe(trace[cursor])}`));
+    note(cursor < 0 ? noSelection : `${cursor + 1} / ${trace.length} · ${describe(trace[cursor])}`));
 }
 function playback(host, api, trace) {
   if (!api.ui.playing || !trace.length) return () => {};
@@ -118,20 +211,24 @@ function byteCharacter(text, offset) {
 }
 function snapshotText(api) { return api.snapshot?.()?.input?.data ?? ''; }
 function enigmaConfig(api) {
-  return { profile: api.param('profile'), rotors: list(api.param('rotors')), rings: list(api.param('rings')), windows: api.param('windows'), reflector: api.param('reflector'), plugboard: list(api.param('plugboard')) };
+  const plugs = parse(api.param('plugboard'), null);
+  return { profile: api.param('profile'), rotors: list(api.param('rotors')), rings: list(api.param('rings')), windows: api.param('windows'), reflector: api.param('reflector'), plugboard: Array.isArray(plugs) ? plugs : undefined };
 }
 function rotorPanel(api, config, index, inspected) {
   const windows = String(config.windows ?? '').padEnd(3, ' ');
+  let ring;
+  try { ring = rawJsonMembers(api.param('rings') ?? [], 'array')[index]?.source; } catch { ring = ''; }
   const setWindow = letter => { const next = [...windows]; next[index] = letter; api.setParam('windows', next.join('')); };
   return h('section', { class: 'enigma-rotor', 'aria-label': `${['Left', 'Middle', 'Right'][index]} rotor` },
     h('span', { class: 'small muted' }, `${index + 1} · ${['Left', 'Middle', 'Right · fast'][index]}`),
     select(`enigma-rotor-${index}`, config.rotors[index], config.profile === 'enigma_i' ? ROTORS.slice(0, 5) : ROTORS, value => change(api, () => setListItem(api, 'rotors', index, value)), `Rotor ${index + 1} type`),
     h('div', { class: 'rotor-drum', 'aria-hidden': 'true' }, h('span', {}, '▲'), h('strong', {}, inspected?.[index] ?? windows[index]?.trim() ?? '—'), h('span', {}, '▼')),
     field('Initial window', `enigma-window-${index}`, select(`enigma-window-${index}`, windows[index].trim(), [...LETTERS], value => change(api, () => setWindow(value)), `Initial window ${index + 1}`)),
-    field('Ring setting', `enigma-ring-${index}`, h('input', { id: `enigma-ring-${index}`, type: 'number', min: 1, max: 26, value: config.rings[index] ?? '', onChange: event => change(api, () => setListItem(api, 'rings', index, int(event.target.value))) })));
+    field('Ring setting', `enigma-ring-${index}`, h('input', { id: `enigma-ring-${index}`, type: 'number', min: 1, max: 26, value: ring === 'null' ? '' : ring ?? '', onChange: event => change(api, () => setListItem(api, 'rings', index, event.target.value)) })));
 }
 function enigma(host, api) {
   const p = enigmaConfig(api); const result = output(api); const trace = Array.isArray(result.trace) ? result.trace : [];
+  const producing = api.snapshot?.()?.parameters;
   const selected = traceWindow(trace, traceCursor(api, trace));
   const source = snapshotText(api); const sourceChar = selected ? byteCharacter(source, selected.offset) : '';
   const targetChar = selected ? byteCharacter(result.text, selected.offset).toUpperCase() : '';
@@ -142,8 +239,11 @@ function enigma(host, api) {
       h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(api.param('trace')), onChange: event => change(api, () => api.setParam('trace', event.target.checked)) }), 'Record post-step windows')),
     h('div', { class: 'enigma-rotors' }, [0, 1, 2].map(index => rotorPanel(api, p, index, selected?.windows))),
     h('p', { class: 'mechanism-reading' }, selected ? `Inspected post-step windows: ${selected.windows}` : 'Initial windows (editable above)', result.final_windows ? h('span', {}, `Final windows: ${result.final_windows}`) : null),
+    producing?.windows ? disclosure(api, 'recorded-initial', 'Recorded initial settings', note(`Windows: ${producing.windows}. Rotors: ${list(producing.rotors).join(' / ')}. Ring settings: ${list(producing.rings).join(' / ')}.`)) : null,
     warning(enigmaProblems(p)), settingsWarning(api),
-    field('Plugboard pairs (for example AB CD)', plugId, h('input', { id: plugId, value: p.plugboard.join(' '), spellcheck: false, onChange: event => change(api, () => jsonParam(api, 'plugboard', event.target.value.trim() ? event.target.value.trim().split(/\s+/) : [])) })),
+    field('Plugboard pairs (for example AB CD)', plugId, h('input', { id: plugId, value: p.plugboard?.join(' ') ?? '', spellcheck: false, onChange: event => change(api, () => jsonParam(api, 'plugboard', event.target.value.trim() ? event.target.value.trim().split(/\s+/) : [])) })),
+    p.plugboard === undefined ? note(api.param('plugboard')?.trim?.() ? 'Repair the plugboard JSON in Parameters, or explicitly choose no pairs.' : 'No plugboard configuration supplied. Enter pairs or explicitly choose no pairs.') : null,
+    button('Use no plugboard pairs', () => change(api, () => jsonParam(api, 'plugboard', [])), {id: 'enigma-no-plugs', 'aria-pressed': String(Array.isArray(p.plugboard) && p.plugboard.length === 0)}),
     h('h3', {}, 'Output lamps'), h('div', { class: 'enigma-keyboard lampboard', 'aria-label': 'Output lampboard' }, [...LETTERS].map(letter => h('span', { class: `lamp${targetChar === letter ? ' lit' : ''}` }, letter))),
     h('h3', {}, 'Compose input'), h('div', { class: 'enigma-keyboard', 'aria-label': 'Input keyboard' }, [...'QWERTZUIOASDFGHJKPYXCVBNML'].map(letter => button(letter, () => change(api, () => { api.setText(api.text() + letter); }), { id: `enigma-insert-${letter}`, 'aria-label': `Insert ${letter}`, 'aria-pressed': String(sourceChar.toUpperCase() === letter) }))),
     selected ? note(`Input byte offset ${selected.offset}: ${sourceChar || 'unavailable'} → ${targetChar || 'unavailable'}. State belongs to the retained run${api.stale() ? ' with earlier settings' : ''}.`) : null,
@@ -157,16 +257,28 @@ function solitaire(host, api) {
   const cardName = card => card === 53 ? 'Joker A' : card === 54 ? 'Joker B' : `Card ${card}`;
   const card = (value, index) => button(h('span', {}, h('small', {}, `#${index + 1}`), ' ', h('strong', {}, value > 52 ? value === 53 ? 'A' : 'B' : value), ' ', h('span', {}, value > 52 ? 'JOKER' : 'CARD')), () => change(api, () => { api.ui.card = index; }), {
     id: `solitaire-card-${index}`, class: `solitaire-card${index === selected ? ' selected' : ''}${value > 52 ? ' joker' : ''}`, draggable: deckStatus(deck).length ? 'false' : 'true', 'aria-label': `#${index + 1} ${value > 52 ? value === 53 ? 'A JOKER' : 'B JOKER' : `${value} CARD`}. Position ${index + 1}: ${cardName(value)}. Select to move.`, 'aria-pressed': String(index === selected),
-    onDragstart: event => { if (deckStatus(deck).length) {event.preventDefault();return;} api.ui.dragCard = index; event.dataTransfer.setData('text/plain', String(index)); event.dataTransfer.effectAllowed = 'move'; },
-    onDragover: event => event.preventDefault(), onDrop: event => { event.preventDefault(); const from = api.ui.dragCard; if (Number.isInteger(from)) change(api, () => { jsonParam(api, 'deck', moveCard(deck, from, index)); api.ui.card = index; delete api.ui.dragCard; }); } });
+    onDragstart: event => {
+      if (deckStatus(deck).length || !event.dataTransfer) { event.preventDefault(); return; }
+      const token = crypto.randomUUID();
+      api.ui.dragCard = {index, token, revision: api.revision?.()};
+      event.dataTransfer.setData(CARD_DRAG, token); event.dataTransfer.effectAllowed = 'move';
+    },
+    onDragend: () => { delete api.ui.dragCard; },
+    onDragover: event => { if (event.dataTransfer?.types.includes(CARD_DRAG)) event.preventDefault(); },
+    onDrop: event => {
+      const drag = api.ui.dragCard; delete api.ui.dragCard;
+      if (!drag || drag.revision !== api.revision?.() || event.dataTransfer?.getData(CARD_DRAG) !== drag.token || deckStatus(deck).length) return;
+      event.preventDefault();
+      change(api, () => { jsonParam(api, 'deck', moveCard(deck, drag.index, index)); api.ui.card = index; });
+    } });
   replace(host, h('div', { class: 'mechanism solitaire-table' }, h('div', { class: 'row between' }, h('h3', {}, 'Initial deck · 54 cards'), button('Use ordered deck 1–54', () => change(api, () => jsonParam(api, 'deck', Array.from({ length: 54 }, (_, i) => i + 1))))),
     note('Select a card to move it, or drag it onto a position. The deck is the initial configuration; the Core result is text, without shuffle states.'), warning(deckStatus(deck)),
-    h('div', { class: 'solitaire-deck', 'aria-label': 'Initial deck in position order' }, deck.slice(0, 54).map(card)),
+    h('div', { class: 'solitaire-deck', 'data-instrument-scroll': 'initial-deck', 'aria-label': 'Initial deck in position order' }, deck.slice(0, 54).map(card)),
     deck.length ? h('div', {}, h('p', {}, `Selected: position ${selected + 1} · ${cardName(deck[selected])}`), h('div', { class: 'toolbar' }, button('Move earlier', () => move(selected - 1), { id: 'solitaire-move-earlier', disabled: selected <= 0 || Boolean(deckStatus(deck).length) }), button('Move later', () => move(selected + 1), { id: 'solitaire-move-later', disabled: selected >= deck.length - 1 || Boolean(deckStatus(deck).length) })),
       field('Move selected card to position (1–54)', 'solitaire-move-position', h('input', { id: 'solitaire-move-position', type: 'number', min: 1, max: 54, disabled: Boolean(deckStatus(deck).length), value: selected + 1, onChange: event => { const to = int(event.target.value) - 1; if (to >= 0 && to < deck.length) move(to); } }))) : null,
     field('Passphrase (ASCII letters; ordered deck required)', 'solitaire-passphrase', h('input', { id: 'solitaire-passphrase', type: 'password', autocomplete: 'off', value: api.param('passphrase') ?? '', maxlength: 65536, onChange: event => change(api, () => api.setParam('passphrase', event.target.value)) })),
     field('Deck-round budget', 'solitaire-max-steps', h('input', { id: 'solitaire-max-steps', type: 'number', min: 0, max: 1048576, value: api.param('max_steps') ?? 1048576, onChange: event => change(api, () => api.setParam('max_steps', event.target.value)) })),
-    h('details', {}, h('summary', {}, 'Accessible deck list and import'), field('Card order JSON', 'solitaire-deck-json', h('textarea', { id: 'solitaire-deck-json', rows: 4, value: typeof api.param('deck') === 'string' ? api.param('deck') : JSON.stringify(deck), onChange: event => change(api, () => api.setParam('deck', event.target.value)) })), h('ol', { class: 'deck-list' }, deck.map((value, index) => h('li', {}, `Position ${index + 1}: ${cardName(value)}`))))));
+    disclosure(api, 'deck-list', 'Accessible deck list and import', field('Card order JSON', 'solitaire-deck-json', h('textarea', { id: 'solitaire-deck-json', rows: 4, value: typeof api.param('deck') === 'string' ? api.param('deck') : JSON.stringify(deck), onChange: event => change(api, () => api.setParam('deck', event.target.value)) })), h('ol', { class: 'deck-list' }, deck.map((value, index) => h('li', {}, `Position ${index + 1}: ${cardName(value)}`))))));
 }
 
 function svg(tag, attrs = {}, children = []) {
@@ -182,8 +294,9 @@ function ringGlyphs(alphabet, radius, shift, cls) {
   });
 }
 function albertiDisk(api, index, editable = true) {
-  const ring = svg('g', {}, ringGlyphs(ALBERTI_RINGS.inner, 126, index, 'alberti-inner-letter'));
-  const disk = svg('svg', { viewBox: '0 0 440 440', role: 'img', 'aria-label': `Alberti 24-position rings. Inner ${ALBERTI_RINGS.inner[index]} aligned under outer A.`, class: `alberti-disk${editable ? '' : ' inspecting'}` }, [
+  const alignment = Math.max(0, index);
+  const ring = svg('g', {}, ringGlyphs(ALBERTI_RINGS.inner, 126, alignment, 'alberti-inner-letter'));
+  const disk = svg('svg', { viewBox: '0 0 440 440', role: 'img', 'aria-label': index < 0 ? 'Alberti 24-position rings. No initial alignment configured.' : `Alberti 24-position rings. Inner ${ALBERTI_RINGS.inner[index]} aligned under outer A.`, class: `alberti-disk${editable ? '' : ' inspecting'}` }, [
     svg('circle', { cx: 220, cy: 220, r: 207, class: 'alberti-outer' }), svg('circle', { cx: 220, cy: 220, r: 150, class: 'alberti-inner' }),
     ...ringGlyphs(ALBERTI_RINGS.outer, 180, 0, 'alberti-outer-letter'), ring,
     svg('path', { d: 'M211 42 L229 42 L220 62 Z', class: 'alberti-marker' }), svg('circle', { cx: 220, cy: 220, r: 20, class: 'alberti-hub' })]);
@@ -195,8 +308,8 @@ function albertiDisk(api, index, editable = true) {
   disk.addEventListener('pointerup', event => {
     if (start === undefined) return;
     const shift = Math.round((angle(event) - start) / (Math.PI / 12)); start = undefined;
-    const next = (index - shift % 24 + 24) % 24;
-    if (next === index) { ring.removeAttribute('transform'); return; }
+    const next = (alignment - shift % 24 + 24) % 24;
+    if (next === alignment) { ring.removeAttribute('transform'); return; }
     change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: setting(api).profile ?? 'alberti_di_palma_2009_v1', initial_index: ALBERTI_RINGS.inner[next] }); });
   });
   disk.addEventListener('pointercancel', () => { start = undefined; ring.removeAttribute('transform'); });
@@ -204,17 +317,21 @@ function albertiDisk(api, index, editable = true) {
 }
 function alberti(host, api) {
   const p = setting(api); const result = output(api); const trace = Array.isArray(result.trace) ? result.trace : [];
+  const producing = api.snapshot?.();
+  const recorded = producing?.namedInputs?.settings ?? parse(producing?.extraInputs?.settings, {});
   const selected = traceWindow(trace, traceCursor(api, trace));
   const initial = ALBERTI_RINGS.inner.indexOf(p.initial_index); const displayed = ALBERTI_RINGS.inner.indexOf(selected?.index ?? p.initial_index);
   const rotate = delta => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: ALBERTI_RINGS.inner[((initial < 0 ? 0 : initial) + delta + 24) % 24] }); });
   replace(host, h('div', { class: 'mechanism alberti-instrument' },
-    h('div', {}, albertiDisk(api, Math.max(0, displayed), !selected), note(selected ? `Inspected alignment: ${selected.index} · input byte ${selected.offset}` : 'Initial alignment. Drag the inner disk to choose an initial index.'),
+    h('div', {}, albertiDisk(api, displayed, !selected), note(selected ? `Inspected alignment: ${selected.index} · input byte ${selected.offset}` : initial < 0 ? 'No initial index configured. Choose an inner symbol, or rotate the geometry preview to set the alignment.' : 'Initial alignment. Drag the inner disk to choose an initial index.'),
       h('div', { class: 'toolbar' }, button('Rotate initial index left', () => rotate(-1), {id:'alberti-rotate-left'}), button('Rotate initial index right', () => rotate(1), {id:'alberti-rotate-right'}))),
     h('div', {}, h('h3', {}, '24-position digit-feedback profile'), note('alberti_di_palma_2009_v1 · Di Palma 2009 museum reconstruction, pp. 11–13. Exact prepared symbols; digits 1–4 are control symbols.'),
       initial < 0 || p.profile !== 'alberti_di_palma_2009_v1' ? warning(['Load the Core example or supply settings with an explicit initial index and profile.']) : null, settingsWarning(api),
       field('Inner symbol under outer A (initial)', 'alberti-initial', select('alberti-initial', p.initial_index, [...ALBERTI_RINGS.inner], value => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: value }); }))),
       h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(p.trace), onChange: event => change(api, () => patchSettings(api, { trace: event.target.checked })) }), 'Record alignment trace'),
       result.final_index !== undefined ? h('p', { class: 'mechanism-reading' }, `Final index: ${result.final_index}`) : null,
+      recorded?.initial_index ? disclosure(api, 'recorded-initial', 'Recorded initial settings', note(`Initial index: ${recorded.initial_index}. Profile: ${recorded.profile}.`)) : null,
+      selected ? note(`Recorded input byte ${selected.offset}: ${byteCharacter(producing?.input?.data, selected.offset)} → ${byteCharacter(result.text, selected.offset)}.`) : null,
       note('Prepared text is the exact text input; the engine does not insert indicators, spaces, or fold U/V.'),
       traceControls(api, trace, row => `input byte ${row.offset} · alignment ${row.index}`))));
   return playback(host, api, trace);
@@ -244,15 +361,17 @@ function importSettings(api, file) {
   }).catch(error => { if (current()) api.ui.importError = error.message; }).finally(finish);
 }
 
-function m138Strip(api, p, id, index, block, selected) {
+function m138Strip(api, p, id, index, block, selected, label) {
   const alphabet = typeof p.strips?.[id - 1] === 'string' ? p.strips[id - 1] : '';
   const input = [...api.text()][block * 30 + index]; const aligned = alphabet.indexOf(input);
   const letters = aligned < 0 ? [...alphabet] : [...alphabet.slice(aligned), ...alphabet.slice(0, aligned)];
-  return h('div', { class: `m138-strip${index === selected ? ' selected' : ''}` }, button(h('span', {}, `#${id}`, ' ', h('small', {}, `Track ${index + 1}`)), () => change(api, () => { api.ui.strip = index; }), { id: `m138-strip-${index}`, class: 'm138-strip-label', 'aria-label': `#${id} Track ${index + 1}. Inspect strip ${id}`, 'aria-pressed': String(index === selected) }),
+  return h('div', { class: `m138-strip${index === selected ? ' selected' : ''}` }, button(h('span', {}, `#${label}`, ' ', h('small', {}, `Track ${index + 1}`)), () => change(api, () => { api.ui.strip = index; }), { id: `m138-strip-${index}`, class: 'm138-strip-label', 'aria-label': `#${label} Track ${index + 1}. Inspect strip ${label}`, 'aria-pressed': String(index === selected) }),
     letters.map((letter, row) => h('div', { class: `m138-cell${row === 0 && aligned >= 0 ? ' source-row' : ''}${row === p.row_offsets?.[block] ? ' offset-row' : ''}` }, letter)));
 }
 function m138a(host, api) {
   const p = setting(api); const order = Array.isArray(p.order) ? p.order : [];
+  let labels;
+  try { labels = rawJsonMembers(settingsField(api, 'order'), 'array').map(row => row.source); } catch { labels = []; }
   const blocks = Math.max(1, Math.ceil([...api.text()].length / 30)); const block = Math.max(0, Math.min(blocks - 1, api.ui.block ?? 0));
   const selected = Math.max(0, Math.min(order.length - 1, api.ui.strip ?? 0));
   const move = delta => { const to = selected + delta; if (to < 0 || to >= order.length) return; change(api, () => { patchSettings(api, { order: moveCard(order, selected, to) }); api.ui.strip = to; }); };
@@ -262,14 +381,14 @@ function m138a(host, api) {
     note('Series and strip alphabets are supplied facts. The Core qualification example is synthetic; it is not a historical standard series.'),
     api.ui.settingsRead ? h('p',{role:'status'},'Reading the selected strip settings…') : null, warning(stripProblems(p, [...api.text()].length)), settingsWarning(api), api.ui.importError ? h('p', { class: 'error', role: 'alert' }, api.ui.importError) : null,
     h('div', { class: 'mechanism-settings' }, field('Inspect block (1-based)', 'm138-block', h('input', { id: 'm138-block', type: 'number', min: 1, max: blocks, value: block + 1, onChange: event => change(api, () => { api.ui.block = Math.max(0, Math.min(blocks - 1, int(event.target.value) - 1)); }) })),
-      field('Row offsets by 30-character block (JSON)', 'm138-offsets', h('input', { id: 'm138-offsets', value: JSON.stringify(p.row_offsets ?? []), onChange: event => { const rows = parse(event.target.value, null); if (rows) change(api, () => patchSettings(api, { row_offsets: rows })); else { api.ui.importError = 'Row offsets must be a JSON array.'; api.refresh(); } } }))),
-    h('div', { class: 'm138-holder', role: 'region', tabindex: 0, 'aria-label': 'Strip alphabets aligned to current input block. Horizontal and vertical scroll.' }, h('div', { class: 'm138-strips' }, order.slice(0, 30).map((id, index) => m138Strip(api, p, id, index, block, selected)))),
+      field('Row offsets by 30-character block (JSON)', 'm138-offsets', h('input', { id: 'm138-offsets', value: settingsField(api, 'row_offsets'), onChange: event => patchSettingsArray(api, 'row_offsets', event.target.value) }))),
+    h('div', { class: 'm138-holder', 'data-instrument-scroll': 'strip-holder', role: 'region', tabindex: 0, 'aria-label': 'Strip alphabets aligned to current input block. Horizontal and vertical scroll.' }, h('div', { class: 'm138-strips' }, order.slice(0, 30).map((id, index) => m138Strip(api, p, id, index, block, selected, labels[index] ?? String(id))))),
     note('Blue outlined row: source alignment. Shaded row: configured clockwise offset. This is a configuration view, not an execution trace.'),
-    order.length ? h('div', { class: 'toolbar' }, h('strong', {}, `Track ${selected + 1} · strip #${order[selected]}`), button('Move track left', () => move(-1), { id:'m138-move-left', disabled: selected === 0 }), button('Move track right', () => move(1), { id:'m138-move-right', disabled: selected === order.length - 1 })) : null,
-    h('details', {}, h('summary', {}, 'Series import and accessible track list'), field('Import complete settings JSON', 'm138-import', uploader),
+    order.length ? h('div', { class: 'toolbar' }, h('strong', {}, `Track ${selected + 1} · strip #${labels[selected] ?? order[selected]}`), button('Move track left', () => move(-1), { id:'m138-move-left', disabled: selected === 0 }), button('Move track right', () => move(1), { id:'m138-move-right', disabled: selected === order.length - 1 })) : null,
+    disclosure(api, 'strip-list', 'Series import and accessible track list', field('Import complete settings JSON', 'm138-import', uploader),
       field('Series identifier', 'm138-series', h('input', { id: 'm138-series', value: p.strip_series ?? '', onChange: event => change(api, () => patchSettings(api, { strip_series: event.target.value })) })),
-      field('Strip order (30 IDs as JSON)', 'm138-order', h('textarea', { id: 'm138-order', rows: 3, value: JSON.stringify(order), onChange: event => { const ids = parse(event.target.value, null); if (Array.isArray(ids)) change(api, () => patchSettings(api, { order: ids })); else { api.ui.importError = 'Strip order must be a JSON array.'; api.refresh(); } } })),
-      h('ol', { class: 'strip-list' }, order.map((id, index) => h('li', {}, `Track ${index + 1} · #${id}: ${p.strips?.[id - 1] ?? 'missing definition'}`))))));
+      field('Strip order (30 IDs as JSON)', 'm138-order', h('textarea', { id: 'm138-order', rows: 3, value: settingsField(api, 'order'), onChange: event => patchSettingsArray(api, 'order', event.target.value) })),
+      h('ol', { class: 'strip-list' }, order.map((id, index) => h('li', {}, `Track ${index + 1} · #${labels[index] ?? id}: ${p.strips?.[id - 1] ?? 'missing definition'}`))))));
 }
 
 function reportOf(api) {
@@ -317,7 +436,7 @@ function brainfuck(host, api) {
     report ? h('p', { class: report.completed ? 'mechanism-reading' : 'warning', role: 'status' }, `${report.completed ? 'Program completed' : 'Execution stopped'} · ${report.stop_reason} · ${report.instructions} dispatched instructions · ${report.options.cell_bits}-bit cells`, report.trace_complete === false ? h('strong', {}, ' · Trace truncated; execution status is separate.') : null) : null,
     sourceSelection(api, selected), brainfuckTape(report, api),
     selected ? h('div', { class: 'bf-dispatch' }, h('h3', {}, `Recorded dispatch ${selected.instruction} · ${selected.command}`), h('p', {}, `Source byte ${selected.source_offset}; pointer ${selected.pointer_before} → ${selected.pointer_after}; cell at pointer before ${selected.cell_before}; cell at pointer after ${selected.cell_after}.`), note('Only these observed cells belong to this dispatch; the final tape below is a separate state.')) : null,
-    traceControls(api, trace, row => `instruction ${row.instruction} · source byte ${row.source_offset} · ${row.command}`),
+    traceControls(api, trace, row => `instruction ${row.instruction} · source byte ${row.source_offset} · ${row.command}`, 'No recorded dispatch selected. The tape shown is the final recorded range.'),
     h('section', { class: 'bf-output' }, h('h3', {}, 'Output bytes'), h('p', { class: 'small muted' }, result === undefined ? 'No execution output retained. Run the selected action.' : `${byteOutput.length} bytes · full output is retained by the result export`),
       h('pre', { 'aria-label': 'Output byte preview in hexadecimal' }, Array.from(byteOutput.slice(0, 1024), byte => byte.toString(16).padStart(2, '0').toUpperCase()).join(' ')),
       h('pre', { 'aria-label': 'Output text preview decoded as UTF-8' }, new TextDecoder().decode(Uint8Array.from(byteOutput.slice(0, 1024)))))));
@@ -335,6 +454,7 @@ export function disposeInstrument(api) {
   const token = api.ui.settingsRead;
   api.ui.settingsRead = null;
   api.ui.playing = false;
+  delete api.ui.dragCard;
   api.ui.settingsError = ''; delete api.ui.settingsErrorRaw; delete api.ui.settingsErrorField;
   if (token) api.pendingInputRead?.(null, token);
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { pngSegments, planeSamples, imageForDrawing, sourceKey, viewportRows, auxiliaryBytes, disposeInstrument, inspectedPlaneBit, sameAnalysisConfiguration, bytesForEvidence } from '../src/instruments/media.mjs';
+import { pngSegments, planeSamples, imageForDrawing, sourceKey, viewportRows, auxiliaryBytes, disposeInstrument, inspectedPlaneBit, sameAnalysisConfiguration, bytesForEvidence, frameFraction, frameAtFraction, frameSeconds } from '../src/instruments/media.mjs';
 
 test('PNG map separates signature, framing, payload and trailing bytes using Core offsets', () => {
  const report={chunks:[{kind:'IHDR',offset:8,length:13},{kind:'IDAT',offset:33,length:12},{kind:'IEND',offset:57,length:0}],boundary:{logical_end:69,trailing_offset:69,trailing_bytes:3}};
@@ -63,4 +63,11 @@ test('file evidence inspection uses the producing source when current file has c
  assert.deepEqual(Array.from(bytesForEvidence(api)),[1,2,3]);
  api.stale=()=>false;
  assert.deepEqual(Array.from(bytesForEvidence(api)),[9,9]);
+});
+
+test('audio drawing uses bounded relative frames while retaining an exact wide origin', () => {
+ const start='9007199254740993',end='9007199254741001';
+ assert.equal(frameFraction('9007199254740997',start,end),0.5);
+ assert.equal(frameAtFraction(start,end,0.5),'9007199254740997');
+ assert.equal(frameSeconds(start,8000,6),'1125899906842.624125');
 });

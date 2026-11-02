@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { deckStatus, moveCard, enigmaProblems, stripProblems, traceWindow, tapePage, settingsForEdit } from '../src/instruments/mechanisms.mjs';
+import { deckStatus, moveCard, enigmaProblems, stripProblems, traceWindow, tapePage, settingsForEdit, rawJsonMembers, replaceSettingsFieldJson } from '../src/instruments/mechanisms.mjs';
 
 test('deck editing moves the selected card and preserves the complete permutation', () => {
   const deck = Array.from({length: 54}, (_, i) => i + 1);
@@ -47,4 +47,21 @@ test('visual settings editing refuses JSON numbers it cannot preserve exactly', 
   assert.throws(() => settingsForEdit('{"order":[1,9007199254740993]}'), /exact/);
   assert.throws(() => settingsForEdit('{"row_offsets":[1e0]}'), /exact/);
   assert.deepEqual(settingsForEdit('{"order":[1,2],"label":"9007199254740993"}'), {order:[1,2],label:'9007199254740993'});
+});
+
+
+test('editing one settings field preserves every exact untouched JSON value', () => {
+  const source='{"profile":"test","wide":9007199254740993,"nested":{"letter":"é,}\\\""},"row_offsets":[1,2]}';
+  const next=replaceSettingsFieldJson(source,'row_offsets','[9007199254740995,1e0]');
+  assert.ok(next.includes('9007199254740993'));
+  assert.ok(next.includes('[9007199254740995,1e0]'));
+  assert.deepEqual(rawJsonMembers(next,'object').map(row=>row.key),['profile','wide','nested','row_offsets']);
+  assert.equal(rawJsonMembers(next,'object').find(row=>row.key==='nested').source,rawJsonMembers(source,'object').find(row=>row.key==='nested').source);
+  const recovered=replaceSettingsFieldJson(next,'row_offsets','[1,2]');
+  assert.equal(rawJsonMembers(recovered,'object').find(row=>row.key==='row_offsets').source,'[1,2]');
+});
+
+test('raw array members retain large, exponent and negative-zero number lexemes', () => {
+  assert.deepEqual(rawJsonMembers('[9007199254740993,1e0,-0,{"text":"x,]"}]','array').map(row=>row.source),['9007199254740993','1e0','-0','{"text":"x,]"}']);
+  assert.throws(()=>replaceSettingsFieldJson('{"order":[1]}','order','[1,'),SyntaxError);
 });

@@ -26,7 +26,7 @@ export function mountPlayground(container, context) {
   const hasInput = !selected || selected.contract.inputs.length > 0;
   const inputLabel = selected?.direct && !selected.pipeline && hasInput ? selected.contract.inputs[0].name === 'input' ? 'Your input' : `${labelFor(selected.contract.inputs[0].name)} input` : 'Your input';
 
-  function changed({ input } = {}) {
+  function changed({ input, preservePresentation = false } = {}) {
     page.controller?.abort(); page.auxiliary?.abort();
     clearTimeout(page.autoTimer);
     page.revision++;
@@ -35,7 +35,7 @@ export function mountPlayground(container, context) {
     page.errors = [];
     page.pendingNext = false;
     page.status = 'Input or settings changed. Run again to refresh results.';
-    if (input) session.setInput(input); else session.invalidate();
+    if (input) { session.setInput(input); if (!preservePresentation) page.inputRevision=(page.inputRevision ?? 0)+1; } else session.invalidate();
     page.redraw?.();
     if (page.auto && !page.tool && session.input.type === 'text' && session.input.data && bytesOf(session.input) <= 4096) {
       const qualified = PRESETS[page.mode].filter(id => (page.fast.get(id) ?? 0) >= bytesOf(session.input));
@@ -121,7 +121,7 @@ export function mountPlayground(container, context) {
     try {
       page.controller?.abort();
       session.continue(result.id, output, conversion);
-      page.revision++; page.readingFile = null; page.running = false; page.pendingNext = true; page.errors = []; page.showRound = null;
+      page.revision++; page.inputRevision=(page.inputRevision ?? 0)+1; page.readingFile = null; page.running = false; page.pendingNext = true; page.errors = []; page.showRound = null;
       page.sourceName = `Result from ${runtime.action(result.operation)?.title ?? 'previous step'}`;
       page.status = 'Next input ready. Your original input and previous rounds are retained.';
       if (!keepTool) page.tool = null; render();
@@ -181,7 +181,7 @@ export function mountPlayground(container, context) {
   const value = session.input;
   let inputControl;
   if (!hasInput) inputControl = null;
-  else if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': inputLabel, onInput: event => { try { changed({ input: { type: 'text', data: event.target.value } }); instrument?.refresh(); } catch (error) { notify(error.message); runButton.disabled = true; } } });
+  else if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': inputLabel, onInput: event => { try { changed({ input: { type: 'text', data: event.target.value }, preservePresentation: descriptor?.kind === 'keyboard' || descriptor?.kind === 'graph' }); instrument?.refresh(); } catch (error) { notify(error.message); runButton.disabled = true; } } });
   else inputControl = h('div', { class: 'byte-input' }, h('strong', {}, page.sourceName ?? `${labelFor(value.type)} input`), h('p', { class: 'muted' }, `${bytesOf(value).toLocaleString()} bytes · ${value.type}`),
     value.type === 'bytes' ? button('Use as UTF-8 text', () => run({ ids: ['text.utf8.decode'], continueAfter: true })) : h('pre', {}, JSON.stringify(value.data, null, 2).slice(0, 2048)));
   const fileInput = h('input', { type: 'file', id: 'playground-file', hidden: true, onChange: event => setFile(event.target.files[0]) });
@@ -252,7 +252,7 @@ export function mountPlayground(container, context) {
   if (descriptor) {
     page.extraInputs[selected.id] ??= {};
     instrument = instrumentShell({page,action:selected,descriptor,runtime,changed,
-      setInput(value) { const previous=session.input.type; changed({input:value}); if (previous !== value.type) render(); },
+      setInput(value, options = {}) { const previous=session.input.type; changed({input:value,...options}); if (previous !== value.type) render(); },
       parameters:()=>page.parameters[selected.id], extra:()=>page.extraInputs[selected.id],
       redrawForm:()=>page.redrawParameters?.(),selectAction,loadExample,convertInput:id=>run({ids:[id],continueAfter:true,keepTool:true})});
     page.dispose = instrument.dispose;
@@ -260,7 +260,7 @@ export function mountPlayground(container, context) {
   append(inputOptions, hasInput && (!descriptor || selected.direct.inputs[selected.contract.inputs[0].name] === 'bytes' && value.type === 'text') ? h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.utf8, onChange: event => { page.utf8 = event.target.checked; changed(); } }), 'Use UTF-8 for text sent to byte tools') : null,
     hasInput && !descriptor ? h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.auto, onChange: event => { page.auto = event.target.checked; changed(); } }), 'Update recently fast tools as I type') : null,
     hasInput && !descriptor ? h('p', { class: 'small muted' }, 'Automatic updates require a measured fast run and an input of 4 KiB or less.') : null,
-    h('div', { class: 'toolbar' }, runButton, button('Stop', () => { clearTimeout(page.autoTimer); page.controller?.abort(); page.auxiliary?.abort(); page.running = false; page.readingFile = null; page.secondaryReading = null; page.status = 'Stop requested; pending input and results are revoked. Awaiting worker lifecycle completion; the previous input is retained.'; page.redraw?.(); })), status,
+    h('div', { class: 'toolbar' }, runButton, button('Stop', () => { clearTimeout(page.autoTimer); page.controller?.abort(); page.auxiliary?.abort(); page.running = false; page.readingFile = null; page.secondaryReading = null; page.status = 'Stop requested; pending input and results are revoked. Core completion is not confirmed; the previous input is retained.'; page.redraw?.(); })), status,
     hasInput && !descriptor ? button('Try an example', () => { changed({ input: { type: 'text', data: page.mode === 'Decode' ? 'SGVsbG8sIEN1YmUh' : 'Hello, Cube!' } }); page.tool = null; render(); }) : null,
     descriptor ? button('Load Core example', loadExample, {id:'load-core-example'}) : null,
     selected ? button('Compare common tools', () => { page.tool = null; changed(); render(); }) : null);
@@ -273,10 +273,12 @@ export function mountPlayground(container, context) {
   function updateTab() {
     if (!instrument) return;
     const visual = (page.instrumentTab ?? 'Visual') === 'Visual';
+    const wasHidden=instrument.surface.hidden;
+    if (!visual) instrument.rememberScroll();
     instrument.surface.hidden = !visual;
     const options = container.querySelector('#instrument-parameter-panel'); if (options) options.hidden = visual;
     for (const tab of ['Visual','Parameters']) container.querySelector(`#instrument-tab-${tab.toLowerCase()}`)?.setAttribute('aria-pressed',String((page.instrumentTab ?? 'Visual') === tab));
-    if (visual) instrument.refresh();
+    if (visual) instrument.refresh({captureScroll:!wasHidden});
   }
   updateTab();
   page.dispose = instrument?.dispose;

@@ -3,9 +3,11 @@ import { h, button, replace } from '../dom.mjs';
 const note = text => h('p', {class:'small muted'},text);
 const field = (id,title,control) => h('div',{class:'field'},h('label',{for:id},title),control);
 const parse = value => { if(typeof value !== 'string') return value; try{return JSON.parse(value);}catch{return null;} };
-const integer = (value,min,max) => { const n=Number(value); return String(value).trim()!=='' && Number.isSafeInteger(n) && n>=min && n<=max ? n : null; };
+const integer = (value,min,max) => { if (!['string','number'].includes(typeof value)) return null; const n=Number(value); return String(value).trim()!=='' && Number.isSafeInteger(n) && n>=min && n<=max ? n : null; };
 function choice(id,value,values,change) {
-  return h('select',{id,onChange:event=>change(event.target.value)},values.map(v=>h('option',{value:v,selected:String(v)===String(value)},v)));
+  const known=values.some(option=>String(option)===String(value));
+  const empty=value === undefined || value === null || value === '';
+  return h('select',{id,onChange:event=>change(event.target.value)}, !known ? h('option',{value:empty?'':String(value),selected:true},empty?'Choose…':`Unavailable: ${value}`) : null, values.map(v=>h('option',{value:v,selected:String(v)===String(value)},v)));
 }
 function patch(api,name,value) {api.setParam(name,value);api.refresh();}
 function addText(api,text,separator='') {api.setText(api.text()+(api.text()?separator:'')+text);api.refresh();}
@@ -21,6 +23,19 @@ export function editGraphEdge(graph,from,to,id) {
   if(!graph.vertices.includes(from)||!graph.vertices.includes(to)||!id||graph.edges.some(edge=>edge.id===id)) throw new Error('Choose existing endpoints and a distinct edge ID.');
   return {...graph,edges:[...graph.edges,{id,from,to}]};
 }
+/** Append an explicitly chosen coordinate while preserving every existing wire
+ * token, including invalid wide integers for Core to diagnose without rounding. */
+export function appendCoordinate(raw,coordinate) {
+  let values;
+  try { values=JSON.parse(raw); } catch { return null; }
+  if (!Array.isArray(values)) return null;
+  const end=raw.lastIndexOf(']');
+  return raw.slice(0,end)+(values.length?', ':'')+JSON.stringify(coordinate)+raw.slice(end);
+}
+function customLayout(name) {
+  document.getElementById('instrument-tab-parameters')?.click();
+  document.getElementById(`playground-options-${name}`)?.focus();
+}
 function geometry(api,value) {return api.data.layouts[value] ?? parse(value);}
 function keyLayout(api,layout,title,selectedKey,target=false) {
   const entries=layout?.entries;
@@ -28,7 +43,7 @@ function keyLayout(api,layout,title,selectedKey,target=false) {
   const layer=api.ui.layer ?? 'base';
   const visible=entries.filter(e=>e.layer===layer);
   const rows=[...new Set(visible.map(e=>e.row ?? 0))];
-  return h('section',{class:'key-layout','aria-label':title},h('h3',{},title),h('div',{class:'instrument-scroll'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol),h('small',{},entry.key)),()=>{
+  return h('section',{class:'key-layout','aria-label':title},h('h3',{},title),h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol),h('small',{},entry.key)),()=>{
     api.ui.key=entry.key;api.ui.layer=entry.layer;
     const offset=api.text().indexOf(entry.symbol);
     api.ui.textPosition=offset<0?null:Array.from(api.text().slice(0,offset)).length;
@@ -40,7 +55,8 @@ function keyLayout(api,layout,title,selectedKey,target=false) {
         if(!Array.isArray(old)){api.ui.error='Use a JSON coordinate array in the input first.';api.refresh();return;}
         const base=integer(api.param('index_base'),0,1);
         if(base===null || entry.row===undefined){api.ui.error='Set a valid coordinate origin and geometry.';api.refresh();return;}
-        api.setText(JSON.stringify([...old,[entry.row+base,entry.column+base,entry.layer]]));
+        api.ui.error='';
+        api.setText(appendCoordinate(api.text(),[entry.row+base,entry.column+base,entry.layer]));
       }else api.setText(api.text()+entry.symbol);
     }
     api.refresh();
@@ -54,7 +70,7 @@ function keyboard(host,api) {
   const sourceEntry=source?.entries?.find(e=>e.key===api.ui.key&&e.layer===layer);
   const targetEntry=target?.entries?.find(e=>e.key===api.ui.key&&e.layer===layer);
   const setLayout=(name,value)=>patch(api,name,remap?value:JSON.stringify(api.data.layouts[value]));
-  const selector=(name,title)=>field(`keyboard-${name}`,title,choice(`keyboard-${name}`,remap?api.param(name):Object.keys(api.data.layouts).find(key=>JSON.stringify(api.data.layouts[key])===JSON.stringify(parse(api.param(name))))??'custom',['custom',...Object.keys(api.data.layouts)],value=>{if(value!=='custom')setLayout(name,value);}));
+  const selector=(name,title)=>field(`keyboard-${name}`,title,choice(`keyboard-${name}`,!api.param(name)?'':remap?api.param(name):Object.keys(api.data.layouts).find(key=>JSON.stringify(api.data.layouts[key])===JSON.stringify(parse(api.param(name))))??'custom',['custom',...Object.keys(api.data.layouts)],value=>{if(value==='custom')customLayout(name);else setLayout(name,value);}));
   const result=api.result();
   const sourceSymbols=Array.from(api.text());
   const textSelection=h('div',{class:'keyboard-text-inspection'},h('h3',{},'Source text positions'),note(`First ${Math.min(64,sourceSymbols.length)} of ${sourceSymbols.length} scalars. Select a position to inspect its key; the complete text remains in the input.`),h('div',{class:'keyboard-text-strip'},sourceSymbols.slice(0,64).map((symbol,index)=>button(symbol===' '?'␠':symbol,()=>{const key=source?.entries?.find(e=>e.symbol===symbol);api.ui.textPosition=index;if(key){api.ui.key=key.key;api.ui.layer=key.layer;}api.refresh();},{id:`keyboard-text-${index}`,'aria-label':`${symbol===' '?'␠':symbol}, source scalar ${index}`,'aria-pressed':String(api.ui.textPosition===index),class:api.ui.textPosition===index?'inspected':''}))));
@@ -72,7 +88,7 @@ function keyboard(host,api) {
     textSelection,
     h('p',{class:'selection-caption'},sourceEntry?`Selected physical key ${sourceEntry.key}: ${sourceEntry.symbol}${targetEntry?` → ${targetEntry.symbol}`:''}. Layer ${layer}.`:'Inspect a key, or choose Insert to compose input.'),
     api.ui.error?h('p',{class:'warning'},api.ui.error):null,
-    positions.length?h('section',{},field('keyboard-position','Recorded text position',h('input',{id:'keyboard-position',type:'range',min:0,max:positions.length-1,value:cursor,onInput:e=>{api.ui.position=Number(e.target.value);const c=result.source_coordinates?.[api.ui.position]??result.coordinates?.[api.ui.position];if(c){const b=Number(api.snapshot()?.parameters?.index_base??0);const k=source?.entries?.find(k=>k.row===c[0]-b&&k.column===c[1]-b&&k.layer===c[2]);if(k){api.ui.key=k.key;api.ui.layer=k.layer;}}api.refresh();}})),note(`Recorded position ${cursor+1}/${positions.length}: UTF-8 byte ${positions[cursor][0]}, scalar ${positions[cursor][1]}. ${result.source_coordinates?JSON.stringify(result.source_coordinates[cursor])+' → '+JSON.stringify(result.target_coordinates[cursor]):JSON.stringify(result.coordinates?.[cursor]??'Decoded position')}`)):null);
+    positions.length?h('section',{},field('keyboard-position','Recorded text position',h('input',{id:'keyboard-position',type:'range',min:0,max:positions.length-1,value:cursor,onInput:e=>{api.ui.position=Number(e.target.value);const c=result.source_coordinates?.[api.ui.position]??result.coordinates?.[api.ui.position];if(c&&!api.stale()){const b=Number(api.snapshot()?.parameters?.index_base??0);const k=source?.entries?.find(k=>k.row===c[0]-b&&k.column===c[1]-b&&k.layer===c[2]);if(k){api.ui.key=k.key;api.ui.layer=k.layer;}}api.refresh();}})),note(`Recorded position ${cursor+1}/${positions.length}: UTF-8 byte ${positions[cursor][0]}, scalar ${positions[cursor][1]}. ${result.source_coordinates?JSON.stringify(result.source_coordinates[cursor])+' → '+JSON.stringify(result.target_coordinates[cursor]):JSON.stringify(result.coordinates?.[cursor]??'Decoded position')}`),api.stale()?note('Recorded coordinates belong to earlier settings. The keyboard above remains the editable current geometry.'):null):null);
   const input=document.getElementById('playground-input');
   const inspect=()=>{const text=input.value.slice(0,input.selectionStart);const symbol=Array.from(text).at(-1);const entry=source?.entries?.find(e=>e.symbol===symbol);if(entry){api.ui.key=entry.key;api.ui.layer=entry.layer;api.refresh();}};
   input?.addEventListener('keyup',inspect); input?.addEventListener('click',inspect);
@@ -92,14 +108,14 @@ function polybius(host,api) {
     field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})));
   const selected=api.ui.cell;
   const start=Math.floor((api.ui.rowPage??0)/8)*8;
-  const grid=side&&base!==null&&alphabet.length===side*side?h('div',{class:'instrument-scroll'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>{const index=(r+start)*side+c;return h('td',{},button(alphabet[index],()=>{
+  const grid=side&&base!==null&&alphabet.length===side*side?h('div',{class:'instrument-scroll','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>{const index=(r+start)*side+c;return h('td',{},button(alphabet[index],()=>{
     api.ui.cell=index;
     if(api.ui.cellAction==='insert') addText(api,api.action.id.endsWith('.decode')?`${r+start+base},${c+base}`:alphabet[index],api.action.id.endsWith('.decode')?' ':'');
     else api.refresh();
   },{id:`polybius-cell-${index}`,'aria-label':`${alphabet[index]}, row ${r+start+base}, column ${c+base}`,'aria-pressed':String(index===selected),class:index===selected?'inspected':''}));})))))):h('p',{class:'warning'},'A custom square requires side² unique scalars and valid aliases. Review Parameters.');
   replace(host,controls,note(`Aliases: ${aliases.join(', ')||'none'}. Presets fold ASCII case. Each literal space is retained as / (a null token). Custom squares match exact scalars.`),
     custom?h('div',{class:'toolbar'},field('polybius-alphabet','Custom alphabet',h('textarea',{id:'polybius-alphabet',rows:2,value:custom,onChange:e=>patch(api,'alphabet',e.target.value)})),field('polybius-side','Side',h('input',{id:'polybius-side',type:'number',min:1,max:64,value:api.param('side'),onChange:e=>patch(api,'side',e.target.value)}))):null,
-    grid,side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh();},{disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh();},{disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null,
+    grid,side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null,
     h('p',{class:'selection-caption'},selected!==undefined&&side?`Selected ${alphabet[selected]} ↔ ${Math.floor(selected/side)+base},${selected%side+base}. Inspection does not edit or run.`:'Select a cell to inspect its coordinates.'));
 }
 
@@ -113,11 +129,23 @@ function graph(host,api) {
   const data=graphDraft(api.text());
   const controls=h('div',{class:'toolbar'});
   if(!data){replace(host,note('Load the Core example or enter a graph with directed, vertices and edges in the input. All graph edits are also available as JSON.'),controls);return;}
-  const save=next=>{api.setText(JSON.stringify(next,null,2));api.refresh();};
+  const save=(next,focusId)=>{api.setText(JSON.stringify(next,null,2));api.refresh({focusId});};
   const vertices=data.vertices;
   const selected=api.ui.node;
-  const positions=api.ui.positions??={};
-  vertices.slice(0,100).forEach((name,index)=>{positions[name]??={x:350+230*Math.cos(index/vertices.length*2*Math.PI),y:230+165*Math.sin(index/vertices.length*2*Math.PI)};});
+  if (!api.ui.positions || Object.getPrototypeOf(api.ui.positions)!==null) api.ui.positions=Object.assign(Object.create(null),api.ui.positions ?? {});
+  const positions=api.ui.positions;
+  const currentNodes=new Set(vertices);
+  for (const name of Object.keys(positions)) if (!currentNodes.has(name)) delete positions[name];
+  vertices.slice(0,100).forEach((name,index)=>{
+    if (Object.hasOwn(positions,name)) return;
+    const preferred={x:350+230*Math.cos(index/vertices.length*2*Math.PI),y:230+165*Math.sin(index/vertices.length*2*Math.PI)};
+    const occupied=Object.values(positions);
+    const free=point=>occupied.every(other=>Math.hypot(point.x-other.x,point.y-other.y)>=52);
+    // Adding a node retains existing layout. Reuse an unoccupied drawing slot
+    // when the circular seed would conceal a node from an earlier source.
+    const slots=free(preferred)?[]:Array.from({length:104},(_,slot)=>({x:35+(slot%13)*52.5,y:35+Math.floor(slot/13)*(390/7)}));
+    positions[name]=free(preferred)?preferred:slots.find(free)??preferred;
+  });
   const canvas=svg('svg',{viewBox:'0 0 700 460',class:'graph-canvas',role:'img','aria-label':'Editable graph layout. Equivalent node and edge actions follow below.'});
   const result=api.result().output?.result;
   for(const edge of data.edges.slice(0,200)) {
@@ -143,16 +171,16 @@ function graph(host,api) {
   const attempt=run=>{try{run();api.ui.error='';}catch(error){api.ui.error=error.message;api.refresh();}};
   const nodeStart=integer(api.ui.nodeStart??0,0,vertices.length)??0;
   const edgeStart=integer(api.ui.edgeStart??0,0,data.edges.length)??0;
-  const pager=(title,key,start,length)=>h('div',{class:'toolbar'},button(`Previous ${title}`,()=>{api.ui[key]=Math.max(0,start-40);api.refresh();},{disabled:!start}),note(`${start+1}–${Math.min(length,start+40)} of ${length}`),button(`Next ${title}`,()=>{api.ui[key]=start+40;api.refresh();},{disabled:start+40>=length}));
+  const pager=(title,key,start,length)=>h('div',{class:'toolbar'},button(`Previous ${title}`,()=>{api.ui[key]=Math.max(0,start-40);api.refresh({fallbackFocusId:title==='nodes'?'graph-new-node':'graph-edge-id'});},{id:`graph-previous-${title}`,disabled:!start}),note(`${start+1}–${Math.min(length,start+40)} of ${length}`),button(`Next ${title}`,()=>{api.ui[key]=start+40;api.refresh({fallbackFocusId:title==='nodes'?'graph-new-node':'graph-edge-id'});},{id:`graph-next-${title}`,disabled:start+40>=length}));
   replace(host,h('div',{class:'toolbar'},field('graph-directed','Graph direction',choice('graph-directed',data.directed?'directed':'undirected',['undirected','directed'],v=>save({...data,directed:v==='directed'}))),
     field('graph-source','Source',choice('graph-source',api.param('source'),vertices,v=>patch(api,'source',v))),field('graph-target','Target',choice('graph-target',api.param('target'),vertices,v=>patch(api,'target',v)))),
-    h('div',{class:'instrument-scroll',tabindex:0,role:'region','aria-label':'Graph layout viewport'},canvas),note(`Drag nodes to change layout only. ${Math.min(vertices.length,100)} nodes and ${Math.min(data.edges.length,200)} edges drawn; the lists retain all graph entries.`),
+    h('div',{class:'instrument-scroll','data-instrument-scroll':'graph-layout',tabindex:0,role:'region','aria-label':'Graph layout viewport'},canvas),note(`Drag nodes to change layout only. ${Math.min(vertices.length,100)} nodes and ${Math.min(data.edges.length,200)} edges drawn; the lists retain all graph entries.`),
     result?h('p',{class:'selection-caption'},`${result.vertices.join(' → ')} · ${result.edges.length} edges${api.stale()?' · earlier input':''}`):note('Run to find a path. The graph has no weights or search trace.'),
-    h('div',{class:'toolbar'},field('graph-new-node','New node ID',vertexInput),button('Add node',()=>attempt(()=>{const name=vertexInput.value;if(!name||vertices.includes(name))throw new Error('Use a nonempty distinct node ID.');save({...data,vertices:[...vertices,name]});}))),
-    h('div',{class:'toolbar'},endpoint('graph-edge-from','from'),endpoint('graph-edge-to','to'),field('graph-edge-id','New edge ID',edgeId),button('Add edge',()=>attempt(()=>save(editGraphEdge(data,api.ui.from??vertices[0],api.ui.to??vertices[0],edgeId.value))))),
+    h('div',{class:'toolbar'},field('graph-new-node','New node ID',vertexInput),button('Add node',()=>attempt(()=>{const name=vertexInput.value;if(!name||vertices.includes(name))throw new Error('Use a nonempty distinct node ID.');save({...data,vertices:[...vertices,name]});}),{id:'graph-add-node'})),
+    h('div',{class:'toolbar'},endpoint('graph-edge-from','from'),endpoint('graph-edge-to','to'),field('graph-edge-id','New edge ID',edgeId),button('Add edge',()=>attempt(()=>save(editGraphEdge(data,api.ui.from??vertices[0],api.ui.to??vertices[0],edgeId.value))),{id:'graph-add-edge'})),
     api.ui.error?h('p',{role:'alert',class:'error'},api.ui.error):null,
-    h('details',{open:true},h('summary',{},'Nodes and layout controls'),h('div',{class:'graph-node-list'},vertices.slice(nodeStart,nodeStart+40).map(name=>h('div',{class:'row'},button(name,()=>{api.ui.node=name;api.refresh();},{'aria-pressed':String(name===selected)}),...['left','right','up','down'].map(direction=>button(direction,()=>{positions[name]??={x:350,y:230};positions[name].x+=direction==='left'?-15:direction==='right'?15:0;positions[name].y+=direction==='up'?-15:direction==='down'?15:0;api.refresh();},{'aria-label':`Move ${name} ${direction}`})),button(`Remove ${name}`,()=>save({...data,vertices:vertices.filter(v=>v!==name),edges:data.edges.filter(e=>e.from!==name&&e.to!==name)}))))),vertices.length>40?pager('nodes','nodeStart',nodeStart,vertices.length):null),
-    h('details',{},h('summary',{},`Edges (${data.edges.length})`),h('ul',{class:'compact-list'},data.edges.slice(edgeStart,edgeStart+40).map(edge=>h('li',{class:'row'},`${edge.id}: ${edge.from} ${data.directed?'→':'—'} ${edge.to}`,button(`Remove edge ${edge.id}`,()=>save({...data,edges:data.edges.filter(e=>e.id!==edge.id)}))))),data.edges.length>40?pager('edges','edgeStart',edgeStart,data.edges.length):null));
+    h('details',{open:api.ui.nodesOpen??true,onToggle:event=>{api.ui.nodesOpen=event.target.open;}},h('summary',{},'Nodes and layout controls'),h('div',{class:'graph-node-list'},vertices.slice(nodeStart,nodeStart+40).map(name=>h('div',{class:'row'},button(name,()=>{api.ui.node=name;api.refresh();},{id:`graph-inspect-${encodeURIComponent(name)}`,'aria-pressed':String(name===selected)}),...['left','right','up','down'].map(direction=>button(direction,()=>{positions[name]??={x:350,y:230};positions[name].x+=direction==='left'?-15:direction==='right'?15:0;positions[name].y+=direction==='up'?-15:direction==='down'?15:0;api.refresh();},{id:`graph-move-${encodeURIComponent(name)}-${direction}`,'aria-label':`Move ${name} ${direction}`})),button(`Remove ${name}`,()=>save({...data,vertices:vertices.filter(v=>v!==name),edges:data.edges.filter(e=>e.from!==name&&e.to!==name)},'graph-new-node'),{id:`graph-remove-${encodeURIComponent(name)}`})))),vertices.length>40?pager('nodes','nodeStart',nodeStart,vertices.length):null),
+    h('details',{open:api.ui.edgesOpen??false,onToggle:event=>{api.ui.edgesOpen=event.target.open;}},h('summary',{},`Edges (${data.edges.length})`),h('ul',{class:'compact-list'},data.edges.slice(edgeStart,edgeStart+40).map(edge=>h('li',{class:'row'},`${edge.id}: ${edge.from} ${data.directed?'→':'—'} ${edge.to}`,button(`Remove edge ${edge.id}`,()=>save({...data,edges:data.edges.filter(e=>e.id!==edge.id)},'graph-edge-id'),{id:`graph-remove-edge-${encodeURIComponent(edge.id)}`})))),data.edges.length>40?pager('edges','edgeStart',edgeStart,data.edges.length):null));
 }
 
 /** Layout coordinates use Core word spans; a subsequent Core decode validates
@@ -175,39 +203,48 @@ export function sourceCells(source,words,scheme,base) {
 function book(host,api) {
   const encode=api.action.id.endsWith('.encode');
   const source=encode?api.text():String(api.param('source')??'');
-  const scheme=api.param('scheme')??'word_character';
-  const base=integer(api.param('index_base')??1,0,1);
+  const scheme=api.param('scheme');
+  const base=integer(api.param('index_base'),0,1);
   const currentKey=JSON.stringify([source,scheme,base]);
   const index=api.ui.bookIndex;
   const stale=index&&index.key!==currentKey;
   const textField=encode?field('book-message','Message',h('textarea',{id:'book-message',rows:2,value:api.extra('text'),onInput:e=>{api.setExtra('text',e.target.value);api.refresh();}})):
     field('book-source','Reference text (exact)',h('textarea',{id:'book-source',rows:4,value:source,onInput:e=>{api.setParam('source',e.target.value);api.refresh();}}));
   const indexSource=async()=>{
+    if (api.ui.bookRequest) return;
     api.ui.bookError='';const revision=api.revision();
+    const request=api.ui.bookRequest={revision};
+    api.refresh();
     try{
       if(base===null)throw new Error('Choose origin 0 or 1.');
+      if(!api.choices('scheme').includes(scheme))throw new Error('Choose a coordinate scheme.');
       const words=(await api.execute('text.word.lengths',{input:source})).output;
       const all=sourceCells(source,words,scheme,base);
       const cells=all.slice(0,4096);
       const decoded=await api.execute('cipher.book.decode',{input:cells.map(c=>c.coordinate).join(',')},{source,scheme,index_base:base});
       if(decoded.output!==cells.map(c=>c.symbol).join(''))throw new Error('The source layout does not match Core coordinates. Keep using the exact Parameters input.');
       const hash=(await api.execute('hash.sha256',{input:new TextEncoder().encode(source)})).output;
-      if(revision!==api.revision())return;
+      if(!api.isCurrent(revision))return;
       api.ui.bookIndex={key:currentKey,source,cells,total:all.length,hash};api.ui.bookPage=0;
-    }catch(error){if(revision===api.revision())api.ui.bookError=error.message;}
-    api.refresh();
+    }catch(error){if(api.ui.bookRequest===request && api.isCurrent(revision))api.ui.bookError=error.message;}
+    finally {
+      if (api.ui.bookRequest===request) { api.ui.bookRequest=null; if(api.isCurrent())api.refresh(); }
+    }
   };
   const start=integer(api.ui.bookPage??0,0,index?.cells.length??0)??0;
-  replace(host,h('div',{class:'toolbar'},field('book-scheme','Coordinate scheme',choice('book-scheme',scheme,['word_character','line_character','line_word_character'],v=>patch(api,'scheme',v))),field('book-base','Index origin',choice('book-base',base,[0,1],v=>patch(api,'index_base',v)))),textField,
-    h('div',{class:'toolbar'},button('Index reference text',indexSource,{id:'book-index'}),button('Insert selected coordinate',()=>{const cell=index?.cells[api.ui.bookCell];if(!cell||stale)return;if(encode){api.setExtra('text',api.extra('text')+cell.symbol);api.refresh();}else addText(api,cell.coordinate,',');},{disabled:!index||stale||api.ui.bookCell===undefined})),
+  replace(host,h('div',{class:'toolbar'},field('book-scheme','Coordinate scheme',choice('book-scheme',scheme,api.choices('scheme'),v=>patch(api,'scheme',v))),field('book-base','Index origin',choice('book-base',base,[0,1],v=>patch(api,'index_base',v))), encode ? field('book-matching','Matching policy',choice('book-matching',api.param('matching'),api.choices('matching'),v=>patch(api,'matching',v))) : null),textField,
+    h('div',{class:'toolbar'},button('Index reference text',indexSource,{id:'book-index','aria-disabled':String(Boolean(api.ui.bookRequest)),'aria-busy':String(Boolean(api.ui.bookRequest))}),button('Insert selected coordinate',()=>{const cell=index?.cells[api.ui.bookCell];if(!cell||stale)return;if(encode){api.setExtra('text',api.extra('text')+cell.symbol);api.refresh();}else addText(api,cell.coordinate,',');},{id:'book-insert-coordinate',disabled:!index||stale||api.ui.bookCell===undefined})),
+    api.ui.bookRequest?h('p',{class:'small muted',role:'status'},'Indexing reference text in Core…'):null,
     api.ui.bookError?h('p',{class:'error',role:'alert'},api.ui.bookError):null,
     stale?h('p',{class:'warning'},'The indexed source or coordinates changed. Index the reference text again; the previous source is retained below.'):null,
     index?h('section',{},note(`Source SHA-256 ${index.hash}. ${index.cells.length} of ${index.total} indexed scalars retained for visual inspection (budget 4,096); the complete source and results remain exact.`),
       h('div',{class:'book-source-grid'},index.cells.slice(start,start+160).map((cell,i)=>button(h('span',{},h('strong',{},cell.symbol===' '?'␠':cell.symbol),h('small',{},cell.coordinate)),()=>{api.ui.bookCell=start+i;api.refresh();},{id:`book-cell-${start+i}`,'aria-pressed':String(api.ui.bookCell===start+i),'aria-label':`${cell.symbol===' '?'␠':cell.symbol}${cell.coordinate}: coordinate ${cell.coordinate}`}))),
-      h('div',{class:'toolbar'},button('Previous source cells',()=>{api.ui.bookPage=Math.max(0,start-160);api.refresh();},{disabled:!start}),note(`${start+1}–${Math.min(start+160,index.cells.length)}`),button('Next source cells',()=>{api.ui.bookPage=start+160;api.refresh();},{disabled:start+160>=index.cells.length})),
+      h('div',{class:'toolbar'},button('Previous source cells',()=>{api.ui.bookPage=Math.max(0,start-160);api.refresh({fallbackFocusId:`book-cell-${api.ui.bookPage}`});},{id:'book-previous-source',disabled:!start}),note(`${start+1}–${Math.min(start+160,index.cells.length)}`),button('Next source cells',()=>{api.ui.bookPage=start+160;api.refresh({fallbackFocusId:`book-cell-${api.ui.bookPage}`});},{id:'book-next-source',disabled:start+160>=index.cells.length})),
       api.ui.bookCell!==undefined? h('p',{class:'selection-caption'},`Selected ${index.cells[api.ui.bookCell]?.coordinate}: ${index.cells[api.ui.bookCell]?.symbol}. Source selection inspects; Insert explicitly composes the message/coordinates.`):null):note('Index the reference text to inspect Core-validated coordinates. Visual wrapping never changes source lines.'),
     api.result().source_sha256?note(`Execution source SHA-256: ${api.result().source_sha256}`):null);
 }
 
 const renderers={keyboard,polybius,graph,book};
 export function mountInstrument(host,api) {return renderers[api.kind](host,api);}
+
+export function disposeInstrument(api) { if (api.kind==='book') api.ui.bookRequest=null; }
