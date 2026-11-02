@@ -1927,6 +1927,124 @@
         "C-52",
         "CX-52"
       ]
+    },
+    "cipher.t52ab.encode": {
+      "display_name": "Encipher with Siemens T52a/b",
+      "summary": "Encipher unpacked five-bit codes with caller-supplied cams, complete socket wiring and explicit wheel state.",
+      "aliases": [
+        "Sturgeon",
+        "T52a",
+        "T52b"
+      ]
+    },
+    "cipher.t52ab.decode": {
+      "display_name": "Decipher with Siemens T52a/b",
+      "summary": "Decipher unpacked five-bit codes with caller-supplied cams, complete socket wiring and explicit wheel state.",
+      "aliases": [
+        "Sturgeon",
+        "T52a",
+        "T52b"
+      ]
+    },
+    "cipher.nema.encode": {
+      "display_name": "Encipher with NEMA",
+      "summary": "Encipher prepared contacts with the Model45 operational or training rotor set and complete lower-row windows.",
+      "aliases": [
+        "Model45"
+      ]
+    },
+    "cipher.nema.decode": {
+      "display_name": "Decipher with NEMA",
+      "summary": "Decipher prepared contacts with the Model45 operational or training rotor set and complete lower-row windows.",
+      "aliases": [
+        "Model45"
+      ]
+    },
+    "cipher.typex.encode": {
+      "display_name": "Encipher with Typex Mk22",
+      "summary": "Encipher prepared contacts with complete configured rotor facts, rings, plugs and five windows.",
+      "aliases": [
+        "Typex"
+      ]
+    },
+    "cipher.typex.decode": {
+      "display_name": "Decipher with Typex Mk22",
+      "summary": "Decipher prepared contacts with complete configured rotor facts, rings, plugs and five windows.",
+      "aliases": [
+        "Typex"
+      ]
+    },
+    "cipher.sigaba.encode": {
+      "display_name": "Encipher with SIGABA CSP889",
+      "summary": "Encipher prepared contacts with complete cipher, control and index banks and physical windows.",
+      "aliases": [
+        "ECM MarkII"
+      ]
+    },
+    "cipher.sigaba.decode": {
+      "display_name": "Decipher with SIGABA CSP889",
+      "summary": "Decipher prepared contacts with complete cipher, control and index banks and physical windows.",
+      "aliases": [
+        "ECM MarkII"
+      ]
+    },
+    "cipher.kl7.encode": {
+      "display_name": "Encipher with KL7",
+      "summary": "Encipher prepared contacts with the qualified rotor/notch set, explicit raw core state and bounded re-entry.",
+      "aliases": [
+        "KL-7"
+      ]
+    },
+    "cipher.kl7.decode": {
+      "display_name": "Decipher with KL7",
+      "summary": "Decipher prepared contacts with the qualified rotor/notch set, explicit raw core state and bounded re-entry.",
+      "aliases": [
+        "KL-7"
+      ]
+    },
+    "cipher.fialka.encode": {
+      "display_name": "Encipher with Fialka M-125",
+      "summary": "Encipher unpacked thirty-contact values with the 6K PROTON I set, punched card and complete rotor state.",
+      "aliases": [
+        "Fialka",
+        "M-125"
+      ]
+    },
+    "cipher.fialka.decode": {
+      "display_name": "Decipher with Fialka M-125",
+      "summary": "Decipher unpacked thirty-contact values with the 6K PROTON I set, punched card and complete rotor state.",
+      "aliases": [
+        "Fialka",
+        "M-125"
+      ]
+    },
+    "cipher.red.encode": {
+      "display_name": "Encipher with RED Type A",
+      "summary": "Encipher prepared contacts with qualified half-rotor wiring, 47 explicit breakwheel pins and complete state.",
+      "aliases": [
+        "RED"
+      ]
+    },
+    "cipher.red.decode": {
+      "display_name": "Decipher with RED Type A",
+      "summary": "Decipher prepared contacts with qualified half-rotor wiring, 47 explicit breakwheel pins and complete state.",
+      "aliases": [
+        "RED"
+      ]
+    },
+    "cipher.purple.encode": {
+      "display_name": "Encipher with PURPLE Type B",
+      "summary": "Encipher prepared contacts with qualified switch tables, daily alphabet, speeds and four switch positions.",
+      "aliases": [
+        "PURPLE"
+      ]
+    },
+    "cipher.purple.decode": {
+      "display_name": "Decipher with PURPLE Type B",
+      "summary": "Decipher prepared contacts with qualified switch tables, daily alphabet, speeds and four switch positions.",
+      "aliases": [
+        "PURPLE"
+      ]
     }
   },
   "operations": {
@@ -4800,6 +4918,140 @@
         "M-209",
         "C-52",
         "CX-52"
+      ]
+    },
+    "cipher.t52ab.encode": {
+      "tool_id": "cipher.t52ab.encode",
+      "display_name": "Encipher with Siemens T52a/b",
+      "summary": "Encipher unpacked five-bit codes with caller-supplied cams, complete socket wiring and explicit wheel state.",
+      "aliases": [
+        "Sturgeon",
+        "T52a",
+        "T52b"
+      ]
+    },
+    "cipher.t52ab.decode": {
+      "tool_id": "cipher.t52ab.decode",
+      "display_name": "Decipher with Siemens T52a/b",
+      "summary": "Decipher unpacked five-bit codes with caller-supplied cams, complete socket wiring and explicit wheel state.",
+      "aliases": [
+        "Sturgeon",
+        "T52a",
+        "T52b"
+      ]
+    },
+    "cipher.nema.encode": {
+      "tool_id": "cipher.nema.encode",
+      "display_name": "Encipher with NEMA",
+      "summary": "Encipher prepared contacts with the Model45 operational or training rotor set and complete lower-row windows.",
+      "aliases": [
+        "Model45"
+      ]
+    },
+    "cipher.nema.decode": {
+      "tool_id": "cipher.nema.decode",
+      "display_name": "Decipher with NEMA",
+      "summary": "Decipher prepared contacts with the Model45 operational or training rotor set and complete lower-row windows.",
+      "aliases": [
+        "Model45"
+      ]
+    },
+    "cipher.typex.encode": {
+      "tool_id": "cipher.typex.encode",
+      "display_name": "Encipher with Typex Mk22",
+      "summary": "Encipher prepared contacts with complete configured rotor facts, rings, plugs and five windows.",
+      "aliases": [
+        "Typex"
+      ]
+    },
+    "cipher.typex.decode": {
+      "tool_id": "cipher.typex.decode",
+      "display_name": "Decipher with Typex Mk22",
+      "summary": "Decipher prepared contacts with complete configured rotor facts, rings, plugs and five windows.",
+      "aliases": [
+        "Typex"
+      ]
+    },
+    "cipher.sigaba.encode": {
+      "tool_id": "cipher.sigaba.encode",
+      "display_name": "Encipher with SIGABA CSP889",
+      "summary": "Encipher prepared contacts with complete cipher, control and index banks and physical windows.",
+      "aliases": [
+        "ECM MarkII"
+      ]
+    },
+    "cipher.sigaba.decode": {
+      "tool_id": "cipher.sigaba.decode",
+      "display_name": "Decipher with SIGABA CSP889",
+      "summary": "Decipher prepared contacts with complete cipher, control and index banks and physical windows.",
+      "aliases": [
+        "ECM MarkII"
+      ]
+    },
+    "cipher.kl7.encode": {
+      "tool_id": "cipher.kl7.encode",
+      "display_name": "Encipher with KL7",
+      "summary": "Encipher prepared contacts with the qualified rotor/notch set, explicit raw core state and bounded re-entry.",
+      "aliases": [
+        "KL-7"
+      ]
+    },
+    "cipher.kl7.decode": {
+      "tool_id": "cipher.kl7.decode",
+      "display_name": "Decipher with KL7",
+      "summary": "Decipher prepared contacts with the qualified rotor/notch set, explicit raw core state and bounded re-entry.",
+      "aliases": [
+        "KL-7"
+      ]
+    },
+    "cipher.fialka.encode": {
+      "tool_id": "cipher.fialka.encode",
+      "display_name": "Encipher with Fialka M-125",
+      "summary": "Encipher unpacked thirty-contact values with the 6K PROTON I set, punched card and complete rotor state.",
+      "aliases": [
+        "Fialka",
+        "M-125"
+      ]
+    },
+    "cipher.fialka.decode": {
+      "tool_id": "cipher.fialka.decode",
+      "display_name": "Decipher with Fialka M-125",
+      "summary": "Decipher unpacked thirty-contact values with the 6K PROTON I set, punched card and complete rotor state.",
+      "aliases": [
+        "Fialka",
+        "M-125"
+      ]
+    },
+    "cipher.red.encode": {
+      "tool_id": "cipher.red.encode",
+      "display_name": "Encipher with RED Type A",
+      "summary": "Encipher prepared contacts with qualified half-rotor wiring, 47 explicit breakwheel pins and complete state.",
+      "aliases": [
+        "RED"
+      ]
+    },
+    "cipher.red.decode": {
+      "tool_id": "cipher.red.decode",
+      "display_name": "Decipher with RED Type A",
+      "summary": "Decipher prepared contacts with qualified half-rotor wiring, 47 explicit breakwheel pins and complete state.",
+      "aliases": [
+        "RED"
+      ]
+    },
+    "cipher.purple.encode": {
+      "tool_id": "cipher.purple.encode",
+      "display_name": "Encipher with PURPLE Type B",
+      "summary": "Encipher prepared contacts with qualified switch tables, daily alphabet, speeds and four switch positions.",
+      "aliases": [
+        "PURPLE"
+      ]
+    },
+    "cipher.purple.decode": {
+      "tool_id": "cipher.purple.decode",
+      "display_name": "Decipher with PURPLE Type B",
+      "summary": "Decipher prepared contacts with qualified switch tables, daily alphabet, speeds and four switch positions.",
+      "aliases": [
+        "PURPLE"
       ]
     }
   }
