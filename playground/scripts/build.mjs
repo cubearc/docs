@@ -4,6 +4,7 @@ import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
+import { writeInstrumentAssets } from './instrument-assets.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docs = resolve(root, '..');
@@ -70,4 +71,5 @@ run('python3', [join(docs, 'tools/playground_details.py'), '--catalog', join(out
 run('python3', [join(root, 'scripts/presentation.py'), '--catalog', join(output, 'catalog.json'), '--output', join(output, 'presentation.json')]);
 await writeFile(join(output, 'runtime-config.mjs'), `export const sdkRoot = ${JSON.stringify(`./${sdkFolder}/`)};\nexport const expectedBuild = ${JSON.stringify(sdk.build)};\n`);
 await writeFile(join(output, 'build-report.json'), `${JSON.stringify({ formatVersion: 1, development, sdk: sdk.build, packageSha256, catalogOperations: catalog.operations.length, directExecutors: sdk.executors.length, pipelineAdapters: sdk.pipelineAdapters.length }, null, 2)}\n`);
+await writeInstrumentAssets(sdk, cubeSource, output);
 console.log(`Playground staged locally with ${catalog.operations.length} canonical operations, ${sdk.executors.length} direct executors and ${sdk.pipelineAdapters.length} pipeline adapters.`);

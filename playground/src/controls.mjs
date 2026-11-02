@@ -24,14 +24,15 @@ export function fieldsFor(action) {
     return {
       name, description: schema.description ?? '', required: action.contract.parameters.required?.includes(name) ?? false,
       default: action.direct?.parameters?.[name] ?? schema.default ?? null,
-      constraints: { type: schema.type === 'boolean' ? 'boolean' : schema.enum?.every(Number.isInteger) ? 'unsigned_choices' : schema.enum ? 'text' : schema.type === 'integer' ? 'integer' : schema.type === 'string' ? 'text' : 'json', choices: schema.enum ?? [] },
+      constraints: { type: schema.type === 'boolean' ? 'boolean' : schema.enum?.every(Number.isInteger) ? 'unsigned_choices' : schema.enum ? 'text' : schema.type === 'integer' || schema['x-cube-integer'] ? 'integer' : schema.type === 'string' ? 'text' : 'json', choices: schema.enum ?? [] },
     };
   });
 }
 
 function displayValue(value, kind) {
   if (value === undefined || value === null) return kind === 'boolean' ? false : '';
-  if (kind === 'json' || (kind === 'text_list' && Array.isArray(value))) return JSON.stringify(value, null, 2);
+  if (kind === 'json') return typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+  if (kind === 'text_list' && Array.isArray(value)) return JSON.stringify(value, null, 2);
   if (Array.isArray(value)) return value.join(', ');
   return value;
 }
@@ -64,11 +65,14 @@ export function parametersForm(action, raw, onChange, prefix = 'options', origin
   }));
 }
 
-function integer(value) {
+function integer(value, allowBig = false) {
   const text = String(value).trim();
   if (!/^-?(0|[1-9][0-9]*)$/.test(text)) throw new Error('Enter a whole number.');
   const result = Number(text);
-  if (!Number.isSafeInteger(result)) throw new Error('That number exceeds this editor’s exact integer range.');
+  if (!Number.isSafeInteger(result)) {
+    if (allowBig) return BigInt(text);
+    throw new Error('That number exceeds this editor’s exact integer range.');
+  }
   return result;
 }
 
@@ -84,9 +88,9 @@ export async function parametersFor(runtime, action, raw, options = {}, original
       if (field.required && !options.allowMissing) { const error = new Error(`Add ${labelFor(field.name).toLowerCase()} to use this tool.`); error.code = 'missing_parameter'; error.parameter = field.name; throw error; }
       continue;
     }
-    if (['integer', 'unsigned', 'unsigned_choices'].includes(kind)) result[field.name] = integer(value);
+    if (['integer', 'unsigned', 'unsigned_choices'].includes(kind)) result[field.name] = integer(value, !action.pipeline);
     else if (kind === 'boolean') result[field.name] = Boolean(value);
-    else if (kind === 'unsigned_list') result[field.name] = { unsigned_list: Array.isArray(value) ? value : String(value).trim() ? String(value).split(',').map(integer) : [] };
+    else if (kind === 'unsigned_list') result[field.name] = { unsigned_list: Array.isArray(value) ? value : String(value).trim() ? String(value).split(',').map(item => integer(item)) : [] };
     else if (kind === 'text_list') {
       const list = Array.isArray(value) ? value : String(value).trim() ? (await runtime.call('execute', [{ operation: 'json.parse', version: 1, inputs: { input: String(value) } }], options)).output : [];
       if (!Array.isArray(list) || list.some(item => typeof item !== 'string')) throw new Error('Use a JSON list containing only text entries.');

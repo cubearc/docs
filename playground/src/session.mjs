@@ -42,6 +42,14 @@ export class Session {
   get pins() { return copy(this.#pins); }
   get current() { return copy(this.#rounds.at(-1) ?? null); }
 
+  latest(operation) {
+    for (let index=this.#rounds.length-1; index>=0; index--) {
+      const result=this.#rounds[index].results.findLast(row=>row.operation===operation);
+      if (result) return copy(result);
+    }
+    return null;
+  }
+
   #check(...added) {
     const retained = size({ input: this.#input, root: this.#root, path: this.#path, rounds: this.#rounds, pins: this.#pins });
     if (retained + added.reduce((sum, value) => sum + size(value), 0) > this.#limits.maxRetainedBytes) throw limit('Retained session limit reached; export or clear this session.');

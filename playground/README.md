@@ -39,6 +39,15 @@ encoding alternatives are equally relevant. Selecting another tool, stopping or
 starting an explicit run revokes queued automatic comparisons; it does not
 relabel earlier results as work from the new selection.
 
+## Use visual instruments
+
+Open All tools → Visual instruments to choose one of the 20 workbenches. Visual
+and Parameters share input/options; selection and recorded trace playback do not
+execute tools. Load Core example fills a labeled synthetic fixture, then Run
+tools executes it locally. Edits preserve earlier evidence. See
+[visual instruments](INSTRUMENTS.md) for controls, boundaries, architecture and
+the additional real-SDK/browser review commands.
+
 ## Edit tool names and summaries
 
 Edit `tools/tool-presentation.json` to update reader-facing language. Each tool

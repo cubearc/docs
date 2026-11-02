@@ -1,6 +1,7 @@
 import { h, button, notify, replace } from './dom.mjs';
 import { searchTools } from './catalog.mjs';
 import { toolLink } from './tool-route.mjs';
+import { instrumentSeries } from './instruments/registry.mjs';
 
 export function mountTools(container, context) {
   const { runtime, state, navigate, useTool, addStep, saveFavorites } = context;
@@ -52,6 +53,10 @@ export function mountTools(container, context) {
     const tool = runtime.tools.find(tool => tool.key === page.tool);
     if (!tool) { detail.replaceChildren(h('h2', {}, page.routeError ? 'Tool link unavailable' : 'Choose a tool'), h('p', { class: page.routeError ? 'warning' : 'muted' }, page.routeError || 'Select a tool to see its explanation, example and available actions.'), page.routeError ? button('Return to All tools', () => navigate('tools')) : h('span')); return; }
     const action = tool.actions.find(action => action.id === page.action) ?? tool.actions[0];
+    const draft=state.pipeline.draft;
+    const previous=draft.steps.at(-1);
+    const pipelineInput=previous ? runtime.action(previous.operation)?.pipeline?.output_type : draft.input.type;
+    const canAdd=Boolean(action.pipeline && !draft.advanced && action.pipeline.input_type === pipelineInput);
     const example = h('section', { 'aria-label': 'Core reference example', class: 'tool-family-example' });
     const exactContract = h('pre', { role: 'region', tabindex: 0, 'aria-label': 'Exact operation contract' }, 'Loading the exact contract…');
     const contractIdentity = h('p', { class: 'small muted' });
@@ -84,7 +89,8 @@ export function mountTools(container, context) {
       h('details', { class: 'tool-family-example' }, h('summary', {}, 'Example from the Core documentation'), h('p', { class: 'small muted' }, 'This command-line example explains the operation. It does not establish browser availability.'), h('div', { class: 'viewer' }, h('pre', {}, action.contract.example))),
       !action.available ? h('p', { class: 'warning' }, action.unavailableReason) : null,
       button('Use tool', () => useTool(action), { class: 'primary', disabled: !action.available || Boolean(page.routeError) }),
-      button('Add to pipeline', () => { if (action.pipeline) addStep(action); else notify('This operation has no supported linear pipeline adapter. You can use its direct tool action.'); }, { class: 'wide spacer', disabled: !action.pipeline || Boolean(page.routeError) }),
+      button('Add to pipeline', () => { if (canAdd) addStep(action); else notify('This operation has no supported linear pipeline adapter. You can use its direct tool action.'); }, { class: 'wide spacer', disabled: !canAdd || Boolean(page.routeError) }),
+      action.pipeline && !canAdd ? h('p',{class:'small muted'},draft.advanced ? 'This imported pipeline is preserved as an exact definition. Start a new editable pipeline to add tools.' : `The current pipeline supplies ${pipelineInput}. This adapter needs ${action.pipeline.input_type}; add an explicit conversion in Pipelines first.`) : null,
       !action.pipeline && action.available ? h('p', { class: 'small muted' }, 'Available as an individual tool. It cannot be added to the current linear pipeline model.') : null,
       h('p', {}, h('a', { href: `../cube/reference/operations/${encodeURIComponent(action.contract.category)}/${encodeURIComponent(action.id)}.html` }, 'Learn how it works')),
       h('details', {}, h('summary', {}, 'Technical details'), h('p', { class: 'small' }, h('code', {}, action.id), ` · operation version ${action.contract.operation_version}`),
@@ -100,7 +106,9 @@ export function mountTools(container, context) {
   renderCategories();
   if (page.detailOpen) grid.classList.add('catalog-mobile-open');
   grid.append(rail, list, detail);
-  container.replaceChildren(h('div', { class: 'catalog-head' }, h('div', { class: 'heading' }, h('h1', {}, 'All tools'), h('p', {}, 'Find the right tool for your next step.')), h('div', {}, h('label', { for: 'tool-search' }, 'Search tools'), query)),
+  const instrumentNames = {keyboard:'Digital keyboard',enigma:'Enigma',solitaire:'Solitaire',scytale:'Scytale',cardan:'Cardan grille',semaphore:'Flag semaphore',brainfuck:'Brainfuck', 'bit-plane':'Image bit planes',alberti:'Alberti disk',m138a:'M-138-A',pigpen:'Pigpen',book:'Book cipher',audio:'Audio analysis',graph:'Shortest path',braille:'Eight-dot Braille',morse:'Morse',polybius:'Polybius',hex:'Hex comparison',colors:'Exact colors',png:'PNG structure'};
+  const launcher=h('details',{class:'panel visual-launcher'},h('summary',{},'Visual instruments · 20 workbenches'),h('div',{class:'visual-instrument-links'},instrumentSeries.map(row=>button(instrumentNames[row.kind],()=>{const action=runtime.action(row.operations[0]);if(row.profile){state.playground.parameters[action.id]??={};state.playground.parameters[action.id].profile=row.profile;}useTool(action);},{'data-open-instrument':row.kind}))));
+  container.replaceChildren(launcher,h('div', { class: 'catalog-head' }, h('div', { class: 'heading' }, h('h1', {}, 'All tools'), h('p', {}, 'Find the right tool for your next step.')), h('div', {}, h('label', { for: 'tool-search' }, 'Search tools'), query)),
     h('div', { class: 'category-selector' }, h('label', { for: 'tool-category' }, 'Category'), categorySelect,
       mobileFavorites), grid);
   renderList(); renderDetail();

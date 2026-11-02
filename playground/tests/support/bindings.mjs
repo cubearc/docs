@@ -11,6 +11,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     await page.locator('[data-tool="cipher.book"]').click();
     await page.getByRole('button',{name:'Use tool',exact:true}).click();
     await page.locator('#playground-input').fill('1:1,2:1');
+    await page.locator('#instrument-tab-parameters').click();
     await page.locator('#playground-options-source').fill('another book');
     await page.locator('#playground-options-scheme').selectOption('word_character');
     await page.getByRole('button',{name:'Run tools',exact:true}).click();
@@ -139,6 +140,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
         const raw=Object.hasOwn(example.inputs,'codes');
         const primary=example.inputs[raw?'codes':'text'];
         await page.locator('#playground-input').fill(typeof primary==='string'?primary:JSON.stringify(primary));
+        if (await page.locator('#instrument-tab-parameters').count()) await page.locator('#instrument-tab-parameters').click();
         const settings=example.inputs.settings;
         await page.locator('#extra-settings').fill(typeof settings==='string'?settings:JSON.stringify(settings));
         await page.getByRole('button',{name:'Run tools',exact:true}).click();

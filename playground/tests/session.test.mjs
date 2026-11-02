@@ -89,3 +89,16 @@ test('pinned results disclose their earlier input after edits', () => {
   session.setInput({ type: 'text', data: 'second' });
   assert.equal(session.pins[0].earlierInput, true);
 });
+
+test('a specialized viewer reads only its latest retained operation evidence', () => {
+  const session=new Session();
+  session.setInput({type:'text',data:'old'});
+  const first=session.begin(); session.accept(first,{operation:'cipher.enigma',outputs:{text:{type:'text',data:'BDZGO'}}});
+  session.setInput({type:'text',data:'new'});
+  session.begin();
+  const retained=session.latest('cipher.enigma');
+  assert.equal(retained.outputs.text.data,'BDZGO');assert.equal(retained.earlierInput,true);
+  retained.outputs.text.data='mutated';
+  assert.equal(session.latest('cipher.enigma').outputs.text.data,'BDZGO');
+  assert.equal(session.latest('missing'),null);
+});

@@ -32,7 +32,7 @@ let rendered = false;
 function beginRun() { clearTimeout(state.playground.autoTimer); activeController?.abort(); activeController = new AbortController(); return activeController; }
 function navigate(next) { if (location.hash === `#/${next}`) route(); else location.hash = `#/${next}`; }
 function useTool(action) {
-  state.playground.controller?.abort(); clearTimeout(state.playground.autoTimer); state.playground.readingFile = null;
+  state.playground.controller?.abort(); state.playground.auxiliary?.abort(); clearTimeout(state.playground.autoTimer); state.playground.readingFile = null; state.playground.secondaryReading = null;
   state.playground.session.invalidate(); state.playground.revision++;
   state.playground.tool = action.id; state.playground.running = false;
   state.playground.status = 'Tool selected. Review its options, then run with your current input.';
@@ -65,16 +65,17 @@ async function fromSequence(steps, input, outputType) {
 }
 function render() {
   if (!runtime) return;
-  state.playground.redraw = null; state.pipeline.redraw = null;
+  state.playground.dispose?.(); state.playground.dispose = null;
+  state.playground.redraw = null; state.playground.redrawParameters = null; state.pipeline.redraw = null;
   const mountedSection = section;
   const context = { runtime, state, render, navigate, beginRun, useTool, addStep, fromSequence, isCurrentView: () => section === mountedSection,
     saveFavorites() { try { localStorage.setItem('cubearc.playground.favorites.v1', JSON.stringify(state.favorites)); } catch { notify('Favorites could not be saved in this browser.'); } },
     clearSession() {
       if (!confirm('Clear the current Playground history and pins? Saved pipelines will remain.')) return;
       state.playground.controller?.abort(); clearTimeout(state.playground.autoTimer);
-      state.playground.session = new Session(); state.playground.revision++; state.playground.running = false; state.playground.readingFile = null;
+      state.playground.session = new Session(); state.playground.revision++; state.playground.running = false; state.playground.readingFile = null; state.playground.secondaryReading = null;
       state.playground.errors = []; state.playground.pendingNext = false; state.playground.sourceName = null;
-      state.playground.outputChoices = {}; state.playground.viewChoices = {}; state.playground.status = 'Session cleared.'; render();
+      state.playground.outputChoices = {}; state.playground.viewChoices = {}; state.playground.presentation = undefined; state.playground.status = 'Session cleared.'; render();
     },
   };
   ({ playground: mountPlayground, pipelines: mountPipelines, tools: mountTools }[section])(main, context);

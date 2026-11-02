@@ -1,0 +1,213 @@
+import { h, button, replace } from '../dom.mjs';
+
+const note = text => h('p', {class:'small muted'},text);
+const field = (id,title,control) => h('div',{class:'field'},h('label',{for:id},title),control);
+const parse = value => { if(typeof value !== 'string') return value; try{return JSON.parse(value);}catch{return null;} };
+const integer = (value,min,max) => { const n=Number(value); return String(value).trim()!=='' && Number.isSafeInteger(n) && n>=min && n<=max ? n : null; };
+function choice(id,value,values,change) {
+  return h('select',{id,onChange:event=>change(event.target.value)},values.map(v=>h('option',{value:v,selected:String(v)===String(value)},v)));
+}
+function patch(api,name,value) {api.setParam(name,value);api.refresh();}
+function addText(api,text,separator='') {api.setText(api.text()+(api.text()?separator:'')+text);api.refresh();}
+export function graphDraft(text) {
+  try {
+    const data=JSON.parse(text);
+    if (!data || Object.keys(data).some(key=>!['vertices','edges','directed'].includes(key)) || !Array.isArray(data.vertices)||!Array.isArray(data.edges)||typeof data.directed!=='boolean') return null;
+    if(data.vertices.some(v=>typeof v!=='string') || data.edges.some(e=>!e||Object.keys(e).some(key=>!['id','from','to'].includes(key))||typeof e.id!=='string'||typeof e.from!=='string'||typeof e.to!=='string')) return null;
+    return data;
+  }catch{return null;}
+}
+export function editGraphEdge(graph,from,to,id) {
+  if(!graph.vertices.includes(from)||!graph.vertices.includes(to)||!id||graph.edges.some(edge=>edge.id===id)) throw new Error('Choose existing endpoints and a distinct edge ID.');
+  return {...graph,edges:[...graph.edges,{id,from,to}]};
+}
+function geometry(api,value) {return api.data.layouts[value] ?? parse(value);}
+function keyLayout(api,layout,title,selectedKey,target=false) {
+  const entries=layout?.entries;
+  if(!Array.isArray(entries)||entries.length>512) return h('p',{class:'warning'},'Choose a canonical layout or a valid custom definition in Parameters.');
+  const layer=api.ui.layer ?? 'base';
+  const visible=entries.filter(e=>e.layer===layer);
+  const rows=[...new Set(visible.map(e=>e.row ?? 0))];
+  return h('section',{class:'key-layout','aria-label':title},h('h3',{},title),h('div',{class:'instrument-scroll'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol),h('small',{},entry.key)),()=>{
+    api.ui.key=entry.key;api.ui.layer=entry.layer;
+    const offset=api.text().indexOf(entry.symbol);
+    api.ui.textPosition=offset<0?null:Array.from(api.text().slice(0,offset)).length;
+    const composer=document.getElementById('playground-input');
+    if(offset>=0&&composer?.setSelectionRange)composer.setSelectionRange(offset,offset+entry.symbol.length);
+    if(api.ui.keyMode==='insert'&&!target) {
+      if(api.action.id==='text.keyboard.coordinates.decode') {
+        const old=parse(api.text());
+        if(!Array.isArray(old)){api.ui.error='Use a JSON coordinate array in the input first.';api.refresh();return;}
+        const base=integer(api.param('index_base'),0,1);
+        if(base===null || entry.row===undefined){api.ui.error='Set a valid coordinate origin and geometry.';api.refresh();return;}
+        api.setText(JSON.stringify([...old,[entry.row+base,entry.column+base,entry.layer]]));
+      }else api.setText(api.text()+entry.symbol);
+    }
+    api.refresh();
+  },{id:`keyboard-${target?'target':'source'}-${entry.layer}-${entry.key}`,class:`keycap${entry.key===selectedKey?' inspected':''}`,'aria-pressed':String(entry.key===selectedKey),'aria-label':`${entry.symbol}${entry.key}: ${target?'Inspect target':'Inspect or insert'}, ${entry.layer}`})))))));
+}
+function keyboard(host,api) {
+  const remap=api.action.id==='text.keyboard.remap';
+  const source=geometry(api,api.param(remap?'source':'layout'));
+  const target=remap?geometry(api,api.param('target')):source;
+  const layer=api.ui.layer ?? 'base';
+  const sourceEntry=source?.entries?.find(e=>e.key===api.ui.key&&e.layer===layer);
+  const targetEntry=target?.entries?.find(e=>e.key===api.ui.key&&e.layer===layer);
+  const setLayout=(name,value)=>patch(api,name,remap?value:JSON.stringify(api.data.layouts[value]));
+  const selector=(name,title)=>field(`keyboard-${name}`,title,choice(`keyboard-${name}`,remap?api.param(name):Object.keys(api.data.layouts).find(key=>JSON.stringify(api.data.layouts[key])===JSON.stringify(parse(api.param(name))))??'custom',['custom',...Object.keys(api.data.layouts)],value=>{if(value!=='custom')setLayout(name,value);}));
+  const result=api.result();
+  const sourceSymbols=Array.from(api.text());
+  const textSelection=h('div',{class:'keyboard-text-inspection'},h('h3',{},'Source text positions'),note(`First ${Math.min(64,sourceSymbols.length)} of ${sourceSymbols.length} scalars. Select a position to inspect its key; the complete text remains in the input.`),h('div',{class:'keyboard-text-strip'},sourceSymbols.slice(0,64).map((symbol,index)=>button(symbol===' '?'␠':symbol,()=>{const key=source?.entries?.find(e=>e.symbol===symbol);api.ui.textPosition=index;if(key){api.ui.key=key.key;api.ui.layer=key.layer;}api.refresh();},{id:`keyboard-text-${index}`,'aria-label':`${symbol===' '?'␠':symbol}, source scalar ${index}`,'aria-pressed':String(api.ui.textPosition===index),class:api.ui.textPosition===index?'inspected':''}))));
+  const positions=result.positions ?? [];
+  const cursor=integer(api.ui.position ?? 0,0,Math.max(0,positions.length-1)) ?? 0;
+  const controls=h('div',{class:'toolbar'},selector(remap?'source':'layout',remap?'Source layout':'Layout'),remap?selector('target','Target layout'):null,
+    field('keyboard-layer','Layer',choice('keyboard-layer',layer,[...new Set(source?.entries?.map(e=>e.layer)??['base','shift'])],value=>{api.ui.layer=value;api.refresh();})),
+    field('keyboard-mode','Key action',choice('keyboard-mode',api.ui.keyMode??'inspect',['inspect','insert'],value=>{api.ui.keyMode=value;api.refresh();})));
+  replace(host,controls,note('QWERTZ uses the canonical Y/Z swap on US ANSI geometry. Physical typing is handled only by the focused input field.'),
+    !remap? h('div',{class:'toolbar'},api.action.id.includes('coordinates')?field('keyboard-origin','Index origin',choice('keyboard-origin',api.param('index_base'),[0,1],v=>patch(api,'index_base',v))):[
+      field('keyboard-dx','Horizontal displacement',h('input',{id:'keyboard-dx',value:api.param('dx')??'',onChange:e=>patch(api,'dx',e.target.value)})),
+      field('keyboard-dy','Vertical displacement',h('input',{id:'keyboard-dy',value:api.param('dy')??'',onChange:e=>patch(api,'dy',e.target.value)})),
+      field('keyboard-edge','Edge policy',choice('keyboard-edge',api.param('edge'),['reject','wrap'],v=>patch(api,'edge',v))) ]):null,
+    h('div',{class:'keyboard-pair'},keyLayout(api,source,'Source',api.ui.key),remap?keyLayout(api,target,'Destination',api.ui.key,true):null),
+    textSelection,
+    h('p',{class:'selection-caption'},sourceEntry?`Selected physical key ${sourceEntry.key}: ${sourceEntry.symbol}${targetEntry?` → ${targetEntry.symbol}`:''}. Layer ${layer}.`:'Inspect a key, or choose Insert to compose input.'),
+    api.ui.error?h('p',{class:'warning'},api.ui.error):null,
+    positions.length?h('section',{},field('keyboard-position','Recorded text position',h('input',{id:'keyboard-position',type:'range',min:0,max:positions.length-1,value:cursor,onInput:e=>{api.ui.position=Number(e.target.value);const c=result.source_coordinates?.[api.ui.position]??result.coordinates?.[api.ui.position];if(c){const b=Number(api.snapshot()?.parameters?.index_base??0);const k=source?.entries?.find(k=>k.row===c[0]-b&&k.column===c[1]-b&&k.layer===c[2]);if(k){api.ui.key=k.key;api.ui.layer=k.layer;}}api.refresh();}})),note(`Recorded position ${cursor+1}/${positions.length}: UTF-8 byte ${positions[cursor][0]}, scalar ${positions[cursor][1]}. ${result.source_coordinates?JSON.stringify(result.source_coordinates[cursor])+' → '+JSON.stringify(result.target_coordinates[cursor]):JSON.stringify(result.coordinates?.[cursor]??'Decoded position')}`)):null);
+  const input=document.getElementById('playground-input');
+  const inspect=()=>{const text=input.value.slice(0,input.selectionStart);const symbol=Array.from(text).at(-1);const entry=source?.entries?.find(e=>e.symbol===symbol);if(entry){api.ui.key=entry.key;api.ui.layer=entry.layer;api.refresh();}};
+  input?.addEventListener('keyup',inspect); input?.addEventListener('click',inspect);
+  return ()=>{input?.removeEventListener('keyup',inspect);input?.removeEventListener('click',inspect);};
+}
+function polybius(host,api) {
+  const custom=api.param('alphabet');
+  const preset=api.data.squares[api.param('preset')??'polybius'];
+  const alphabet=Array.from(custom||preset?.alphabet||'');
+  const side=integer(custom?api.param('side'):preset?.side,1,64);
+  const base=integer(api.param('index_base')??1,0,1);
+  const aliases=custom?parse(api.param('aliases'))??[]:preset?.aliases??[];
+  const controls=h('div',{class:'toolbar'},field('polybius-preset','Square',choice('polybius-preset',custom?'custom':api.param('preset')??'polybius',['polybius','tap','custom'],v=>{
+    if(v==='custom'){api.setParam('preset',undefined);api.setParam('alphabet',preset.alphabet);api.setParam('side','5');api.setParam('aliases',JSON.stringify(preset.aliases));}
+    else {api.setParam('alphabet',undefined);api.setParam('side',undefined);api.setParam('aliases',undefined);api.setParam('preset',v);}api.refresh();})),
+    field('polybius-base','Index origin',choice('polybius-base',base,[0,1],v=>patch(api,'index_base',v))),
+    field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})));
+  const selected=api.ui.cell;
+  const start=Math.floor((api.ui.rowPage??0)/8)*8;
+  const grid=side&&base!==null&&alphabet.length===side*side?h('div',{class:'instrument-scroll'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>{const index=(r+start)*side+c;return h('td',{},button(alphabet[index],()=>{
+    api.ui.cell=index;
+    if(api.ui.cellAction==='insert') addText(api,api.action.id.endsWith('.decode')?`${r+start+base},${c+base}`:alphabet[index],api.action.id.endsWith('.decode')?' ':'');
+    else api.refresh();
+  },{id:`polybius-cell-${index}`,'aria-label':`${alphabet[index]}, row ${r+start+base}, column ${c+base}`,'aria-pressed':String(index===selected),class:index===selected?'inspected':''}));})))))):h('p',{class:'warning'},'A custom square requires side² unique scalars and valid aliases. Review Parameters.');
+  replace(host,controls,note(`Aliases: ${aliases.join(', ')||'none'}. Presets fold ASCII case. Each literal space is retained as / (a null token). Custom squares match exact scalars.`),
+    custom?h('div',{class:'toolbar'},field('polybius-alphabet','Custom alphabet',h('textarea',{id:'polybius-alphabet',rows:2,value:custom,onChange:e=>patch(api,'alphabet',e.target.value)})),field('polybius-side','Side',h('input',{id:'polybius-side',type:'number',min:1,max:64,value:api.param('side'),onChange:e=>patch(api,'side',e.target.value)}))):null,
+    grid,side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh();},{disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh();},{disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null,
+    h('p',{class:'selection-caption'},selected!==undefined&&side?`Selected ${alphabet[selected]} ↔ ${Math.floor(selected/side)+base},${selected%side+base}. Inspection does not edit or run.`:'Select a cell to inspect its coordinates.'));
+}
+
+function svg(tag,attributes={},...children) {
+  const node=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(const [name,value]of Object.entries(attributes)){if(name.startsWith('on'))node.addEventListener(name.slice(2).toLowerCase(),value);else node.setAttribute(name,String(value));}
+  for(const child of children.flat(Infinity))if(child!==null&&child!==undefined)node.append(child instanceof Node?child:document.createTextNode(String(child)));
+  return node;
+}
+function graph(host,api) {
+  const data=graphDraft(api.text());
+  const controls=h('div',{class:'toolbar'});
+  if(!data){replace(host,note('Load the Core example or enter a graph with directed, vertices and edges in the input. All graph edits are also available as JSON.'),controls);return;}
+  const save=next=>{api.setText(JSON.stringify(next,null,2));api.refresh();};
+  const vertices=data.vertices;
+  const selected=api.ui.node;
+  const positions=api.ui.positions??={};
+  vertices.slice(0,100).forEach((name,index)=>{positions[name]??={x:350+230*Math.cos(index/vertices.length*2*Math.PI),y:230+165*Math.sin(index/vertices.length*2*Math.PI)};});
+  const canvas=svg('svg',{viewBox:'0 0 700 460',class:'graph-canvas',role:'img','aria-label':'Editable graph layout. Equivalent node and edge actions follow below.'});
+  const result=api.result().output?.result;
+  for(const edge of data.edges.slice(0,200)) {
+    const a=positions[edge.from],b=positions[edge.to];if(!a||!b)continue;
+    const active=result?.edges?.includes(edge.id);
+    canvas.append(svg('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:active?'#005fcc':'#8998aa','stroke-width':active?5:2,'stroke-dasharray':active?'':'5 3'}));
+    canvas.append(svg('text',{x:(a.x+b.x)/2,y:(a.y+b.y)/2-6,'text-anchor':'middle',class:'graph-edge-label'},`${edge.id}${data.directed?` (${edge.from} → ${edge.to})`:''}`));
+  }
+  for(const name of vertices.slice(0,100)) {
+    const pos=positions[name];
+    const node=svg('g',{transform:`translate(${pos.x} ${pos.y})`,class:'graph-node'});
+    node.append(svg('circle',{r:25,fill:result?.vertices?.includes(name)?'#d9eaff':'#fff',stroke:name===selected?'#005fcc':'#59677b','stroke-width':name===selected?4:2}),svg('text',{'text-anchor':'middle',y:6},name));
+    node.addEventListener('pointerdown',event=>{
+      event.preventDefault();node.setPointerCapture(event.pointerId);let moved=false;
+      const move=e=>{const r=canvas.getBoundingClientRect();positions[name]={x:Math.min(665,Math.max(35,(e.clientX-r.left)/r.width*700)),y:Math.min(425,Math.max(35,(e.clientY-r.top)/r.height*460))};moved=true;node.setAttribute('transform',`translate(${positions[name].x} ${positions[name].y})`);};
+      const end=()=>{node.removeEventListener('pointermove',move);node.removeEventListener('pointerup',end);node.removeEventListener('pointercancel',end);api.ui.node=name;api.refresh();};
+      node.addEventListener('pointermove',move);node.addEventListener('pointerup',end);node.addEventListener('pointercancel',end);
+    });canvas.append(node);
+  }
+  const vertexInput=h('input',{id:'graph-new-node',value:api.ui.newNode??'',onInput:e=>{api.ui.newNode=e.target.value;}});
+  const endpoint=(id,key)=>field(id,key,choice(id,api.ui[key]??vertices[0],vertices,value=>{api.ui[key]=value;}));
+  const edgeId=h('input',{id:'graph-edge-id',value:api.ui.edgeId??'',onInput:e=>{api.ui.edgeId=e.target.value;}});
+  const attempt=run=>{try{run();api.ui.error='';}catch(error){api.ui.error=error.message;api.refresh();}};
+  const nodeStart=integer(api.ui.nodeStart??0,0,vertices.length)??0;
+  const edgeStart=integer(api.ui.edgeStart??0,0,data.edges.length)??0;
+  const pager=(title,key,start,length)=>h('div',{class:'toolbar'},button(`Previous ${title}`,()=>{api.ui[key]=Math.max(0,start-40);api.refresh();},{disabled:!start}),note(`${start+1}–${Math.min(length,start+40)} of ${length}`),button(`Next ${title}`,()=>{api.ui[key]=start+40;api.refresh();},{disabled:start+40>=length}));
+  replace(host,h('div',{class:'toolbar'},field('graph-directed','Graph direction',choice('graph-directed',data.directed?'directed':'undirected',['undirected','directed'],v=>save({...data,directed:v==='directed'}))),
+    field('graph-source','Source',choice('graph-source',api.param('source'),vertices,v=>patch(api,'source',v))),field('graph-target','Target',choice('graph-target',api.param('target'),vertices,v=>patch(api,'target',v)))),
+    h('div',{class:'instrument-scroll',tabindex:0,role:'region','aria-label':'Graph layout viewport'},canvas),note(`Drag nodes to change layout only. ${Math.min(vertices.length,100)} nodes and ${Math.min(data.edges.length,200)} edges drawn; the lists retain all graph entries.`),
+    result?h('p',{class:'selection-caption'},`${result.vertices.join(' → ')} · ${result.edges.length} edges${api.stale()?' · earlier input':''}`):note('Run to find a path. The graph has no weights or search trace.'),
+    h('div',{class:'toolbar'},field('graph-new-node','New node ID',vertexInput),button('Add node',()=>attempt(()=>{const name=vertexInput.value;if(!name||vertices.includes(name))throw new Error('Use a nonempty distinct node ID.');save({...data,vertices:[...vertices,name]});}))),
+    h('div',{class:'toolbar'},endpoint('graph-edge-from','from'),endpoint('graph-edge-to','to'),field('graph-edge-id','New edge ID',edgeId),button('Add edge',()=>attempt(()=>save(editGraphEdge(data,api.ui.from??vertices[0],api.ui.to??vertices[0],edgeId.value))))),
+    api.ui.error?h('p',{role:'alert',class:'error'},api.ui.error):null,
+    h('details',{open:true},h('summary',{},'Nodes and layout controls'),h('div',{class:'graph-node-list'},vertices.slice(nodeStart,nodeStart+40).map(name=>h('div',{class:'row'},button(name,()=>{api.ui.node=name;api.refresh();},{'aria-pressed':String(name===selected)}),...['left','right','up','down'].map(direction=>button(direction,()=>{positions[name]??={x:350,y:230};positions[name].x+=direction==='left'?-15:direction==='right'?15:0;positions[name].y+=direction==='up'?-15:direction==='down'?15:0;api.refresh();},{'aria-label':`Move ${name} ${direction}`})),button(`Remove ${name}`,()=>save({...data,vertices:vertices.filter(v=>v!==name),edges:data.edges.filter(e=>e.from!==name&&e.to!==name)}))))),vertices.length>40?pager('nodes','nodeStart',nodeStart,vertices.length):null),
+    h('details',{},h('summary',{},`Edges (${data.edges.length})`),h('ul',{class:'compact-list'},data.edges.slice(edgeStart,edgeStart+40).map(edge=>h('li',{class:'row'},`${edge.id}: ${edge.from} ${data.directed?'→':'—'} ${edge.to}`,button(`Remove edge ${edge.id}`,()=>save({...data,edges:data.edges.filter(e=>e.id!==edge.id)}))))),data.edges.length>40?pager('edges','edgeStart',edgeStart,data.edges.length):null));
+}
+
+/** Layout coordinates use Core word spans; a subsequent Core decode validates
+ * every inspectable coordinate before this drawing is offered to the user. */
+export function sourceCells(source,words,scheme,base) {
+  const scalars=Array.from(source);
+  const lines=[];let line=0,within=0;
+  for(let i=0;i<scalars.length;i++) {
+    lines[i]={line,within};
+    if(scalars[i]==='\n'){line++;within=0;}else within++;
+  }
+  if(scheme==='line_character')return scalars.flatMap((symbol,i)=>symbol==='\n'||symbol==='\r'&&scalars[i+1]==='\n'?[]:[{symbol,scalar:i,coordinate:`${lines[i].line+base}:${lines[i].within+base}`}]);
+  const lineWords=new Map();
+  return words.flatMap(word=>{
+    const row=lines[word.scalar_index]?.line??0;
+    const wordInLine=lineWords.get(row)??0;lineWords.set(row,wordInLine+1);
+    return scalars.slice(word.scalar_index,word.scalar_index+word.scalar_length).map((symbol,index)=>({symbol,scalar:word.scalar_index+index,coordinate:scheme==='word_character'?`${word.word_index+base}:${index+base}`:`${row+base}:${wordInLine+base}:${index+base}`}));
+  });
+}
+function book(host,api) {
+  const encode=api.action.id.endsWith('.encode');
+  const source=encode?api.text():String(api.param('source')??'');
+  const scheme=api.param('scheme')??'word_character';
+  const base=integer(api.param('index_base')??1,0,1);
+  const currentKey=JSON.stringify([source,scheme,base]);
+  const index=api.ui.bookIndex;
+  const stale=index&&index.key!==currentKey;
+  const textField=encode?field('book-message','Message',h('textarea',{id:'book-message',rows:2,value:api.extra('text'),onInput:e=>{api.setExtra('text',e.target.value);api.refresh();}})):
+    field('book-source','Reference text (exact)',h('textarea',{id:'book-source',rows:4,value:source,onInput:e=>{api.setParam('source',e.target.value);api.refresh();}}));
+  const indexSource=async()=>{
+    api.ui.bookError='';const revision=api.revision();
+    try{
+      if(base===null)throw new Error('Choose origin 0 or 1.');
+      const words=(await api.execute('text.word.lengths',{input:source})).output;
+      const all=sourceCells(source,words,scheme,base);
+      const cells=all.slice(0,4096);
+      const decoded=await api.execute('cipher.book.decode',{input:cells.map(c=>c.coordinate).join(',')},{source,scheme,index_base:base});
+      if(decoded.output!==cells.map(c=>c.symbol).join(''))throw new Error('The source layout does not match Core coordinates. Keep using the exact Parameters input.');
+      const hash=(await api.execute('hash.sha256',{input:new TextEncoder().encode(source)})).output;
+      if(revision!==api.revision())return;
+      api.ui.bookIndex={key:currentKey,source,cells,total:all.length,hash};api.ui.bookPage=0;
+    }catch(error){if(revision===api.revision())api.ui.bookError=error.message;}
+    api.refresh();
+  };
+  const start=integer(api.ui.bookPage??0,0,index?.cells.length??0)??0;
+  replace(host,h('div',{class:'toolbar'},field('book-scheme','Coordinate scheme',choice('book-scheme',scheme,['word_character','line_character','line_word_character'],v=>patch(api,'scheme',v))),field('book-base','Index origin',choice('book-base',base,[0,1],v=>patch(api,'index_base',v)))),textField,
+    h('div',{class:'toolbar'},button('Index reference text',indexSource,{id:'book-index'}),button('Insert selected coordinate',()=>{const cell=index?.cells[api.ui.bookCell];if(!cell||stale)return;if(encode){api.setExtra('text',api.extra('text')+cell.symbol);api.refresh();}else addText(api,cell.coordinate,',');},{disabled:!index||stale||api.ui.bookCell===undefined})),
+    api.ui.bookError?h('p',{class:'error',role:'alert'},api.ui.bookError):null,
+    stale?h('p',{class:'warning'},'The indexed source or coordinates changed. Index the reference text again; the previous source is retained below.'):null,
+    index?h('section',{},note(`Source SHA-256 ${index.hash}. ${index.cells.length} of ${index.total} indexed scalars retained for visual inspection (budget 4,096); the complete source and results remain exact.`),
+      h('div',{class:'book-source-grid'},index.cells.slice(start,start+160).map((cell,i)=>button(h('span',{},h('strong',{},cell.symbol===' '?'␠':cell.symbol),h('small',{},cell.coordinate)),()=>{api.ui.bookCell=start+i;api.refresh();},{id:`book-cell-${start+i}`,'aria-pressed':String(api.ui.bookCell===start+i),'aria-label':`${cell.symbol===' '?'␠':cell.symbol}${cell.coordinate}: coordinate ${cell.coordinate}`}))),
+      h('div',{class:'toolbar'},button('Previous source cells',()=>{api.ui.bookPage=Math.max(0,start-160);api.refresh();},{disabled:!start}),note(`${start+1}–${Math.min(start+160,index.cells.length)}`),button('Next source cells',()=>{api.ui.bookPage=start+160;api.refresh();},{disabled:start+160>=index.cells.length})),
+      api.ui.bookCell!==undefined? h('p',{class:'selection-caption'},`Selected ${index.cells[api.ui.bookCell]?.coordinate}: ${index.cells[api.ui.bookCell]?.symbol}. Source selection inspects; Insert explicitly composes the message/coordinates.`):null):note('Index the reference text to inspect Core-validated coordinates. Visual wrapping never changes source lines.'),
+    api.result().source_sha256?note(`Execution source SHA-256: ${api.result().source_sha256}`):null);
+}
+
+const renderers={keyboard,polybius,graph,book};
+export function mountInstrument(host,api) {return renderers[api.kind](host,api);}

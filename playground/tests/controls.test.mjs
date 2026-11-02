@@ -35,3 +35,13 @@ test('missing required text and prohibited empty values remain missing parameter
   await assert.rejects(parametersFor(runtime, action({ type: 'string', minLength: 1 }), { padding: '' }), { code: 'missing_parameter', parameter: 'padding' });
   assert.deepEqual(await parametersFor(runtime, action({ type: 'string', minLength: 1 }), { padding: '7' }), { padding: '7' });
 });
+
+test('direct schema integers retain exact bigint values without changing pipeline bounds', async () => {
+  const action = { contract: { parameters: { type: 'object', properties: { count: { type: 'integer' } } } }, direct: {parameters:{}} };
+  assert.equal((await parametersFor({},action,{count:'9223372036854775807'})).count,9223372036854775807n);
+});
+
+test('wide integer support does not widen pipeline position lists', async()=>{
+  const action={pipeline:{parameters:[{name:'positions',required:true,constraints:{type:'unsigned_list'}}]},contract:{parameters:{properties:{positions:{type:'array'}}}}};
+  await assert.rejects(()=>parametersFor({},action,{positions:'0,9223372036854775807'}),/exact integer range/);
+});

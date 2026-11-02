@@ -721,7 +721,7 @@
     },
     "image.bit_plane.extract": {
       "display_name": "Extract an image bit plane",
-      "summary": "Read one bit position from image samples to inspect patterns that may be hidden in that plane.",
+      "summary": "Extract one bit from an exact image channel and inspect its raw 0/1 plane.",
       "aliases": []
     },
     "image.channel.extract": {
@@ -3085,7 +3085,7 @@
     "image.bit_plane.extract": {
       "tool_id": "image.bit_plane.extract",
       "display_name": "Extract an image bit plane",
-      "summary": "Read one bit position from image samples to inspect patterns that may be hidden in that plane.",
+      "summary": "Extract one bit from an exact image channel and inspect its raw 0/1 plane.",
       "aliases": []
     },
     "image.channel.extract": {

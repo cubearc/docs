@@ -46,6 +46,13 @@ export class Runtime {
   #queue = Promise.resolve();
   #pending = 0;
   constructor(sdk, catalog, presentation, tools) { Object.assign(this, { sdk, catalog, presentation, tools }); }
+  instrumentData() {
+    return this.instrumentAssets ??= metadata('./instrument-data.json', 256 * 1024).then(raw => {
+      const data = JSON.parse(raw);
+      if (data.source.sourceSha256 !== this.sdk.build.sourceSha256) throw new Error('Instrument definitions do not match the installed runtime. Reload the site.');
+      return data;
+    }).catch(error => { this.instrumentAssets = null; throw error; });
+  }
   async toolDetails(action) {
     const detail = JSON.parse(await metadata(`./tool-details/${encodeURIComponent(action.id)}.json`, 1024 * 1024));
     if (detail.operation !== action.id || detail.operation_version !== action.contract.operation_version || detail.catalog_sha256 !== this.sdk.build.catalogSha256) throw new Error('Tool detail identity differs from the selected operation. Reload the complete site.');
