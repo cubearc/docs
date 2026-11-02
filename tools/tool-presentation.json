@@ -1895,6 +1895,16 @@
       "display_name": "Decipher with Alberti disk",
       "summary": "Decipher prepared historical text and return the alignment needed to continue.",
       "aliases": []
+    },
+    "cipher.lorenz.encode": {
+      "display_name": "Encipher Lorenz five-bit codes",
+      "summary": "Encipher unpacked five-bit codes with an explicit SZ40, SZ42a or SZ42b profile and continuation state.",
+      "aliases": []
+    },
+    "cipher.lorenz.decode": {
+      "display_name": "Decipher Lorenz five-bit codes",
+      "summary": "Decipher unpacked five-bit codes with an explicit SZ40, SZ42a or SZ42b profile and continuation state.",
+      "aliases": []
     }
   },
   "operations": {
@@ -4732,6 +4742,18 @@
       "tool_id": "cipher.alberti.decode",
       "display_name": "Decipher with Alberti disk",
       "summary": "Decipher prepared historical text and return the alignment needed to continue.",
+      "aliases": []
+    },
+    "cipher.lorenz.encode": {
+      "tool_id": "cipher.lorenz.encode",
+      "display_name": "Encipher Lorenz five-bit codes",
+      "summary": "Encipher unpacked five-bit codes with an explicit SZ40, SZ42a or SZ42b profile and continuation state.",
+      "aliases": []
+    },
+    "cipher.lorenz.decode": {
+      "tool_id": "cipher.lorenz.decode",
+      "display_name": "Decipher Lorenz five-bit codes",
+      "summary": "Decipher unpacked five-bit codes with an explicit SZ40, SZ42a or SZ42b profile and continuation state.",
       "aliases": []
     }
   }
