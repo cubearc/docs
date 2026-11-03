@@ -175,7 +175,8 @@
 @container(max-width:760px){
   .symbol-pigpen .pigpen-workbench{grid-template-columns:minmax(0,1fr)}
   .symbol-pigpen .pigpen-compose-station{display:flex;align-items:center;gap:1.5rem;border-left:0;border-top:1px solid var(--symbol-rule);padding:1rem 0 0}
-  .symbol-pigpen .symbol-selected{display:flex;align-items:center;margin:0;flex:1;min-width:0}
+  .symbol-pigpen .symbol-selected{display:flex;flex-wrap:wrap;align-items:center;margin:0;flex:1;min-width:0}
+  .symbol-pigpen .symbol-selected>div{flex:1 1 8rem}
   .symbol-pigpen .symbol-selected>.pigpen-glyph{width:80px;height:80px}
   .symbol-pigpen .pigpen-compose-actions{flex:0 1 160px}
 }
@@ -213,7 +214,7 @@
 }
 @media(max-width:700px){
   .symbol-instrument .symbol-window-controls{gap:.4rem}
-  .symbol-instrument .symbol-window-controls button{flex:1}
+  .symbol-instrument .symbol-window-controls button{flex:1 1 7rem}
   .symbol-instrument .symbol-window-controls p{flex-basis:100%;order:3}
   .symbol-instrument .symbol-control-bar{gap:.7rem}
   .symbol-instrument .symbol-section-title>.small{max-width:100%}

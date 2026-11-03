@@ -55,7 +55,7 @@ test('action menus and paired glyph targets fit narrow enlarged-text views', {ti
           }
           const fragmentedWords = await page.evaluate(() => {
             const broken = [];
-            for (const control of document.querySelectorAll('#run-tools, #instrument-tab-visual, #instrument-tab-parameters, #input-section .input-main .toolbar button, .instrument-jumps a, .media-audio-commandbar button, .site-header nav a')) {
+            for (const control of document.querySelectorAll('#run-tools, #instrument-tab-visual, #instrument-tab-parameters, #input-section .input-main .toolbar button, .instrument-jumps a, .media-audio-commandbar button, .symbol-selected .check, .symbol-window-controls button, .site-header nav a')) {
               const walker = document.createTreeWalker(control, NodeFilter.SHOW_TEXT);
               while (walker.nextNode()) {
                 const node = walker.currentNode;
