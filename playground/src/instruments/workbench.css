@@ -1,6 +1,104 @@
-.instrument-scroll{max-width:100%;overflow:auto;overscroll-behavior:contain}.instrument .toolbar>.field{margin:.5rem 0;min-width:9rem;max-width:100%;flex:0 1 auto}.instrument button[aria-pressed=true],.instrument .inspected{border:2px solid var(--blue);background:var(--pale);box-shadow:inset 0 -3px var(--blue)}.selection-caption{border-left:4px solid var(--blue);padding:.75rem 1rem;background:var(--pale);font-family:ui-monospace,monospace}.keyboard-pair{display:grid;grid-template-columns:minmax(0,1fr);gap:1.2rem}.keyboard-board{min-width:680px;width:max-content;margin:.25rem auto;padding:1.25rem;background:#e9edf1;border:1px solid #b5c0cc;border-radius:10px;box-shadow:inset 0 -5px #ced6df,0 3px 8px #1420330a}.keyboard-row{display:flex;gap:5px;margin:5px 0}.keycap{min-width:44px;width:44px;height:48px;padding:.3rem;border-radius:5px;background:#fffefa;box-shadow:0 3px 0 #b5bfcb;border-color:#b9c2cd}.keycap span,.book-source-grid button span{display:grid;gap:3px}.keycap strong{font-size:1.2rem}.key-layout{min-width:0}.key-layout h3{margin:.5rem 0;font-size:.85rem;font-weight:600;color:var(--muted)}.polybius-board{background:#f8f9fb;padding:1.5rem 0;border-block:1px solid var(--line);margin:1rem 0}.polybius-square{border-collapse:separate;border-spacing:0;font-family:ui-monospace,monospace;width:max-content;margin:0 auto}.polybius-square caption{caption-side:bottom;font-family:Inter,system-ui;font-size:.85rem;color:var(--muted);padding-top:1rem}.polybius-square th{padding:.3rem;min-width:44px}.polybius-square td{padding:0}.polybius-square button{width:64px;min-width:64px;min-height:64px;font-size:1.5rem;border-radius:0;background:white;border-color:#ccd5df;margin:-.5px}.coordinate-highlight{background:var(--pale);color:var(--blue);outline:2px solid var(--blue)}.graph-canvas{width:100%;min-width:480px;max-height:540px;display:block;background:#f8fafd;border:1px solid var(--line);border-radius:9px;touch-action:none}.graph-node{cursor:grab}.graph-node text{fill:var(--ink);font-size:17px;font-family:Inter,system-ui}.graph-edge-label{fill:#455469;font-size:13px}.graph-node-list{display:grid;gap:0}.graph-node-list>.row{padding:.5rem 0;border-bottom:1px solid var(--line)}.graph-node-list>.row>button:first-child{min-width:44px;background:var(--pale);border-color:transparent}.graph-node-list>.row>button:last-child{margin-left:auto}.book-reference{padding:1.25rem 1.5rem;margin:1rem 0;background:#fffdf7;border:1px solid #e4dfd2;border-left:3px solid #cbbd9f}.book-reference h3{font-size:.85rem;color:#665d4c}.book-source-preview{font-family:Georgia,serif;font-size:1.4rem;line-height:1.8;white-space:pre-wrap;max-height:22rem;overflow:auto}.book-source-grid{display:flex;flex-wrap:wrap;gap:3px;padding:1rem 0;white-space:pre-wrap}.book-source-grid button{min-width:60px;min-height:62px;padding:.3rem;border-radius:3px;background:#fffdf7;border-color:#dfdacd}.book-source-grid strong{font-size:1.2rem}.book-source-grid small{font-size:.75rem;color:var(--muted)}.visual-launcher{margin-bottom:1rem}.visual-instrument-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.5rem}.visual-instrument-links button{text-align:left;justify-content:flex-start;font-size:.9rem}.instrument h2,.instrument h3{margin-bottom:.7rem}.instrument canvas{max-width:100%}
-@media(max-width:700px){.instrument .toolbar{align-items:stretch}.instrument .toolbar>.field{flex:1 1 130px;min-width:0}.instrument .toolbar>.field select,.instrument .toolbar>.field input{width:100%}.polybius-square button{width:44px;min-width:44px;min-height:44px;font-size:1.1rem}.polybius-square{border-spacing:0}.polybius-board{padding:1rem 0}.polybius-square th{min-width:32px}.book-reference{padding:1rem}.book-source-preview{font-size:1.25rem}.visual-instrument-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.instrument-scroll{max-width:100%;overflow:auto;overscroll-behavior:contain}.instrument .toolbar>.field{margin:.5rem 0;min-width:9rem;max-width:100%;flex:0 1 auto}.instrument button[aria-pressed=true],.instrument .inspected{border:2px solid var(--blue);background:var(--pale);box-shadow:inset 0 -3px var(--blue)}.selection-caption{border-left:4px solid var(--blue);padding:.75rem 1rem;background:var(--pale);font-family:ui-monospace,monospace}
+.graph-canvas{width:100%;min-width:480px;max-height:540px;display:block;background:#f8fafd;border:1px solid var(--line);border-radius:9px;touch-action:none}.graph-node{cursor:grab}.graph-node text{fill:var(--ink);font-size:17px;font-family:Inter,system-ui}.graph-edge-label{fill:#455469;font-size:13px}.graph-node-list{display:grid;gap:0}.graph-node-list>.row{padding:.5rem 0;border-bottom:1px solid var(--line)}.graph-node-list>.row>button:first-child{min-width:44px;background:var(--pale);border-color:transparent}.graph-node-list>.row>button:last-child{margin-left:auto}.book-reference{padding:1.25rem 1.5rem;margin:1rem 0;background:#fffdf7;border:1px solid #e4dfd2;border-left:3px solid #cbbd9f}.book-reference h3{font-size:.85rem;color:#665d4c}.book-source-preview{font-family:Georgia,serif;font-size:1.4rem;line-height:1.8;white-space:pre-wrap;max-height:22rem;overflow:auto}.book-source-grid{display:flex;flex-wrap:wrap;gap:3px;padding:1rem 0;white-space:pre-wrap}.book-source-grid button{min-width:60px;min-height:62px;padding:.3rem;border-radius:3px;background:#fffdf7;border-color:#dfdacd}.book-source-grid strong{font-size:1.2rem}.book-source-grid small{font-size:.75rem;color:var(--muted)}.visual-launcher{margin-bottom:1rem}.visual-instrument-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.5rem}.visual-instrument-links button{text-align:left;justify-content:flex-start;font-size:.9rem}.instrument h2,.instrument h3{margin-bottom:.7rem}.instrument canvas{max-width:100%}
 
+/* The two keyboard cases share the same physical key selection. */
+.keyboard-touch-controls { justify-content: flex-end; gap: 1.25rem; margin-bottom: .8rem; }
+.instrument .keyboard-touch-controls > .field { display: flex; align-items: center; gap: .6rem; margin: 0; }
+.keyboard-touch-controls label { margin: 0; white-space: nowrap; }
+.keyboard-touch-controls select { width: auto; min-width: 7rem; }
+.keyboard-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.key-layout { display: grid; grid-template-columns: minmax(9rem, .2fr) minmax(0, 1fr); align-items: center; gap: 1rem; min-width: 0; padding: 1rem; border: 3px solid #24354d; border-radius: 14px; background: linear-gradient(130deg, #fffcf6, #f1eee7); box-shadow: 0 4px 0 #24354d12, 0 8px 16px #1420330a; }
+.keyboard-case-label { min-width: 0; padding: .5rem 1rem .5rem .5rem; border-right: 1px solid #d6d1c7; }
+.instrument .keyboard-case-label h3 { margin: 0 0 .75rem; text-transform: uppercase; font-size: .75rem; letter-spacing: .14em; color: #50617b; }
+.keyboard-case-label .field { margin: 0; }
+.keyboard-case-label .field label { font-size: .75rem; color: #50617b; }
+.keyboard-case-label select { font-weight: 750; font-size: 1rem; background-color: #fffcf7; border-color: #b9b8b4; }
+.keyboard-case-detail { display: block; color: #50617b; font-size: .75rem; line-height: 1.5; margin-top: .75rem; }
+.keyboard-board { --key-size: clamp(44px, 4vw, 60px); width: max-content; min-width: 680px; margin: auto; padding: .25rem .3rem .6rem; }
+.keyboard-row { display: flex; gap: 5px; margin: 5px 0; }
+.keycap { width: var(--key-size); min-width: var(--key-size); height: 50px; padding: .3rem; border-radius: 7px; background: linear-gradient(#fffefb, #f2ece0); box-shadow: inset 0 0 0 2px #fffdf6, 0 3px 0 #b7b1a5, 0 4px 5px #1b2e4526; border: 1px solid #c4beb3; color: #172b44; }
+.keycap span, .book-source-grid button span { display: grid; gap: 3px; }
+.keycap strong { font-size: 1.25rem; }
+.instrument .keycap[aria-pressed=true] { color: #fff; background: linear-gradient(#0968e3, #0056c9); border-color: #0056c9; box-shadow: inset 0 0 0 2px #71a9ff, 0 3px 0 #163b73, 0 0 0 2px #bdceee; }
+.keycap:focus-visible { outline-offset: 4px; }
+.keyboard-correspondence { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; padding: .4rem; color: #50617b; font-size: .8rem; }
+.keyboard-correspondence-glyphs { display: flex; align-items: center; justify-content: center; gap: .5rem; min-width: 0; width: 9rem; max-width: 100%; padding: .25rem .4rem; background: #eaf2ff; border: 1px solid #9dbdea; border-radius: 50px; color: #173659; }
+.keyboard-correspondence-glyphs strong { font-size: 1.7rem; font-family: ui-monospace, monospace; }
+.keyboard-correspondence-glyphs > span { font-size: 1.5rem; }
+.keyboard-text-inspection { margin-top: 1rem; display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; }
+.instrument .keyboard-text-inspection h3 { margin: 0; font-size: .8rem; }
+.keyboard-text-inspection > p { flex-basis: 100%; order: 3; margin: 0; font-size: .75rem; }
+.keyboard-text-strip { display: flex; gap: 4px; flex-wrap: wrap; }
+.keyboard-text-strip button { min-width: 44px; padding: .4rem; }
+.keyboard-text-strip button.inspected { outline: 2px solid var(--blue); outline-offset: 1px; }
 
+/* A coordinate instrument with visible axes and a separate selection readout. */
+.polybius-instrument { display: grid; grid-template-columns: minmax(0, 1fr) minmax(13rem, .38fr); gap: 2rem; align-items: center; }
+.polybius-stage { min-width: 0; }
+.polybius-board { background-color: #fcfaf5; background-image: linear-gradient(#d7d1c62b 1px, transparent 1px), linear-gradient(90deg, #d7d1c62b 1px, transparent 1px); background-size: 22px 22px; padding: 1rem; border-radius: 10px; }
+.polybius-square { border-collapse: separate; border-spacing: 0; font-family: ui-monospace, monospace; width: max-content; margin: 0 auto; background: #182d47; border: 3px solid #182d47; border-radius: 10px; box-shadow: 0 5px 12px #1b2d411a; }
+.polybius-square caption { background: #fcfaf5; caption-side: bottom; font-family: Inter, system-ui; font-size: .8rem; color: var(--muted); padding-top: 1rem; }
+.polybius-square th { padding: .4rem; min-width: 48px; height: 48px; color: #fff; background: #182d47; font-size: 1.25rem; border: 1px solid #182d47; }
+.polybius-square th:first-child { border-radius: 7px 0 0; }
+.polybius-square td { padding: 0; background: #fffcf6; }
+.polybius-square button { width: 80px; min-width: 80px; min-height: 80px; font-size: 2rem; border-radius: 0; background: linear-gradient(#fffefb,#fbf7ef); border: 1px solid #c0c7ce; margin: 0; color: #172b44; }
+.polybius-square .axis-highlight button { background: #e7effc; }
+.polybius-square th.coordinate-highlight { background: #075ecf; color: white; box-shadow: inset 0 0 0 2px #aecfff; }
+.instrument .polybius-square button.inspected { background: #075ecf; border: 2px solid #075ecf; color: white; box-shadow: inset 0 0 0 2px #b3d2ff; }
+.polybius-square button:focus-visible { outline-offset: -5px; outline: 2px solid #142b4d; }
+.polybius-square button.inspected:focus-visible { outline-color: white; }
+.polybius-inspection { min-width: 0; padding: .5rem 0 .5rem 1.75rem; border-left: 1px solid #d9d6ce; }
+.instrument .polybius-inspection h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: #50617b; margin: 0 0 1rem; }
+.polybius-coordinate-readout { display: flex; gap: 1.5rem; align-items: center; }
+#polybius-selected-symbol { font-size: 5rem; line-height: 1.2; font-family: ui-monospace, monospace; color: #172b44; overflow-wrap: anywhere; }
+.polybius-coordinate-readout dl { margin: 0; border-left: 1px solid #d9d6ce; padding-left: 1.25rem; }
+.polybius-coordinate-readout dl > div + div { margin-top: .5rem; }
+.polybius-coordinate-readout dt { text-transform: uppercase; color: #50617b; font-size: .7rem; letter-spacing: .08em; }
+.polybius-coordinate-readout dd { margin: 0; font-size: 1.75rem; font-family: ui-monospace, monospace; font-weight: 750; }
+.polybius-aliases { display: flex; flex-wrap: wrap; gap: .5rem 1rem; padding: .7rem 1rem; background: #eaf2ff; border-radius: 8px; overflow-wrap: anywhere; }
+.polybius-aliases > span { color: #50617b; font-size: .85rem; }
+.polybius-inspection > .field { margin: .75rem 0; }
+.polybius-inspection > .small { font-size: .8rem; }
+.polybius-settings { border-top: 1px solid #d9d6ce; padding-top: 1rem; margin-top: 1rem; }
+.polybius-settings .field { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: .5rem 0; }
+.polybius-settings label { margin: 0; font-size: .85rem; }
+.polybius-settings select { width: auto; max-width: 65%; }
+.polybius-rules { margin-top: 1rem; padding: .75rem 0 0; border: 0; border-top: 1px solid #d9d6ce; }
+.polybius-rules summary { font-size: .85rem; }
+.polybius-custom { margin-top: 1rem; }
 
-.keyboard-text-inspection{margin-top:1rem}.keyboard-text-strip{display:flex;gap:4px;flex-wrap:wrap}.keyboard-text-strip button{min-width:44px;padding:.4rem}.keyboard-text-strip button.inspected{outline:2px solid var(--blue);outline-offset:1px}
+@media(max-width:1100px) {
+  .key-layout { grid-template-columns: minmax(7rem, .18fr) minmax(0, 1fr); padding: .75rem; gap: .5rem; }
+  .keyboard-case-label { padding-right: .5rem; }
+  .polybius-instrument { gap: 1rem; grid-template-columns: minmax(0,1fr) minmax(12rem,.42fr); }
+  .polybius-square button { width: 64px; min-width: 64px; min-height: 64px; font-size: 1.75rem; }
+  .polybius-inspection { padding-left: 1rem; }
+}
+@media(max-width:700px) {
+  .instrument .toolbar { align-items: stretch; }
+  .instrument .toolbar > .field { flex: 1 1 130px; min-width: 0; }
+  .instrument .toolbar > .field select,.instrument .toolbar > .field input { width: 100%; }
+  .key-layout { display: block; border-width: 2px; padding: .65rem; }
+  .keyboard-case-label { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .4rem 1rem; padding: 0 0 .6rem; margin-bottom: .5rem; border: 0; border-bottom: 1px solid #d6d1c7; }
+  .instrument .keyboard-case-label h3 { margin: 0; }
+  .keyboard-case-label .field { display: flex; gap: .5rem; align-items: center; flex: 0 1 auto; }
+  .keyboard-case-label select { max-width: 10rem; }
+  .keyboard-case-label .field label,.keyboard-case-detail { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  .instrument .keyboard-touch-controls > .field { display: block; }
+  .keyboard-touch-controls label { margin-bottom: .3rem; }
+  .keyboard-correspondence { gap: .4rem; }
+  .keyboard-correspondence > span { flex-basis: 100%; text-align: center; }
+  .polybius-instrument { grid-template-columns: minmax(0,1fr); }
+  .polybius-board { padding: .7rem 0; }
+  .polybius-square button { width: 44px; min-width: 44px; min-height: 44px; font-size: 1.25rem; }
+  .polybius-square th { min-width: 30px; height: 36px; padding: .2rem; font-size: .9rem; }
+  .polybius-inspection { padding: 1rem 0 0; border-left: 0; border-top: 1px solid #d9d6ce; }
+  .polybius-coordinate-readout { gap: 1.5rem; }
+  #polybius-selected-symbol { font-size: 3.5rem; }
+  .polybius-coordinate-readout dl { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .polybius-coordinate-readout dl > div + div { margin-top: 0; }
+  .polybius-coordinate-readout dd { font-size: 1.5rem; }
+  .book-reference { padding: 1rem; }
+  .book-source-preview { font-size: 1.25rem; }
+  .visual-instrument-links { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}

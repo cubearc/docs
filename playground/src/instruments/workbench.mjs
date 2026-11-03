@@ -40,13 +40,14 @@ function customLayout(name) {
   document.getElementById(`playground-options-${name}`)?.focus();
 }
 function geometry(api,value) {return api.data.layouts[value] ?? parse(value);}
-function keyLayout(api,layout,title,selectedKey,target=false) {
+function keyLayout(api,layout,title,selectedKey,target=false,layoutControl=null) {
   const entries=layout?.entries;
-  if(!Array.isArray(entries)||entries.length>512) return h('p',{class:'warning'},'Choose a canonical layout or a valid custom definition in Parameters.');
+  const header=h('div',{class:'keyboard-case-label'},h('h3',{},title),layoutControl,h('span',{class:'keyboard-case-detail'},'Physical key positions'));
+  if(!Array.isArray(entries)||entries.length>512) return h('section',{class:'key-layout','aria-label':title},header,h('p',{class:'warning'},'Choose a canonical layout or a valid custom definition in Parameters.'));
   const layer=api.ui.layer ?? 'base';
   const visible=entries.filter(e=>e.layer===layer);
   const rows=[...new Set(visible.map(e=>e.row ?? 0))];
-  return h('section',{class:'key-layout','aria-label':title},h('h3',{},title),h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
+  return h('section',{class:'key-layout','aria-label':title},header,h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
     api.ui.key=entry.key;api.ui.layer=entry.layer;
     const offset=api.text().indexOf(entry.symbol);
     api.ui.textPosition=offset<0?null:Array.from(api.text().slice(0,offset)).length;
@@ -79,23 +80,53 @@ function keyboard(host,api) {
   const textSelection=h('div',{class:'keyboard-text-inspection'},h('h3',{},'Source text positions'),note(`First ${Math.min(64,sourceSymbols.length)} of ${sourceSymbols.length} scalars. Select a position to inspect its key; the complete text remains in the input.`),h('div',{class:'keyboard-text-strip'},sourceSymbols.slice(0,64).map((symbol,index)=>button(symbol===' '?'␠':symbol,()=>{const key=source?.entries?.find(e=>e.symbol===symbol);api.ui.textPosition=index;if(key){api.ui.key=key.key;api.ui.layer=key.layer;}api.refresh();},{id:`keyboard-text-${index}`,'aria-label':`${symbol===' '?'␠':symbol}, source scalar ${index}`,'aria-pressed':String(api.ui.textPosition===index),class:api.ui.textPosition===index?'inspected':''}))));
   const positions=result.positions ?? [];
   const cursor=integer(api.ui.position ?? 0,0,Math.max(0,positions.length-1)) ?? 0;
-  const controls=h('div',{class:'toolbar'},selector(remap?'source':'layout',remap?'Source layout':'Layout'),remap?selector('target','Target layout'):null,
+  const controls=h('div',{class:'toolbar keyboard-touch-controls'},
     field('keyboard-layer','Layer',choice('keyboard-layer',layer,[...new Set(source?.entries?.map(e=>e.layer)??['base','shift'])],value=>{api.ui.layer=value;api.refresh();})),
     field('keyboard-mode','Key action',choice('keyboard-mode',api.ui.keyMode??'inspect',['inspect','insert'],value=>{api.ui.keyMode=value;api.refresh();})));
-  replace(host,controls,note('QWERTZ uses the canonical Y/Z swap on US ANSI geometry. Physical typing is handled only by the focused input field.'),
+  const correspondence=h('div',{id:'keyboard-correspondence',class:'keyboard-correspondence','aria-label':'Selected physical key correspondence'},
+    h('div',{class:'keyboard-correspondence-glyphs'},h('strong',{id:'keyboard-correspondence-source'},sourceEntry?.symbol??'—'),remap?[h('span',{'aria-hidden':'true'},'→'),h('strong',{id:'keyboard-correspondence-target'},targetEntry?.symbol??'—')]:null),
+    h('span',{},sourceEntry?`Physical key ${sourceEntry.key} · ${layer}`:'Select a key to inspect its position'));
+  replace(host,controls,
     !remap? h('div',{class:'toolbar'},api.action.id.includes('coordinates')?field('keyboard-origin','Index origin',choice('keyboard-origin',api.param('index_base'),[0,1],v=>patch(api,'index_base',v))):[
       field('keyboard-dx','Horizontal displacement',h('input',{id:'keyboard-dx',value:api.param('dx')??'',onChange:e=>patch(api,'dx',e.target.value)})),
       field('keyboard-dy','Vertical displacement',h('input',{id:'keyboard-dy',value:api.param('dy')??'',onChange:e=>patch(api,'dy',e.target.value)})),
       field('keyboard-edge','Edge policy',choice('keyboard-edge',api.param('edge'),['reject','wrap'],v=>patch(api,'edge',v))) ]):null,
-    h('div',{class:'keyboard-pair'},keyLayout(api,source,'Source',api.ui.key),remap?keyLayout(api,target,'Destination',api.ui.key,true):null),
+    h('div',{class:'keyboard-pair'},keyLayout(api,source,'Source',api.ui.key,false,selector(remap?'source':'layout',remap?'Source layout':'Layout')),correspondence,remap?keyLayout(api,target,'Destination',api.ui.key,true,selector('target','Target layout')):null),
     textSelection,
     h('p',{class:'selection-caption'},sourceEntry?`Selected physical key ${sourceEntry.key}: ${sourceEntry.symbol}${targetEntry?` → ${targetEntry.symbol}`:''}. Layer ${layer}.`:'Inspect a key, or choose Insert to compose input.'),
+    note('QWERTZ uses the canonical Y/Z swap on US ANSI geometry. Physical typing is handled only by the focused input field.'),
     api.ui.error?h('p',{class:'warning'},api.ui.error):null,
     positions.length?h('section',{},field('keyboard-position','Recorded text position',h('input',{id:'keyboard-position',type:'range',min:0,max:positions.length-1,value:cursor,onInput:e=>{api.ui.position=Number(e.target.value);const c=result.source_coordinates?.[api.ui.position]??result.coordinates?.[api.ui.position];if(c&&!api.stale()){const b=Number(api.snapshot()?.parameters?.index_base??0);const k=source?.entries?.find(k=>k.row===c[0]-b&&k.column===c[1]-b&&k.layer===c[2]);if(k){api.ui.key=k.key;api.ui.layer=k.layer;}}api.refresh();}})),note(`Recorded position ${cursor+1}/${positions.length}: UTF-8 byte ${positions[cursor][0]}, scalar ${positions[cursor][1]}. ${result.source_coordinates?JSON.stringify(result.source_coordinates[cursor])+' → '+JSON.stringify(result.target_coordinates[cursor]):JSON.stringify(result.coordinates?.[cursor]??'Decoded position')}`),api.stale()?note('Recorded coordinates belong to earlier settings. The keyboard above remains the editable current geometry.'):null):null);
   const input=document.getElementById('playground-input');
   const inspect=()=>{const text=input.value.slice(0,input.selectionStart);const symbol=Array.from(text).at(-1);const entry=source?.entries?.find(e=>e.symbol===symbol);if(entry){api.ui.key=entry.key;api.ui.layer=entry.layer;api.refresh();}};
   input?.addEventListener('keyup',inspect); input?.addEventListener('click',inspect);
   return ()=>{input?.removeEventListener('keyup',inspect);input?.removeEventListener('click',inspect);};
+}
+function polybiusNavigate(api,event,index,side) {
+  const row=Math.floor(index/side), column=index%side;
+  const next={ArrowLeft:row*side+Math.max(0,column-1),ArrowRight:row*side+Math.min(side-1,column+1),ArrowUp:Math.max(0,row-1)*side+column,ArrowDown:Math.min(side-1,row+1)*side+column,Home:row*side,End:row*side+side-1}[event.key];
+  if(next===undefined)return;
+  event.preventDefault();
+  api.ui.cell=next;
+  api.ui.rowPage=Math.floor(Math.floor(next/side)/8)*8;
+  api.refresh({focusId:`polybius-cell-${next}`});
+}
+function polybiusCell(api,alphabet,index,side,base,selected) {
+  const row=Math.floor(index/side),column=index%side;
+  const onAxis=selected!==undefined&&(Math.floor(selected/side)===row||selected%side===column);
+  return h('td',{class:onAxis?'axis-highlight':''},button(alphabet[index],()=>{
+    api.ui.cell=index;
+    if(api.ui.cellAction==='insert')addText(api,api.action.id.endsWith('.decode')?`${row+base},${column+base}`:alphabet[index],api.action.id.endsWith('.decode')?' ':'');
+    else api.refresh();
+  },{id:`polybius-cell-${index}`,'aria-label':`${alphabet[index]}, row ${row+base}, column ${column+base}`,'aria-pressed':String(index===selected),class:index===selected?'inspected':'',onKeydown:event=>polybiusNavigate(api,event,index,side)}));
+}
+function polybiusRules(api) {
+  return h('details',{class:'polybius-rules',open:api.ui.polybiusRules===true,onToggle:event=>{
+    if(event.currentTarget.isConnected)api.ui.polybiusRules=event.currentTarget.open;
+  }},h('summary',{id:'polybius-rules-summary',onClick:event=>{
+    // Native toggle is queued; remember activation before inspection redraws.
+    if(event.currentTarget.isConnected&&!event.defaultPrevented)api.ui.polybiusRules=!event.currentTarget.parentElement.open;
+  }},'Matching and spaces'),note('Presets fold ASCII case. Each literal space is retained as / (a null token). Custom squares match exact scalars.'));
 }
 function polybius(host,api) {
   const custom=api.param('alphabet');
@@ -104,22 +135,25 @@ function polybius(host,api) {
   const side=integer(custom?api.param('side'):preset?.side,1,64);
   const base=integer(api.param('index_base')??1,0,1);
   const aliases=custom?parse(api.param('aliases'))??[]:preset?.aliases??[];
-  const controls=h('div',{class:'toolbar'},field('polybius-preset','Square',choice('polybius-preset',custom?'custom':api.param('preset')??'polybius',['polybius','tap','custom'],v=>{
-    if(v==='custom'){api.setParam('preset',undefined);api.setParam('alphabet',preset.alphabet);api.setParam('side','5');api.setParam('aliases',JSON.stringify(preset.aliases));}
-    else {api.setParam('alphabet',undefined);api.setParam('side',undefined);api.setParam('aliases',undefined);api.setParam('preset',v);}api.refresh();})),
-    field('polybius-base','Index origin',choice('polybius-base',base,[0,1],v=>patch(api,'index_base',v))),
-    field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})));
-  const selected=api.ui.cell;
-  const start=Math.floor((api.ui.rowPage??0)/8)*8;
-  const grid=side&&base!==null&&alphabet.length===side*side?h('div',{class:'instrument-scroll polybius-board','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>{const index=(r+start)*side+c;return h('td',{},button(alphabet[index],()=>{
-    api.ui.cell=index;
-    if(api.ui.cellAction==='insert') addText(api,api.action.id.endsWith('.decode')?`${r+start+base},${c+base}`:alphabet[index],api.action.id.endsWith('.decode')?' ':'');
-    else api.refresh();
-  },{id:`polybius-cell-${index}`,'aria-label':`${alphabet[index]}, row ${r+start+base}, column ${c+base}`,'aria-pressed':String(index===selected),class:index===selected?'inspected':''}));})))))):h('p',{class:'warning'},'A custom square requires side² unique scalars and valid aliases. Review Parameters.');
-  replace(host,controls,note(`Aliases: ${aliases.join(', ')||'none'}. Presets fold ASCII case. Each literal space is retained as / (a null token). Custom squares match exact scalars.`),
-    custom?h('div',{class:'toolbar'},field('polybius-alphabet','Custom alphabet',h('textarea',{id:'polybius-alphabet',rows:2,value:custom,onChange:e=>patch(api,'alphabet',e.target.value)})),field('polybius-side','Side',h('input',{id:'polybius-side',type:'number',min:1,max:64,value:api.param('side'),onChange:e=>patch(api,'side',e.target.value)}))):null,
-    grid,side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null,
-    h('p',{class:'selection-caption'},selected!==undefined&&side?`Selected ${alphabet[selected]} ↔ ${Math.floor(selected/side)+base},${selected%side+base}. Inspection does not edit or run.`:'Select a cell to inspect its coordinates.'));
+  const valid=side&&base!==null&&alphabet.length===side*side;
+  const selected=valid&&Number.isInteger(api.ui.cell)&&api.ui.cell>=0&&api.ui.cell<alphabet.length?api.ui.cell:undefined;
+  const start=Math.min(Math.floor((api.ui.rowPage??0)/8)*8,Math.max(0,Math.floor(((side??1)-1)/8)*8));
+  const controls=h('div',{class:'polybius-settings'},field('polybius-preset','Square',choice('polybius-preset',custom?'custom':api.param('preset')??'polybius',['polybius','tap','custom'],v=>{
+    if(v==='custom'){const initial=preset??api.data.squares.polybius;api.setParam('preset',undefined);api.setParam('alphabet',initial.alphabet);api.setParam('side',String(initial.side));api.setParam('aliases',JSON.stringify(initial.aliases));}
+    else {api.setParam('alphabet',undefined);api.setParam('side',undefined);api.setParam('aliases',undefined);api.setParam('preset',v);}
+    api.ui.rowPage=0;api.refresh();})),
+    field('polybius-base','Index origin',choice('polybius-base',base,[0,1],v=>patch(api,'index_base',v))));
+  const grid=valid?h('div',{class:'instrument-scroll polybius-board','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected!==undefined&&selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:selected!==undefined&&Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>polybiusCell(api,alphabet,(r+start)*side+c,side,base,selected))))))):h('p',{class:'warning'},'A custom square requires side² unique scalars and valid aliases. Review Parameters.');
+  const inspection=h('aside',{class:'polybius-inspection','aria-label':'Selected cell coordinates'},h('h3',{},'Selected cell'),
+    h('div',{class:'polybius-coordinate-readout'},h('strong',{id:'polybius-selected-symbol'},selected===undefined?'—':alphabet[selected]),
+      h('dl',{},h('div',{},h('dt',{},'Row'),h('dd',{id:'polybius-selected-row'},selected===undefined?'—':Math.floor(selected/side)+base)),h('div',{},h('dt',{},'Column'),h('dd',{id:'polybius-selected-column'},selected===undefined?'—':selected%side+base)))),
+    h('p',{class:'polybius-aliases'},h('span',{},'Aliases'),h('strong',{},Array.isArray(aliases)?aliases.join(', ')||'none':'Review Parameters')),
+    field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})),
+    note('Arrow keys inspect adjacent cells. Choose Insert, then activate a cell to compose.'),controls,
+    polybiusRules(api));
+  replace(host,h('div',{class:'polybius-instrument'},h('div',{class:'polybius-stage'},grid,side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null),inspection),
+    custom?h('div',{class:'toolbar polybius-custom'},field('polybius-alphabet','Custom alphabet',h('textarea',{id:'polybius-alphabet',rows:2,value:custom,onChange:e=>patch(api,'alphabet',e.target.value)})),field('polybius-side','Side',h('input',{id:'polybius-side',type:'number',min:1,max:64,value:api.param('side'),onChange:e=>patch(api,'side',e.target.value)}))):null,
+    h('p',{class:'selection-caption'},selected!==undefined?`Selected ${alphabet[selected]} ↔ ${Math.floor(selected/side)+base},${selected%side+base}. Inspection does not edit or run.`:'Select a cell to inspect its coordinates.'));
 }
 
 function svg(tag,attributes={},...children) {

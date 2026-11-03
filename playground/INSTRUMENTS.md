@@ -5,9 +5,11 @@ tool from its normal catalog entry. **Load Core example** loads a labeled,
 synthetic conformance example. It does not run it. Review the input and press
 **Run tools** to execute the installed local SDK in its dedicated worker.
 
-On wide screens, input and results sit beside the instrument. On smaller screens,
-they follow the order input, instrument, results. The action selector and
-**Visual / Parameters** controls stay above the work area.
+Keyboard, Enigma, Polybius, Alberti and Solitaire use a full-width instrument
+below a compact input strip. Expand **Input actions** for file loading, paste
+and clear. Other workbenches place input and results beside the instrument on
+wide screens. Narrow screens follow the order input, instrument, results.
+The action selector and **Visual / Parameters** controls stay above the work area.
 
 **Visual** and **Parameters** share one configuration. Selecting a cell, card,
 node, byte or recorded trace step inspects data. Insertion, movement of cards,
@@ -34,7 +36,7 @@ use Core outputs, independently of canvas drawing or browser playback.
 
 | Instrument | Main interaction | Core evidence used |
 | --- | --- | --- |
-| Digital keyboard | Inspect/insert keys, choose canonical layouts/layers and displacement | Exact text, coordinate/position reports when supplied |
+| Digital keyboard | Inspect/insert keys, compare physical positions across layouts, choose layers and displacement | Exact text, coordinate/position reports when supplied |
 | Enigma | Initial rotors, windows, rings, reflector and disjoint plugs | Text, final windows, optional post-step windows |
 | Solitaire | Import/reorder all 54 cards with drag or movement buttons | Text; no invented deck trace |
 | Scytale | Discrete columns and character inspection in strip/grid views | Text; no inferred source-to-destination mapping |
@@ -42,7 +44,7 @@ use Core outputs, independently of canvas drawing or browser playback.
 | Flag semaphore | Adjust anatomical arms, interpret pair and compose symbols | Canonical sender-facing arm pairs |
 | Brainfuck | Edit program/byte stdin, inspect report tape and recorded steps | Final execution, report/compare, status and truncation |
 | Image bit planes | Select channel/bit, inspect exact pixel, synchronized image views | Raw packed bits, valid bits and Core visual output |
-| Alberti | Rotate exact 24-position rings, inspect recorded alignment | Named text/settings, index and optional trace |
+| Alberti | Rotate exact 24-position rings, inspect recorded alignment, return to the editable initial alignment | Named text/settings, index and optional trace |
 | M-138-A | Import full series, reorder distinct strips, edit block offsets | Text; explicit qualification series rather than an invented historical default |
 | Pigpen | Compose canonical Haverhill pair glyphs, inspect/edit tokens | Exact profile definition and readings |
 | Book cipher | Index reference text, select validated coordinates | Core word spans and complete coordinate validation; source SHA-256 |
@@ -50,7 +52,7 @@ use Core outputs, independently of canvas drawing or browser playback.
 | Shortest path | Edit graph vertices/edges, position nodes, choose endpoints | Returned vertex/edge path; no weights or search trace |
 | Eight-dot Braille | Toggle numbered dots, edit hex/binary, compose byte masks | Core-generated Unicode table and exact byte outputs |
 | Morse | Dot, Dash, Next letter/word, Delete and explicit text/signals modes | Exact Core text/symbol conversion |
-| Polybius | Inspect/insert cells, choose origin/preset/custom square | Exact square configuration and aliases |
+| Polybius | Inspect cells by click or arrow keys; choose Insert to compose; set origin/preset/custom square | Exact square configuration and aliases |
 | Hex comparison | Inspect aligned rows, select ranges, navigate differences | Positional byte comparison, complete counts/listing status |
 | Exact colors | Select exact original samples/palette entries, build mask/layer | Core histogram, selection counts and exported image bytes |
 | PNG structure | Select chunks/signature/trailing bytes, inspect/export payload | Original byte offsets, payload/total lengths, CRC and boundary report |

@@ -2,6 +2,7 @@ import { h, button, replace } from '../dom.mjs';
 import { fieldsFor } from '../controls.mjs';
 import { snapshot } from '../data.mjs';
 import { PresentationState } from './state.mjs';
+import { isInstrumentStudy, studyOutput } from './study.mjs';
 
 /** Adapts existing Playground/session ownership to lazy, disposable renderers. */
 export function instrumentShell({ page, action, descriptor, runtime, changed, setInput, parameters, extra, redrawForm, selectAction, loadExample, convertInput }) {
@@ -11,6 +12,7 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
   const host = h('div', { class: `instrument instrument-${descriptor.kind}`, 'data-instrument': descriptor.kind });
   const warning = h('p', { class: 'warning small' });
   const surface = h('section', { class: 'panel instrument-surface', 'aria-label': `${descriptor.kind} visual instrument` }, warning, host);
+  let output;
   let cleanup;
   let disposed = false;
   let module;
@@ -40,6 +42,11 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     evidence=page.session.latest(action.id);
     redrawForm?.();
     warning.textContent = record()?.earlierInput ? 'This result belongs to earlier input or settings. The instrument retains its producing evidence.' : '';
+    if (isInstrumentStudy(descriptor) && descriptor.kind !== 'enigma') {
+      output?.remove();
+      output = studyOutput(descriptor, evidence);
+      surface.append(output);
+    }
     if (!module || !data) return;
     const active = host.contains(document.activeElement) ? document.activeElement : null;
     const focus = focusId ?? active?.id;

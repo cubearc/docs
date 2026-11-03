@@ -27,3 +27,8 @@ export function presentationFor(action, parameters = {}) {
   if (!action) return null;
   return instrumentSeries.find(row => row.operations.includes(action.id) && row.versions.includes(action.contract.operation_version) && (!row.profile || (parameters.profile ?? action.direct?.parameters?.profile ?? action.contract.parameters?.properties?.profile?.default) === row.profile)) ?? null;
 }
+
+export function primaryOutputName(descriptor, result) {
+  const names = Object.keys(result.outputs);
+  return [descriptor?.primaryOutputs[result.operation], 'output', 'text'].find(name => names.includes(name)) ?? names[0];
+}

@@ -305,14 +305,23 @@ function solitaire(host, api) {
       event.preventDefault();
       change(api, () => { jsonParam(api, 'deck', moveCard(deck, drag.index, index)); api.ui.card = index; });
     } });
-  replace(host, h('div', { class: 'mechanism solitaire-table' }, h('div', { class: 'row between solitaire-header' }, h('h3', {}, 'Initial deck · 54 cards'), button('Use ordered deck 1–54', () => change(api, () => jsonParam(api, 'deck', Array.from({ length: 54 }, (_, i) => i + 1))))),
-    note('Select a card to move it, or drag it onto a position. This is the initial deck; no intermediate shuffle states are returned.'), warning(deckStatus(deck)),
-    h('div', { class: 'solitaire-deck', 'data-instrument-scroll': 'initial-deck', 'aria-label': 'Initial deck in position order' }, deck.slice(0, 54).map(card)),
-    deck.length ? h('div', {class: 'solitaire-selection'}, h('p', {}, `Selected: position ${selected + 1} · ${cardName(deck[selected])}`), h('div', { class: 'toolbar' }, button('Move earlier', () => move(selected - 1), { id: 'solitaire-move-earlier', disabled: selected <= 0 || Boolean(deckStatus(deck).length) }), button('Move later', () => move(selected + 1), { id: 'solitaire-move-later', disabled: selected >= deck.length - 1 || Boolean(deckStatus(deck).length) })),
-      field('Move selected card to position (1–54)', 'solitaire-move-position', h('input', { id: 'solitaire-move-position', type: 'number', min: 1, max: 54, disabled: Boolean(deckStatus(deck).length), value: selected + 1, onChange: event => { const to = int(event.target.value) - 1; if (to >= 0 && to < deck.length) move(to); } }))) : null,
-    h('div', {class: 'mechanism-settings solitaire-options'}, field('Passphrase (ASCII letters; ordered deck required)', 'solitaire-passphrase', h('input', { id: 'solitaire-passphrase', type: 'password', autocomplete: 'off', value: api.param('passphrase') ?? '', maxlength: 65536, onChange: event => change(api, () => api.setParam('passphrase', event.target.value)) })),
-      field('Deck-round budget', 'solitaire-max-steps', h('input', { id: 'solitaire-max-steps', type: 'number', min: 0, max: 1048576, value: api.param('max_steps') ?? 1048576, onChange: event => change(api, () => api.setParam('max_steps', event.target.value)) }))),
-    disclosure(api, 'deck-list', 'Accessible deck list and import', field('Card order JSON', 'solitaire-deck-json', h('textarea', { id: 'solitaire-deck-json', rows: 4, value: typeof api.param('deck') === 'string' ? api.param('deck') : JSON.stringify(deck), onChange: event => change(api, () => api.setParam('deck', event.target.value)) })), h('ol', { class: 'deck-list' }, deck.map((value, index) => h('li', {}, `Position ${index + 1}: ${cardName(value)}`))))));
+  const selectedValue = deck[selected];
+  const selectedCard = selectedValue > 52 ? selectedValue === 53 ? 'A' : 'B' : selectedValue;
+  replace(host, h('div', { class: 'mechanism solitaire-table' },
+    h('div', {class: 'solitaire-mat'},
+      h('div', { class: 'row between solitaire-header' }, h('div', {}, h('h3', {}, 'Initial deck · 54 cards'), note('Select a card, then move it. Or drag it onto a new position.')), button('Use ordered deck 1–54', () => change(api, () => jsonParam(api, 'deck', Array.from({ length: 54 }, (_, i) => i + 1))))),
+      warning(deckStatus(deck)),
+      h('div', { class: 'solitaire-deck', 'data-instrument-scroll': 'initial-deck', 'aria-label': 'Initial deck in position order' }, deck.slice(0, 54).map(card)),
+      deck.length ? h('div', {class: 'solitaire-selection'},
+        h('div', {class: 'solitaire-selected'}, h('div', {}, h('span', {class: 'solitaire-selection-label'}, 'Selected card'), h('p', {id: 'solitaire-selected-position'}, `Position ${selected + 1} · ${cardName(selectedValue)}`)),
+          h('div', {class: `solitaire-selected-card${selectedValue > 52 ? ' joker' : ''}`, 'aria-hidden': 'true'}, h('small', {}, `#${selected + 1}`), h('strong', {id: 'solitaire-selected-value'}, selectedCard), selectedValue > 52 ? h('span', {}, 'JOKER') : null)),
+        h('div', { class: 'toolbar' }, button('Move earlier', () => move(selected - 1), { id: 'solitaire-move-earlier', disabled: selected <= 0 || Boolean(deckStatus(deck).length) }), button('Move later', () => move(selected + 1), { id: 'solitaire-move-later', disabled: selected >= deck.length - 1 || Boolean(deckStatus(deck).length) })),
+        field('Move selected card to position (1–54)', 'solitaire-move-position', h('input', { id: 'solitaire-move-position', type: 'number', min: 1, max: 54, disabled: Boolean(deckStatus(deck).length), value: selected + 1, onChange: event => { const to = int(event.target.value) - 1; if (to >= 0 && to < deck.length) move(to); } }))) : null),
+    note('This is the initial configuration. The result is text; intermediate shuffle states are not returned.'),
+    disclosure(api, 'deck-list', 'Accessible deck list and import',
+      h('div', {class: 'mechanism-settings solitaire-options'}, field('Passphrase (ASCII letters; ordered deck required)', 'solitaire-passphrase', h('input', { id: 'solitaire-passphrase', type: 'password', autocomplete: 'off', value: api.param('passphrase') ?? '', maxlength: 65536, onChange: event => change(api, () => api.setParam('passphrase', event.target.value)) })),
+        field('Deck-round budget', 'solitaire-max-steps', h('input', { id: 'solitaire-max-steps', type: 'number', min: 0, max: 1048576, value: api.param('max_steps') ?? 1048576, onChange: event => change(api, () => api.setParam('max_steps', event.target.value)) }))),
+      field('Card order JSON', 'solitaire-deck-json', h('textarea', { id: 'solitaire-deck-json', rows: 4, value: typeof api.param('deck') === 'string' ? api.param('deck') : JSON.stringify(deck), onChange: event => change(api, () => api.setParam('deck', event.target.value)) })), h('ol', { class: 'deck-list' }, deck.map((value, index) => h('li', {}, `Position ${index + 1}: ${cardName(value)}`))))));
 }
 
 function svg(tag, attrs = {}, children = []) {
@@ -337,9 +346,18 @@ function albertiDisk(api, index, editable = true) {
   const alignment = Math.max(0, index);
   const ring = svg('g', {}, ringGlyphs(ALBERTI_RINGS.inner, 126, alignment, 'alberti-inner-letter'));
   const disk = svg('svg', { viewBox: '0 0 440 440', role: 'img', 'aria-label': index < 0 ? 'Alberti 24-position rings. No initial alignment configured.' : `Alberti 24-position rings. Inner ${ALBERTI_RINGS.inner[index]} aligned under outer A.`, class: `alberti-disk${editable ? '' : ' inspecting'}` }, [
-    svg('circle', { cx: 220, cy: 220, r: 207, class: 'alberti-outer' }), ...ringGraduations(), svg('circle', { cx: 220, cy: 220, r: 150, class: 'alberti-inner' }),
+    svg('defs', {}, [
+      svg('linearGradient', {id:'alberti-ivory',x1:'0',y1:'0',x2:'1',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#fffdf3'}),svg('stop',{offset:'.5','stop-color':'#f1e5ca'}),svg('stop',{offset:'1','stop-color':'#fff8e8'})]),
+      svg('radialGradient', {id:'alberti-ink'}, [svg('stop',{offset:'0','stop-color':'#29425c'}),svg('stop',{offset:'1','stop-color':'#14283f'})]),
+      svg('linearGradient', {id:'alberti-brass',x1:'0',y1:'0',x2:'1',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#f9e4a7'}),svg('stop',{offset:'.4','stop-color':'#d8b66b'}),svg('stop',{offset:'.7','stop-color':'#a87e35'}),svg('stop',{offset:'1','stop-color':'#f1d58e'})])
+    ]),
+    svg('circle', { cx: 220, cy: 220, r: 209, class: 'alberti-rim' }),
+    svg('circle', { cx: 220, cy: 220, r: 205, class: 'alberti-outer' }), ...ringGraduations(),
+    svg('circle', { cx: 220, cy: 220, r: 153, class: 'alberti-inner-rim' }), svg('circle', { cx: 220, cy: 220, r: 149, class: 'alberti-inner' }),
     ...ringGlyphs(ALBERTI_RINGS.outer, 180, 0, 'alberti-outer-letter'), ring,
-    svg('path', { d: 'M214 56 L226 56 L220 66 Z', class: 'alberti-marker' }), svg('circle', { cx: 220, cy: 220, r: 20, class: 'alberti-hub' })]);
+    svg('path', { d: 'M211 4 L229 4 L220 22 Z', class: 'alberti-marker' }),
+    svg('circle', { cx: 220, cy: 220, r: 23, class: 'alberti-hub-shadow' }), svg('circle', { cx: 220, cy: 218, r: 20, class: 'alberti-hub' }),
+    svg('circle', { cx: 220, cy: 218, r: 14, class: 'alberti-hub-detail' })]);
   if (!editable) return disk;
   let start;
   const angle = event => { const bounds = disk.getBoundingClientRect(); return Math.atan2(event.clientY - bounds.top - bounds.height / 2, event.clientX - bounds.left - bounds.width / 2); };
@@ -362,18 +380,32 @@ function alberti(host, api) {
   const selected = traceWindow(trace, traceCursor(api, trace));
   const initial = ALBERTI_RINGS.inner.indexOf(p.initial_index); const displayed = ALBERTI_RINGS.inner.indexOf(selected?.index ?? p.initial_index);
   const rotate = delta => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: ALBERTI_RINGS.inner[((initial < 0 ? 0 : initial) + delta + 24) % 24] }); });
+  const returnToInitial = () => {
+    api.ui.traceCursor = -1; api.ui.playing = false;
+    api.refresh({fallbackFocusId:'alberti-initial'});
+  };
   replace(host, h('div', { class: 'mechanism alberti-instrument' },
-    h('div', {class: 'alberti-stage'}, albertiDisk(api, displayed, !selected), note(selected ? `Inspected alignment: ${selected.index} · input byte ${selected.offset}` : initial < 0 ? 'No initial index configured. Choose an inner symbol, or rotate the geometry preview to set the alignment.' : 'Initial alignment. Drag the inner disk to choose an initial index.'),
-      h('div', { class: 'toolbar' }, button('Rotate initial index left', () => rotate(-1), {id:'alberti-rotate-left'}), button('Rotate initial index right', () => rotate(1), {id:'alberti-rotate-right'}))),
-    h('div', {class: 'alberti-controls'}, h('h3', {}, 'Alignment'), note('24 positions · alberti_di_palma_2009_v1. Di Palma 2009, pp. 11–13; digits 1–4 are control symbols.'),
+    h('div', {class: 'alberti-stage'}, albertiDisk(api, displayed, !selected),
+      h('div', {class: 'alberti-stand'},
+        button('‹', () => rotate(-1), {id:'alberti-rotate-left', 'aria-label':'Rotate initial index left'}),
+        field('Initial · inner symbol under A', 'alberti-initial', select('alberti-initial', p.initial_index, [...ALBERTI_RINGS.inner], value => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: value }); }))),
+        button('›', () => rotate(1), {id:'alberti-rotate-right', 'aria-label':'Rotate initial index right'})),
+      note(selected ? `Inspected alignment: ${selected.index} · input byte ${selected.offset}` : initial < 0 ? 'No initial index configured. Choose an inner symbol, or rotate the geometry preview to set the alignment.' : 'Drag the inner disk or use the arrows to set the initial alignment.')),
+    h('div', {class: 'alberti-controls'}, h('h3', {}, 'Alignment'),
       initial < 0 || p.profile !== 'alberti_di_palma_2009_v1' ? warning(['Load the Core example or supply settings with an explicit initial index and profile.']) : null, settingsWarning(api),
-      field('Inner symbol under outer A (initial)', 'alberti-initial', select('alberti-initial', p.initial_index, [...ALBERTI_RINGS.inner], value => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: value }); }))),
-      h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(p.trace), onChange: event => change(api, () => patchSettings(api, { trace: event.target.checked })) }), 'Record alignment trace'),
-      result.final_index !== undefined ? h('p', { class: 'mechanism-reading' }, `Final index: ${result.final_index}`) : null,
-      recorded?.initial_index ? disclosure(api, 'recorded-initial', 'Recorded initial settings', note(`Initial index: ${recorded.initial_index}. Profile: ${recorded.profile}.`)) : null,
+      h('dl', {class: 'alberti-readings'},
+        h('div', {}, h('dt', {}, 'Initial setting'), h('dd', {id:'alberti-initial-index'}, p.initial_index ?? '—')),
+        h('div', {class:'alberti-inspection-reading'}, h('dt', {}, 'Inspected step'), h('dd', {id:'alberti-inspected-index'}, selected?.index ?? '—')),
+        h('div', {}, h('dt', {}, 'Final index'), h('dd', {id:'alberti-final-index'}, result.final_index ?? '—'))),
+      result.final_index !== undefined && api.stale() ? note('Inspected and final values belong to the previous configuration.') : null,
+      h('div', {class:'alberti-inspection-actions'}, button('Return to initial alignment', returnToInitial, {id:'alberti-return-initial', disabled:!selected})),
       selected ? note(`Recorded input byte ${selected.offset}: ${byteCharacter(producing?.input?.data, selected.offset)} → ${byteCharacter(result.text, selected.offset)}.`) : null,
-      note('Prepared text is the exact text input; the engine does not insert indicators, spaces, or fold U/V.'),
-      traceControls(api, trace, row => `input byte ${row.offset} · alignment ${row.index}`))));
+      traceControls(api, trace, row => `input byte ${row.offset} · alignment ${row.index}`),
+      disclosure(api, 'alberti-profile', 'Profile and trace settings',
+        note('24 positions · alberti_di_palma_2009_v1. Di Palma 2009, pp. 11–13; digits 1–4 are control symbols.'),
+        h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(p.trace), onChange: event => change(api, () => patchSettings(api, { trace: event.target.checked })) }), 'Record alignment trace'),
+        note('Prepared text is the exact text input; the engine does not insert indicators, spaces, or fold U/V.')),
+      recorded?.initial_index ? disclosure(api, 'recorded-initial', 'Recorded initial settings', note(`Initial index: ${recorded.initial_index}. Profile: ${recorded.profile}.`)) : null)));
   return playback(host, api, trace);
 }
 
