@@ -21,6 +21,7 @@ export function mountPlayground(container, context) {
   const originalAction = page.tool ? runtime.action(page.tool) : null;
   const descriptor = presentationFor(originalAction, page.parameters[page.tool] ?? {});
   const selected = descriptor && originalAction?.direct ? { ...originalAction, pipeline: null } : originalAction;
+  const enigmaStudy = descriptor?.kind === 'enigma';
   let instrument;
   const parameterRegion = h('div', { id: 'instrument-parameters' });
   const hasInput = !selected || selected.contract.inputs.length > 0;
@@ -279,10 +280,16 @@ export function mountPlayground(container, context) {
   const editorTabs = descriptor ? h('div', {class:'instrument-tabs segmented',role:'group','aria-label':'Editor view'}, ['Visual','Parameters'].map(tab=>button(tab,()=>{ page.instrumentTab=tab; updateTab(); },{id:`instrument-tab-${tab.toLowerCase()}`,'aria-pressed':String((page.instrumentTab ?? 'Visual')===tab)}))) : null;
   const inputPanel = h('section', { class: 'panel input-panel', id: 'input-section', tabindex: -1, 'aria-label': 'Input and options' },
     descriptor ? null : h('div', { class: 'segmented mode-control' }, ['Decode', 'Encode'].map(mode => button(mode, () => { page.mode = mode; page.tool = null; changed(); render(); }, { 'aria-pressed': String(page.mode === mode) }))), inputMain, inputOptions);
-  replace(container, h('div', { class: descriptor ? 'heading instrument-heading' : 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, selected ? selected.description : page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),
+  if (enigmaStudy && hasInput) {
+    const actions = inputMain.querySelector('.toolbar');
+    const limit = inputMain.querySelector(':scope > p');
+    inputMain.append(h('details', {class:'enigma-input-actions'}, h('summary', {}, 'Input actions'), actions, limit));
+    if (inputControl?.tagName === 'TEXTAREA') inputControl.rows = 2;
+  }
+  replace(container, h('div', { class: descriptor ? `heading instrument-heading${enigmaStudy ? ' enigma-heading' : ''}` : 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, selected ? selected.description : page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),
     session.path.length ? h('div', { class: 'row spacer' }, h('span', { class: 'tag' }, `${session.path.length} chosen steps`), button('Save chosen sequence', () => fromSequence(session.path, session.originalInput, session.input.type))) : null),
     h('div', { class: descriptor ? 'section-jumps toolbar instrument-jumps' : 'section-jumps toolbar' }, h('a', { class: 'button', href: '#input-section' }, 'Input'), h('a', { class: 'button', href: '#results-section' }, 'Results')),
-    h('div', { class: descriptor ? 'play-grid visual-workspace' : 'play-grid' },
+    h('div', { class: descriptor ? `play-grid visual-workspace${enigmaStudy ? ' enigma-workspace' : ''}` : 'play-grid' },
       descriptor ? h('div', {class:'instrument-command-bar'}, actionControl, editorTabs) : null,
       inputPanel,
       ...(descriptor ? [instrument.surface, h('section',{class:'panel instrument-options',id:'instrument-parameter-panel','aria-label':'Operation parameters'},parameterRegion)] : []), results),

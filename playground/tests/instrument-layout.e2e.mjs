@@ -134,10 +134,18 @@ test('visual instruments keep the working surface beside input and results', {ti
         if (kind === 'polybius') await page.locator('#polybius-cell-7').click();
         await page.evaluate(() => window.scrollTo(0, 0));
         const {surface, input, result} = await geometry(page);
-        assert.ok(surface.width > input.width * 2, 'The instrument is the dominant work area.');
-        assert.ok(surface.x + surface.width <= input.x, 'Input sits beside the instrument.');
-        assert.ok(Math.abs(surface.y - input.y) < 2, 'Input and instrument start together.');
-        assert.ok(Math.abs(result.x - input.x) < 2, 'Result follows its input in the same rail.');
+        if (kind === 'enigma') {
+          const console = await page.locator('.enigma-console').boundingBox();
+          assert.ok(console.width > surface.width * .7, 'The Enigma console dominates the full-width stage.');
+          assert.ok(input.height < 180, 'The input is a compact strip above the machine.');
+          assert.ok(input.y + input.height <= surface.y, 'Input precedes the machine.');
+          assert.ok(result.y >= surface.y + surface.height, 'Full evidence follows the machine.');
+        } else {
+          assert.ok(surface.width > input.width * 2, 'The instrument is the dominant work area.');
+          assert.ok(surface.x + surface.width <= input.x, 'Input sits beside the instrument.');
+          assert.ok(Math.abs(surface.y - input.y) < 2, 'Input and instrument start together.');
+          assert.ok(Math.abs(result.x - input.x) < 2, 'Result follows its input in the same rail.');
+        }
         assert.ok(surface.y < 360, 'The instrument starts within the first viewport.');
         const calls = await page.evaluate(() => window.instrumentCalls);
         await page.locator('#instrument-tab-parameters').click();

@@ -1,4 +1,4 @@
-import { h, button, replace } from '../dom.mjs';
+import { h, button, replace, copyText } from '../dom.mjs';
 
 // Exact display alphabets from Cube ciphers/mechanical/alberti.rs at the locked revision.
 // These arrange the instrument; all enciphering and advancement remain in Core.
@@ -225,11 +225,22 @@ function rotorPanel(api, config, index, inspected) {
   const windows = String(config.windows ?? '').padEnd(3, ' ');
   let ring;
   try { ring = rawJsonMembers(api.param('rings') ?? [], 'array')[index]?.source; } catch { ring = ''; }
-  const setWindow = letter => { const next = [...windows]; next[index] = letter; api.setParam('windows', next.join('')); };
+  const setWindow = letter => {
+    const next = [...windows]; next[index] = letter;
+    api.ui.traceCursor = -1; api.ui.playing = false;
+    api.setParam('windows', next.join(''));
+  };
+  const stepWindow = direction => change(api, () => setWindow(LETTERS[(LETTERS.indexOf(windows[index]) + direction + 26) % 26]));
+  const invalidWindows = !/^[A-Z]{3}$/.test(config.windows ?? '');
   return h('section', { class: 'enigma-rotor', 'aria-label': `${['Left', 'Middle', 'Right'][index]} rotor` },
     h('span', { class: 'small muted' }, `${index + 1} · ${['Left', 'Middle', 'Right · fast'][index]}`),
     select(`enigma-rotor-${index}`, config.rotors[index], config.profile === 'enigma_i' ? ROTORS.slice(0, 5) : ROTORS, value => change(api, () => setListItem(api, 'rotors', index, value)), `Rotor ${index + 1} type`),
-    h('div', { class: 'rotor-drum', 'aria-hidden': 'true' }, h('span', {}, '▲'), h('strong', {}, inspected?.[index] ?? windows[index]?.trim() ?? '—'), h('span', {}, '▼')),
+    h('div', { class: 'rotor-wheel' },
+      h('div', { class: 'rotor-drum', 'aria-hidden': 'true' }, h('span', {class:'rotor-marker'}, '▼'), h('strong', {}, inspected?.[index] ?? windows[index]?.trim() ?? '—'), h('span', {class:'rotor-hub'})),
+      h('div', {class:'rotor-step-controls'},
+        button('−', () => stepWindow(-1), {id:`enigma-rewind-${index}`, 'aria-label':`Rewind rotor ${index + 1} initial window`, disabled:invalidWindows}),
+        h('span', {}, inspected ? 'Recorded' : 'Initial'),
+        button('+', () => stepWindow(1), {id:`enigma-advance-${index}`, 'aria-label':`Advance rotor ${index + 1} initial window`, disabled:invalidWindows}))),
     h('div', {class: 'enigma-rotor-adjustments'},
       field('Initial window', `enigma-window-${index}`, select(`enigma-window-${index}`, windows[index].trim(), [...LETTERS], value => change(api, () => setWindow(value)), `Initial window ${index + 1}`)),
       field('Ring setting', `enigma-ring-${index}`, h('input', { id: `enigma-ring-${index}`, type: 'number', min: 1, max: 26, value: ring === 'null' ? '' : ring ?? '', onChange: event => change(api, () => setListItem(api, 'rings', index, event.target.value)) }))));
@@ -244,8 +255,12 @@ function enigma(host, api) {
   const plugId = 'enigma-plugs';
   replace(host, h('div', { class: 'mechanism enigma-machine' },
     h('div', {class: 'enigma-console'},
+      h('section', {class:'enigma-output-strip', 'aria-label':'Retained text output'},
+        h('div', {class:'enigma-output-label'}, h('span', {}, 'Output'), h('small', {}, api.stale() ? 'Previous configuration' : typeof result.text === 'string' ? 'Result ready' : 'Run to produce output')),
+        h('pre', {id:'enigma-output', tabindex:0}, typeof result.text === 'string' ? result.text : '—'),
+        button('Copy', () => copyText(result.text), {'aria-label':'Copy output text', disabled:typeof result.text !== 'string'})),
       h('div', {class: 'enigma-rotor-seat'}, h('h3', {}, 'Rotors'), h('div', { class: 'enigma-rotors' }, [0, 1, 2].map(index => rotorPanel(api, p, index, selected?.windows)))),
-      h('p', { class: 'mechanism-reading' }, selected ? `Inspected post-step windows: ${selected.windows}` : 'Initial windows (editable above)', result.final_windows ? h('span', {}, `Final windows: ${result.final_windows}`) : null),
+      h('p', { class: 'mechanism-reading' }, h('span', {}, `Initial windows: ${p.windows || '—'}`), selected ? h('span', {}, `Inspected post-step windows: ${selected.windows}`) : null, result.final_windows ? h('span', {}, `Final windows: ${result.final_windows}`) : null),
       h('section', {class: 'enigma-signal-bank'}, h('h3', {}, 'Output lamps'),
         h('div', {class: 'enigma-keyfield', role: 'region', tabindex: 0, 'aria-label': 'Output lampboard', 'data-instrument-scroll': 'enigma-lamps'},
           h('div', { class: 'enigma-keyboard lampboard' }, enigmaRows(letter => h('span', { class: `lamp${targetChar === letter ? ' lit' : ''}` }, letter))))),
