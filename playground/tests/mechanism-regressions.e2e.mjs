@@ -103,6 +103,33 @@ test('mechanical editors preserve exact inputs and retained execution evidence',
     assert.equal(await panel.getAttribute('open'),'','Editing must not collapse the accessible configuration panel.');
     await page.close();
   });
+  await t.test('a deck edit before the queued native toggle preserves disclosure state',async()=>{
+    const page=await open('cipher.solitaire.encode','solitaire');
+    const panel=page.locator('.solitaire-table details');
+    const retired=await panel.elementHandle();
+    await page.evaluate(()=>{
+      document.querySelector('#mechanism-deck-list').click();
+      const field=document.querySelector('#solitaire-deck-json');
+      const order=JSON.parse(field.value);[order[0],order[1]]=[order[1],order[0]];
+      field.value=JSON.stringify(order);
+      field.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+    assert.equal(await panel.getAttribute('open'),'','A redraw before the native toggle task must retain the visibly open panel.');
+    await page.evaluate(()=>{
+      document.querySelector('#mechanism-deck-list').click();
+      document.querySelector('#solitaire-card-0').click();
+    });
+    assert.equal(await panel.getAttribute('open'),null,'Closing and inspecting in one task must retain the closed panel.');
+    await page.evaluate(details=>{
+      details.dispatchEvent(new Event('toggle'));
+      details.querySelector('summary').click();
+      details.querySelector('summary').click();
+      document.querySelector('#solitaire-card-1').click();
+    },retired);
+    assert.equal(await panel.getAttribute('open'),null,'Events on a retired disclosure must not reopen its current replacement.');
+    await retired.dispose();
+    await page.close();
+  });
   await t.test('deck and strip scrolling survives configuration and inspection edits',async()=>{
     const page=await open('cipher.solitaire.encode','solitaire');await page.setViewportSize({width:390,height:900});
     const deck=page.locator('.solitaire-deck');

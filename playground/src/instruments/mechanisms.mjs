@@ -23,7 +23,13 @@ const jsonParam = (api, name, value) => api.setParam(name, JSON.stringify(value)
 function field(label, id, control) { return h('div', { class: 'field' }, h('label', { for: id }, label), control); }
 function disclosure(api, key, title, ...contents) {
   api.ui.disclosures ??= {};
-  return h('details', {open: Boolean(api.ui.disclosures[key]), onToggle: event => { api.ui.disclosures[key] = event.currentTarget.open; }}, h('summary', {id: `mechanism-${key}`}, title), ...contents);
+  return h('details', {open: Boolean(api.ui.disclosures[key]), onToggle: event => {
+    if (event.currentTarget.isConnected) api.ui.disclosures[key] = event.currentTarget.open;
+  }}, h('summary', {id: `mechanism-${key}`, onClick: event => {
+    // Native toggle is queued. Retain this activation before a setting edit can
+    // redraw the details element, including keyboard-generated clicks.
+    if (event.currentTarget.isConnected && !event.defaultPrevented) api.ui.disclosures[key] = !event.currentTarget.parentElement.open;
+  }}, title), ...contents);
 }
 function select(id, value, options, onChange, label) {
   const missing = value === undefined || value === null || value === '';
