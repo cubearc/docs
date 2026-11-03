@@ -1,4 +1,5 @@
 import { h, button, replace } from '../dom.mjs';
+import { labelFor } from '../controls.mjs';
 
 const note = text => h('p', {class:'small muted'},text);
 const field = (id,title,control) => h('div',{class:'field'},h('label',{for:id},title),control);
@@ -7,7 +8,9 @@ const integer = (value,min,max) => { if (!['string','number'].includes(typeof va
 function choice(id,value,values,change) {
   const known=values.some(option=>String(option)===String(value));
   const empty=value === undefined || value === null || value === '';
-  return h('select',{id,onChange:event=>change(event.target.value)}, !known ? h('option',{value:empty?'':String(value),selected:true},empty?'Choose…':`Unavailable: ${value}`) : null, values.map(v=>h('option',{value:v,selected:String(v)===String(value)},v)));
+  const editorialLabels = /^(keyboard-|polybius-|book-)/.test(id) || id === 'graph-directed';
+  const label = value => !editorialLabels ? String(value) : ['qwerty','qwertz','dvorak','colemak'].includes(value) ? value.toUpperCase() : labelFor(String(value));
+  return h('select',{id,onChange:event=>change(event.target.value)}, !known ? h('option',{value:empty?'':String(value),selected:true},empty?'Choose…':`Unavailable: ${value}`) : null, values.map(v=>h('option',{value:v,selected:String(v)===String(value)},label(v))));
 }
 function patch(api,name,value) {api.setParam(name,value);api.refresh();}
 function addText(api,text,separator='') {api.setText(api.text()+(api.text()?separator:'')+text);api.refresh();}
@@ -43,7 +46,7 @@ function keyLayout(api,layout,title,selectedKey,target=false) {
   const layer=api.ui.layer ?? 'base';
   const visible=entries.filter(e=>e.layer===layer);
   const rows=[...new Set(visible.map(e=>e.row ?? 0))];
-  return h('section',{class:'key-layout','aria-label':title},h('h3',{},title),h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol),h('small',{},entry.key)),()=>{
+  return h('section',{class:'key-layout','aria-label':title},h('h3',{},title),h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
     api.ui.key=entry.key;api.ui.layer=entry.layer;
     const offset=api.text().indexOf(entry.symbol);
     api.ui.textPosition=offset<0?null:Array.from(api.text().slice(0,offset)).length;
@@ -60,7 +63,7 @@ function keyLayout(api,layout,title,selectedKey,target=false) {
       }else api.setText(api.text()+entry.symbol);
     }
     api.refresh();
-  },{id:`keyboard-${target?'target':'source'}-${entry.layer}-${entry.key}`,class:`keycap${entry.key===selectedKey?' inspected':''}`,'aria-pressed':String(entry.key===selectedKey),'aria-label':`${entry.symbol}${entry.key}: ${target?'Inspect target':'Inspect or insert'}, ${entry.layer}`})))))));
+  },{id:`keyboard-${target?'target':'source'}-${entry.layer}-${entry.key}`,class:`keycap${entry.key===selectedKey?' inspected':''}`,title:entry.key,'aria-pressed':String(entry.key===selectedKey),'aria-label':`${entry.symbol} · ${entry.key}: ${target?'Inspect target':'Inspect or insert'}, ${entry.layer}`})))))));
 }
 function keyboard(host,api) {
   const remap=api.action.id==='text.keyboard.remap';
@@ -108,7 +111,7 @@ function polybius(host,api) {
     field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})));
   const selected=api.ui.cell;
   const start=Math.floor((api.ui.rowPage??0)/8)*8;
-  const grid=side&&base!==null&&alphabet.length===side*side?h('div',{class:'instrument-scroll','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>{const index=(r+start)*side+c;return h('td',{},button(alphabet[index],()=>{
+  const grid=side&&base!==null&&alphabet.length===side*side?h('div',{class:'instrument-scroll polybius-board','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>{const index=(r+start)*side+c;return h('td',{},button(alphabet[index],()=>{
     api.ui.cell=index;
     if(api.ui.cellAction==='insert') addText(api,api.action.id.endsWith('.decode')?`${r+start+base},${c+base}`:alphabet[index],api.action.id.endsWith('.decode')?' ':'');
     else api.refresh();
@@ -166,7 +169,7 @@ function graph(host,api) {
     });canvas.append(node);
   }
   const vertexInput=h('input',{id:'graph-new-node',value:api.ui.newNode??'',onInput:e=>{api.ui.newNode=e.target.value;}});
-  const endpoint=(id,key)=>field(id,key,choice(id,api.ui[key]??vertices[0],vertices,value=>{api.ui[key]=value;}));
+  const endpoint=(id,key)=>field(id,labelFor(key),choice(id,api.ui[key]??vertices[0],vertices,value=>{api.ui[key]=value;}));
   const edgeId=h('input',{id:'graph-edge-id',value:api.ui.edgeId??'',onInput:e=>{api.ui.edgeId=e.target.value;}});
   const attempt=run=>{try{run();api.ui.error='';}catch(error){api.ui.error=error.message;api.refresh();}};
   const nodeStart=integer(api.ui.nodeStart??0,0,vertices.length)??0;
@@ -232,16 +235,25 @@ function book(host,api) {
     }
   };
   const start=integer(api.ui.bookPage??0,0,index?.cells.length??0)??0;
+  const identity = index || api.result().source_sha256 ? h('details', {
+    open: Boolean(api.ui.bookIdentity),
+    onToggle: event => { if (event.currentTarget.isConnected) api.ui.bookIdentity = event.currentTarget.open; },
+  }, h('summary', {onClick: event => {
+    if (event.currentTarget.isConnected && !event.defaultPrevented) api.ui.bookIdentity = !event.currentTarget.parentElement.open;
+  }}, 'Source identity and inspection limits'),
+    index ? note(`Source SHA-256 ${index.hash}. Visual inspection retains at most 4,096 scalars; the complete source and results remain exact.`) : null,
+    api.result().source_sha256 ? note(`Execution source SHA-256: ${api.result().source_sha256}`) : null) : null;
   replace(host,h('div',{class:'toolbar'},field('book-scheme','Coordinate scheme',choice('book-scheme',scheme,api.choices('scheme'),v=>patch(api,'scheme',v))),field('book-base','Index origin',choice('book-base',base,[0,1],v=>patch(api,'index_base',v))), encode ? field('book-matching','Matching policy',choice('book-matching',api.param('matching'),api.choices('matching'),v=>patch(api,'matching',v))) : null),textField,
+    h('section',{class:'book-reference'},h('h3',{},'Reference text'),h('pre',{class:'book-source-preview'},source||'No reference text yet.')),
     h('div',{class:'toolbar'},button('Index reference text',indexSource,{id:'book-index','aria-disabled':String(Boolean(api.ui.bookRequest)),'aria-busy':String(Boolean(api.ui.bookRequest))}),button('Insert selected coordinate',()=>{const cell=index?.cells[api.ui.bookCell];if(!cell||stale)return;if(encode){api.setExtra('text',api.extra('text')+cell.symbol);api.refresh();}else addText(api,cell.coordinate,',');},{id:'book-insert-coordinate',disabled:!index||stale||api.ui.bookCell===undefined})),
     api.ui.bookRequest?h('p',{class:'small muted',role:'status'},'Indexing reference text in Core…'):null,
     api.ui.bookError?h('p',{class:'error',role:'alert'},api.ui.bookError):null,
     stale?h('p',{class:'warning'},'The indexed source or coordinates changed. Index the reference text again; the previous source is retained below.'):null,
-    index?h('section',{},note(`Source SHA-256 ${index.hash}. ${index.cells.length} of ${index.total} indexed scalars retained for visual inspection (budget 4,096); the complete source and results remain exact.`),
+    index?h('section',{},note(`${index.cells.length} of ${index.total} indexed scalars · select a character to inspect its coordinate.`),
       h('div',{class:'book-source-grid'},index.cells.slice(start,start+160).map((cell,i)=>button(h('span',{},h('strong',{},cell.symbol===' '?'␠':cell.symbol),h('small',{},cell.coordinate)),()=>{api.ui.bookCell=start+i;api.refresh();},{id:`book-cell-${start+i}`,'aria-pressed':String(api.ui.bookCell===start+i),'aria-label':`${cell.symbol===' '?'␠':cell.symbol}${cell.coordinate}: coordinate ${cell.coordinate}`}))),
       h('div',{class:'toolbar'},button('Previous source cells',()=>{api.ui.bookPage=Math.max(0,start-160);api.refresh({fallbackFocusId:`book-cell-${api.ui.bookPage}`});},{id:'book-previous-source',disabled:!start}),note(`${start+1}–${Math.min(start+160,index.cells.length)}`),button('Next source cells',()=>{api.ui.bookPage=start+160;api.refresh({fallbackFocusId:`book-cell-${api.ui.bookPage}`});},{id:'book-next-source',disabled:start+160>=index.cells.length})),
       api.ui.bookCell!==undefined? h('p',{class:'selection-caption'},`Selected ${index.cells[api.ui.bookCell]?.coordinate}: ${index.cells[api.ui.bookCell]?.symbol}. Source selection inspects; Insert explicitly composes the message/coordinates.`):null):note('Index the reference text to inspect Core-validated coordinates. Visual wrapping never changes source lines.'),
-    api.result().source_sha256?note(`Execution source SHA-256: ${api.result().source_sha256}`):null);
+    identity);
 }
 
 const renderers={keyboard,polybius,graph,book};

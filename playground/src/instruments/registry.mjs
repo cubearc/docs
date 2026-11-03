@@ -1,6 +1,6 @@
 // Presentation routing only. Versions, contracts, availability and algorithms
 // continue to come from the installed SDK and the editorial tool catalog.
-const family = (kind, module, operations, versions = [1], profile) => ({ kind, module, operations, versions, profile });
+const family = (kind, module, operations, versions = [1], profile, primaryOutputs = {}) => ({ kind, module, operations, versions, profile, primaryOutputs });
 export const instrumentSeries = [
   family('keyboard', 'workbench', ['text.keyboard.remap', 'text.keyboard.coordinates.encode', 'text.keyboard.coordinates.decode', 'text.keyboard.shift.encode', 'text.keyboard.shift.decode']),
   family('enigma', 'mechanisms', ['cipher.enigma']),
@@ -12,8 +12,8 @@ export const instrumentSeries = [
   family('bit-plane', 'media', ['image.bit_plane.extract']),
   family('alberti', 'mechanisms', ['cipher.alberti.encode', 'cipher.alberti.decode']),
   family('m138a', 'mechanisms', ['cipher.m138a.encode', 'cipher.m138a.decode']),
-  family('pigpen', 'symbols', ['symbol.alphabet.encode', 'symbol.alphabet.decode'], [1], 'pigpen_haverhill_pairs_v1'),
-  family('book', 'workbench', ['cipher.book.encode', 'cipher.book.decode']),
+  family('pigpen', 'symbols', ['symbol.alphabet.encode', 'symbol.alphabet.decode'], [1], 'pigpen_haverhill_pairs_v1', {'symbol.alphabet.encode':'tokens', 'symbol.alphabet.decode':'readings'}),
+  family('book', 'workbench', ['cipher.book.encode', 'cipher.book.decode'], [1], undefined, {'cipher.book.encode':'coordinates'}),
   family('audio', 'media', ['audio.wave.inspect', 'audio.pcm.extract', 'audio.waveform.envelope', 'audio.spectrum', 'audio.spectrogram']),
   family('graph', 'workbench', ['graph.shortest_path']),
   family('braille', 'symbols', ['symbol.braille.encode', 'symbol.braille.decode']),

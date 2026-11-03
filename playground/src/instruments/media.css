@@ -1,9 +1,179 @@
-.instrument .media-workspace{min-width:0;display:grid;gap:1rem}.instrument .media-field{display:flex;flex-direction:column;gap:.45rem;margin:0;font-size:.875rem;font-weight:600;min-width:0;max-width:100%}.instrument .media-field input,.instrument .media-field select{min-width:0;width:100%;max-width:19rem}.instrument .media-scroll{max-width:100%;overflow:auto;border:1px solid var(--line);border-radius:8px}.instrument .media-table{border-collapse:collapse;text-align:left;white-space:nowrap;width:100%;font-size:.875rem}.instrument .media-table th{background:#edf4ff;font-weight:650}.instrument .media-table th,.instrument .media-table td{padding:.55rem .65rem;border-bottom:1px solid var(--line);vertical-align:middle}.instrument .media-table code{white-space:pre}.instrument .media-image-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.instrument .media-image-triple{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.instrument .media-image-panel{min-width:0}.instrument .media-image-panel h3{margin-bottom:.65rem}.instrument .media-image-scroll{height:260px;overflow:auto;background:repeating-conic-gradient(#f1f3f7 0% 25%,#fff 0% 50%) 0/16px 16px;border:1px solid var(--line);border-radius:8px}.instrument .media-raster{image-rendering:pixelated;display:block;height:auto;cursor:crosshair;min-width:1px;min-height:1px}.instrument .media-bits{display:flex;gap:.35rem;flex-wrap:wrap}.instrument .media-bits button{width:44px;padding:.5rem}.instrument button[aria-pressed=true]{border:2px solid var(--blue);background:var(--pale);color:var(--ink)}.instrument .media-thumbnails{display:flex;gap:.65rem;flex-wrap:wrap}.instrument .media-thumbnails>button{min-width:80px}.instrument .media-mini-bits{display:grid;grid-template-columns:repeat(8,6px);margin-top:.5rem;border:1px solid #738399}.instrument .media-mini-bits i{width:6px;height:6px;display:block}.instrument .media-palette{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem}.instrument .media-palette button{min-height:68px;text-align:left}.instrument .media-palette button>span{display:grid;grid-template-columns:36px auto;gap:.25rem .65rem}.instrument .media-palette button strong{align-self:end;font-family:ui-monospace,monospace}.instrument .media-palette button span>span:last-child{grid-column:2}.instrument .media-swatch{width:36px;height:36px;border:1px solid #7d8ca1;border-radius:5px;grid-row:1/3;align-self:center}.instrument .media-selection{border-top:1px solid var(--line);padding-top:1rem}.instrument .media-png-map{display:flex;gap:3px;padding:.75rem 0;flex-wrap:wrap}.instrument .media-png-map button{min-height:88px;min-width:92px;flex-basis:90px;padding:.75rem .5rem;background:#f1f5fb}.instrument .media-png-map button>span{display:flex;flex-direction:column;gap:.4rem;font-size:.8rem}.instrument .media-png-map strong{font-size:1rem}.instrument .media-hex-cells{display:flex;gap:2px;font-family:ui-monospace,SFMono-Regular,monospace}.instrument .media-hex-cells button{min-width:31px;min-height:36px;padding:.2rem;border-radius:3px;font-size:.875rem;font-weight:450;border-color:transparent}.instrument .media-hex-cells .media-byte-changed{background:#fff0cc;color:#583b00;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}.instrument .media-hex-cells .media-byte-selected{outline:2px solid var(--blue);outline-offset:-2px;background:var(--pale);font-weight:700}.instrument .media-audio-panel{min-width:0;border-top:1px solid var(--line);padding-top:1rem}.instrument .media-audio-panel h3{margin-bottom:.75rem}.instrument .media-plot{display:block;width:100%;height:auto;max-height:280px;background:#f7f9fc;border:1px solid var(--line);border-radius:6px;cursor:crosshair}.instrument .media-audio-frequency{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.instrument .media-audio-controls{align-items:end}.instrument .media-audio-controls .media-field{flex:1 1 120px}.instrument .media-audio-controls select{min-width:100px}.instrument .media-coordinates .media-field{max-width:10rem}.instrument .media-table td>button{white-space:normal}.instrument .media-workspace pre{font-size:.875rem}.instrument .media-image-panel details{max-width:100%}
-@media(max-width:834px){.instrument .media-image-triple{grid-template-columns:repeat(2,minmax(0,1fr))}.instrument .media-image-triple>section:first-child{grid-column:1/-1}.instrument .media-audio-frequency{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:550px){.instrument .media-image-pair,.instrument .media-image-triple{grid-template-columns:minmax(0,1fr)}.instrument .media-image-triple>section:first-child{grid-column:auto}.instrument .media-image-scroll{height:210px}.instrument .media-field{flex:1 1 120px}.instrument .media-field input,.instrument .media-field select{max-width:100%}.instrument .media-coordinates .media-field{max-width:100%}.instrument .media-plot{min-height:150px;object-fit:fill}.instrument .media-bits{gap:.2rem}.instrument .media-bits button{width:40px;min-width:40px}.instrument .media-table th,.instrument .media-table td{padding:.45rem}.instrument .media-hex-cells button{min-height:40px;min-width:34px}}
-.instrument .media-workspace>*{min-width:0;max-width:100%}.instrument .media-selection{min-width:0;max-width:100%}.instrument .media-scroll{min-width:0}
-.instrument .media-raster-frame{position:relative;display:block;max-width:none}.instrument .media-pixel-marker{position:absolute;border:2px solid var(--blue);box-shadow:inset 0 0 0 1px white;pointer-events:none;min-width:3px;min-height:3px}
-.instrument .media-axis-scale{display:flex;justify-content:space-between;gap:1rem;font-size:.875rem;font-family:ui-monospace,monospace;padding:.5rem 0;color:var(--ink)}
-.instrument .media-workspace button{overflow-wrap:anywhere;max-width:100%}.instrument .media-png-map button>span{min-width:0;max-width:100%}.instrument .media-workspace .toolbar{min-width:0;max-width:100%}
-.instrument .media-field>label{margin:0}
-.instrument-png .media-table td:first-child>button{white-space:nowrap;overflow-wrap:normal;min-width:max-content;max-width:none}
+/* Media instruments share controls, but their evidence determines the composition. */
+.instrument .media-workspace{display:grid;gap:1rem;min-width:0}
+.instrument .media-workspace>*{min-width:0;max-width:100%}
+.instrument .media-workspace p{margin:.35rem 0;line-height:1.55}
+.instrument .media-workspace h3{font-size:.95rem;margin:0 0 .6rem;font-weight:650}
+.instrument .media-workspace button{max-width:100%;overflow-wrap:anywhere;font-size:.875rem;min-height:40px;border-radius:6px}
+.instrument .media-workspace .toolbar{gap:.5rem;min-width:0;max-width:100%}
+.instrument .media-field{display:flex;flex-direction:column;gap:.4rem;min-width:0;max-width:100%;margin:0;font-size:.8rem;font-weight:600}
+.instrument .media-field>label{margin:0;font-size:inherit}
+.instrument .media-field input,.instrument .media-field select{width:100%;min-width:0;max-width:19rem;min-height:40px;padding:.55rem .65rem;border-radius:5px;background:var(--surface);font-size:.9rem;font-weight:450}
+.instrument .media-control-label{font-size:.8rem;font-weight:600;line-height:1.35}
+.instrument .media-settings-bar{display:flex;gap:.8rem;align-items:end;flex-wrap:wrap;padding:.85rem;background:#f3f6fa;border-bottom:1px solid var(--line);border-radius:7px}
+.instrument .media-settings-bar .media-field{flex:0 1 175px}
+.instrument .media-workspace .warning,.instrument .media-workspace .error{margin:0;font-size:.875rem}
+.instrument .media-workspace pre{font-size:.875rem}
+.instrument .media-workspace details{min-width:0;max-width:100%}
+.instrument .media-workspace summary{min-height:36px;padding:.45rem 0;font-size:.8rem;color:var(--muted)}
+.instrument .media-workspace summary:hover{color:var(--ink)}
+.instrument .media-workspace button[aria-pressed=true]{border:2px solid var(--blue);color:var(--ink);background:var(--pale);box-shadow:inset 0 -2px var(--blue)}
+
+/* Image stages keep source pixels centered and distinct from transparent space. */
+.instrument .media-plane-settings{display:grid;grid-template-columns:110px minmax(0,1fr) 180px;align-items:end;gap:1rem}
+.instrument .media-bit-control{display:grid;gap:.4rem;min-width:0}
+.instrument .media-bits{display:grid;grid-template-columns:repeat(8,minmax(32px,1fr));gap:4px}
+.instrument .media-bits button{min-width:0;min-height:40px;padding:.4rem;font-family:ui-monospace,monospace}
+.instrument .media-image-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.instrument .media-image-triple{display:grid;grid-template-columns:1.12fr 1fr 1fr;gap:1rem}
+.instrument .media-image-panel{min-width:0}
+.instrument .media-image-panel h3{display:flex;align-items:center;gap:.5rem;margin-bottom:.65rem}
+.instrument .media-image-panel h3::before{content:'';width:5px;height:14px;background:#8c9db5;border-radius:2px}
+.instrument .media-image-panel:first-child h3::before{background:var(--blue)}
+.instrument .media-image-scroll,.instrument .media-image-placeholder{height:260px;max-width:100%;overflow:auto;overscroll-behavior:contain;border:1px solid #d4deeb;border-radius:6px;background:repeating-conic-gradient(#f1f4f8 0% 25%,#fff 0% 50%) 0/20px 20px}
+.instrument .media-image-scroll{display:flex;align-items:safe center}
+.instrument .media-raster-frame{position:relative;display:block;flex:none;max-width:none;margin:auto}
+.instrument .media-raster{display:block;image-rendering:pixelated;min-width:1px;min-height:1px;cursor:crosshair}
+.instrument .media-pixel-marker{position:absolute;min-width:3px;min-height:3px;border:2px solid var(--blue);box-shadow:inset 0 0 0 1px white;pointer-events:none}
+.instrument .media-image-panel>p{font-family:ui-monospace,monospace;font-size:.75rem;color:var(--muted);margin:.6rem 0 .15rem}
+.instrument .media-image-placeholder{display:grid;place-items:center;background:#f5f7fa;border-style:dashed;padding:1rem;text-align:center}
+.instrument .media-image-placeholder p{max-width:20ch;font-size:.875rem}
+.instrument .media-coordinates{padding:.8rem 0;border-top:1px solid var(--line);align-items:end}
+.instrument .media-coordinates .media-field{max-width:90px;flex:0 1 90px}
+.instrument .media-coordinates>p{margin-left:auto;font-family:ui-monospace,monospace;font-size:.8rem}
+.instrument .media-thumbnail-section{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem 1rem;align-items:center;padding-top:.8rem;border-top:1px solid var(--line)}
+.instrument .media-thumbnail-section h3{margin:0}
+.instrument .media-thumbnail-section>p{font-size:.8rem;grid-column:1}
+.instrument .media-thumbnail-section>button{grid-column:2;grid-row:1/3}
+.instrument .media-thumbnails{display:flex;flex-wrap:wrap;gap:.5rem;grid-column:1/-1;margin-top:.5rem}
+.instrument .media-thumbnails>button{min-width:76px;text-align:left}
+.instrument .media-mini-bits{display:grid;grid-template-columns:repeat(8,6px);margin-top:.45rem;border:1px solid #738399}
+.instrument .media-mini-bits i{display:block;width:6px;height:6px}
+.instrument .media-color-actions{padding-bottom:.8rem;border-bottom:1px solid var(--line);align-items:end}
+.instrument .media-color-actions>.media-field{flex:1 1 150px;max-width:220px;margin-left:auto}
+.instrument .media-palette-strip{display:grid;grid-template-columns:100px minmax(0,1fr);align-items:center;gap:.6rem}
+.instrument .media-palette-strip h3{margin:0}
+.instrument .media-palette{display:flex;flex-wrap:wrap;gap:.5rem}
+.instrument .media-palette button{min-height:62px;padding:.55rem .75rem;text-align:left;background:#f8fafc}
+.instrument .media-palette button>span{display:grid;grid-template-columns:32px auto;gap:.15rem .65rem}
+.instrument .media-palette button strong{align-self:end;font-family:ui-monospace,monospace;font-size:.85rem}
+.instrument .media-palette button span>span:last-child{grid-column:2;font-size:.8rem;color:var(--muted)}
+.instrument .media-swatch{width:32px;height:32px;grid-row:1/3;align-self:center;border:1px solid #8391a5;border-radius:4px}
+.instrument .media-exports{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding-top:.75rem;border-top:1px solid var(--line)}
+.instrument .media-exports h3{flex-basis:100%;margin:0}
+
+/* File structures use a dense evidence sheet rather than stacked cards. */
+.instrument .media-scroll{min-width:0;max-width:100%;overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:6px;background:white}
+.instrument .media-table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap;font-size:.82rem;font-variant-numeric:tabular-nums}
+.instrument .media-table thead{position:sticky;top:0;z-index:1}
+.instrument .media-table th{padding:.7rem .65rem;background:#edf2f8;color:#3b4c63;font-weight:600;border-bottom:1px solid #cbd6e4}
+.instrument .media-table td{padding:.45rem .65rem;border-bottom:1px solid #e5ebf2;vertical-align:middle}
+.instrument .media-table tbody tr:last-child td{border-bottom:0}
+.instrument .media-table code{white-space:pre;font-size:.82rem;letter-spacing:.025em}
+.instrument .media-png-settings{justify-content:space-between;align-items:center}
+.instrument .media-png-settings .check{margin:0;font-size:.875rem;font-weight:500}
+.instrument .media-png-settings>.media-field{flex:0 1 190px}
+.instrument .media-png-map{display:flex;flex-wrap:wrap;gap:3px;margin:.2rem 0 1rem;padding:0}
+.instrument .media-png-map button{flex-basis:65px;min-width:65px;min-height:90px;padding:.8rem .5rem;border-color:#d4deeb;border-radius:4px;background:#edf2f7;text-align:left;justify-content:flex-start}
+.instrument .media-png-map button[data-chunk=IDAT]{background:#f6f8fb}
+.instrument .media-png-map button[data-chunk=Signature]{background:#e5ebf3;min-width:112px;flex-basis:112px}
+.instrument .media-png-map button>span{display:grid;gap:.45rem;min-width:0;max-width:100%;font-size:.72rem;font-family:ui-monospace,monospace}
+.instrument .media-png-map strong{font-family:Inter,system-ui,sans-serif;font-size:1.05rem;letter-spacing:.02em;white-space:nowrap;overflow-wrap:normal}
+.instrument .media-file-report>.media-scroll{margin:.8rem 0;max-height:380px}
+.instrument .media-selection{min-width:0;max-width:100%;border-top:1px solid var(--line);padding-top:.85rem}
+.instrument-png .media-selection{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:.6rem 1rem;padding:.85rem 0}
+.instrument-png .media-selection>h3{grid-column:1;grid-row:1/4;padding-top:.25rem;font-size:1.5rem;font-family:ui-monospace,monospace}
+.instrument-png .media-selection>p,.instrument-png .media-selection>.toolbar,.instrument-png .media-selection>div{grid-column:2;margin:0}
+.instrument-png .media-table td:first-child>button{white-space:nowrap;overflow-wrap:normal;min-width:max-content;max-width:none;min-height:36px;font-family:ui-monospace,monospace;font-weight:600}
+
+/* Left and right files share an offset, with their full hex and ASCII rows together. */
+.instrument .media-hex-settings{align-items:end}
+.instrument .media-hex-settings .media-field{flex:1 1 140px;max-width:210px}
+.instrument .media-source-bar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:.8rem}
+.instrument .media-source-bar .media-field{flex:0 1 300px}
+.instrument .media-source-bar input[type=file]{padding:.4rem;font-size:.8rem;border-color:var(--line)}
+.instrument .media-source-bar>p{font-family:ui-monospace,monospace;font-size:.8rem}
+.instrument .media-byte-controls{align-items:end}
+.instrument .media-byte-controls .media-field{max-width:120px}
+.instrument .media-hex-table{max-height:500px}
+.instrument .media-hex-table .media-table{min-width:680px}
+.instrument .media-hex-table td{padding:.4rem .6rem}
+.instrument .media-source-offset{display:grid;gap:.2rem;font-family:ui-monospace,monospace;font-size:.72rem}
+.instrument .media-source-offset strong{font-family:Inter,system-ui,sans-serif;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.instrument .media-hex-pair .media-hex-left{background:#f5f8fc}
+.instrument .media-hex-pair .media-hex-right td{border-bottom:1px solid #c8d5e5}
+.instrument .media-hex-cells{display:flex;gap:2px;font-family:ui-monospace,monospace}
+.instrument .media-hex-cells button{flex:none;min-width:25px;width:25px;min-height:34px;padding:.15rem;border-color:transparent;border-radius:3px;font-size:.8rem;font-weight:450}
+.instrument .media-hex-cells .media-byte-changed{background:#fff0cc;color:#583b00;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.instrument .media-hex-cells .media-byte-selected{outline:2px solid var(--blue);outline-offset:-2px;background:var(--pale);font-weight:700}
+.instrument .media-range-selection{display:grid;grid-template-columns:155px minmax(0,1fr);gap:.6rem 1rem}
+.instrument .media-range-selection>h3{grid-column:1;grid-row:1/3;margin:0;padding-top:.2rem}
+.instrument .media-range-selection>.toolbar{grid-column:2;align-items:end}
+.instrument .media-range-selection .media-field{flex:0 1 150px;max-width:150px}
+.instrument .media-selection-help{grid-column:1/-1;font-size:.8rem}
+
+/* Audio is a timeline first; numerical inspectors sit below their producing plots. */
+.instrument .media-audio{gap:.85rem}
+.instrument .media-audio-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(90px,.7fr) minmax(130px,1fr);align-items:end;padding:.8rem;background:#f3f6fa;border-bottom:1px solid var(--line);border-radius:6px}
+.instrument .media-audio-controls .media-field{min-width:0;max-width:none}
+.instrument .media-audio-controls input,.instrument .media-audio-controls select{max-width:none}
+.instrument .media-audio-commandbar button:first-child{background:var(--blue);border-color:var(--blue);color:white}
+.instrument .media-audio-commandbar button:first-child:hover{background:#004fae}
+.instrument .media-source-info{display:flex;gap:.2rem 1rem;flex-wrap:wrap;align-items:center;font-size:.8rem}
+.instrument .media-source-info p{font-size:.8rem;margin:0}
+.instrument .media-audio-panel{min-width:0}
+.instrument .media-audio-panel h3{margin:0 0 .65rem}
+.instrument .media-plot{display:block;width:100%;height:auto;min-height:180px;max-height:280px;object-fit:fill;border:1px solid #d6e0ed;border-radius:5px;background:#f7f9fc;cursor:crosshair}
+.instrument .media-axis-scale{display:flex;justify-content:space-between;gap:1rem;padding:.4rem 0;font-size:.75rem;font-family:ui-monospace,monospace;color:var(--ink)}
+.instrument .media-audio-panel>p{font-size:.8rem;margin:.25rem 0 .5rem}
+.instrument .media-audio-panel details{border-top:1px solid var(--line);margin-top:.4rem}
+.instrument .media-audio-panel .media-scroll{max-height:250px}
+.instrument .media-timeline-controls{align-items:end;padding:.7rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.instrument .media-timeline-controls .media-field{flex:1 1 130px;max-width:180px}
+.instrument .media-timeline-controls>p{flex:1 1 240px;font-size:.8rem;margin:0}
+.instrument .media-audio-frequency{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:.2rem 0}
+.instrument .media-export-actions{border-top:1px solid var(--line);padding-top:.8rem}
+
+@media(max-width:900px){
+ .instrument .media-plane-settings{grid-template-columns:100px minmax(0,1fr);gap:.75rem}
+ .instrument .media-plane-settings>.media-field:last-child{grid-column:1/-1;max-width:250px}
+ .instrument .media-audio-controls{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .instrument .media-audio-controls .media-field:nth-last-child(-n+2){max-width:none}
+}
+@media(max-width:700px){
+ .instrument .media-image-triple{grid-template-columns:minmax(0,1fr);gap:1rem}
+ .instrument .media-image-pair{grid-template-columns:minmax(0,1fr)}
+ .instrument .media-image-scroll,.instrument .media-image-placeholder{height:240px}
+ .instrument .media-plane-settings{grid-template-columns:90px minmax(0,1fr)}
+ .instrument .media-bits{grid-template-columns:repeat(4,minmax(32px,1fr))}
+ .instrument .media-plane-settings>.media-field:last-child{max-width:none}
+ .instrument .media-workspace button{min-height:44px}
+ .instrument .media-coordinates .media-field{max-width:none;flex:1 1 80px}
+ .instrument .media-coordinates>p{margin-left:0;flex-basis:100%}
+ .instrument .media-color-actions>.media-field{margin-left:0;max-width:none;flex-basis:100%}
+ .instrument .media-palette-strip{grid-template-columns:minmax(0,1fr)}
+ .instrument .media-palette button{min-height:60px}
+ .instrument .media-thumbnail-section{display:block}
+ .instrument .media-thumbnail-section>button{margin:.6rem 0 .2rem}
+ .instrument .media-thumbnails{margin-top:.5rem}
+ .instrument .media-png-settings{align-items:stretch}
+ .instrument .media-png-settings>.media-field{flex-basis:100%;max-width:none}
+ .instrument .media-png-map button{min-height:80px;flex-basis:65px}
+ .instrument-png .media-selection{grid-template-columns:minmax(0,1fr);gap:.5rem}
+ .instrument-png .media-selection>h3,.instrument-png .media-selection>p,.instrument-png .media-selection>.toolbar,.instrument-png .media-selection>div{grid-column:1;grid-row:auto}
+ .instrument-png .media-selection>h3{font-size:1.25rem}
+ .instrument-png .media-table td:first-child>button{min-height:44px}
+ .instrument .media-range-selection{display:block}
+ .instrument .media-range-selection>.toolbar{margin:.5rem 0}
+ .instrument .media-range-selection .media-field{flex:1 1 100px;max-width:none}
+ .instrument .media-byte-controls .media-field{flex:1 1 100px;max-width:none}
+ .instrument .media-source-bar .media-field{flex-basis:100%}
+ .instrument .media-hex-cells button{min-height:34px;min-width:25px}
+ .instrument .media-audio-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .instrument .media-audio-controls .media-field:last-child{grid-column:1/-1}
+ .instrument .media-audio-frequency{grid-template-columns:minmax(0,1fr)}
+ .instrument .media-timeline-controls .media-field{max-width:none;flex:1 1 125px}
+ .instrument .media-timeline-controls>.media-field:first-child{flex-basis:100%}
+ .instrument .media-plot{min-height:180px}
+ .instrument .media-source-info{display:block}
+ .instrument .media-source-info p+p{margin-top:.25rem}
+}

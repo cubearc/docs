@@ -5,6 +5,7 @@ import { h, button, replace } from '../dom.mjs';
 export const ALBERTI_RINGS = Object.freeze({ outer: 'ABCDEFGILMNOPQRSTVXZ1234', inner: 'c&bmdgpfznxyutoskerlhaiq' });
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ROTORS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+const ENIGMA_ROWS = ['QWERTZUIO', 'ASDFGHJK', 'PYXCVBNML'];
 const CARD_DRAG = 'application/x-cubearc-solitaire-card';
 const parse = (value, fallback) => { if (typeof value !== 'string') return value ?? fallback; try { return JSON.parse(value); } catch { return fallback; } };
 const list = value => { const parsed = parse(value, []); return Array.isArray(parsed) ? parsed : []; };
@@ -229,9 +230,11 @@ function rotorPanel(api, config, index, inspected) {
     h('span', { class: 'small muted' }, `${index + 1} · ${['Left', 'Middle', 'Right · fast'][index]}`),
     select(`enigma-rotor-${index}`, config.rotors[index], config.profile === 'enigma_i' ? ROTORS.slice(0, 5) : ROTORS, value => change(api, () => setListItem(api, 'rotors', index, value)), `Rotor ${index + 1} type`),
     h('div', { class: 'rotor-drum', 'aria-hidden': 'true' }, h('span', {}, '▲'), h('strong', {}, inspected?.[index] ?? windows[index]?.trim() ?? '—'), h('span', {}, '▼')),
-    field('Initial window', `enigma-window-${index}`, select(`enigma-window-${index}`, windows[index].trim(), [...LETTERS], value => change(api, () => setWindow(value)), `Initial window ${index + 1}`)),
-    field('Ring setting', `enigma-ring-${index}`, h('input', { id: `enigma-ring-${index}`, type: 'number', min: 1, max: 26, value: ring === 'null' ? '' : ring ?? '', onChange: event => change(api, () => setListItem(api, 'rings', index, event.target.value)) })));
+    h('div', {class: 'enigma-rotor-adjustments'},
+      field('Initial window', `enigma-window-${index}`, select(`enigma-window-${index}`, windows[index].trim(), [...LETTERS], value => change(api, () => setWindow(value)), `Initial window ${index + 1}`)),
+      field('Ring setting', `enigma-ring-${index}`, h('input', { id: `enigma-ring-${index}`, type: 'number', min: 1, max: 26, value: ring === 'null' ? '' : ring ?? '', onChange: event => change(api, () => setListItem(api, 'rings', index, event.target.value)) }))));
 }
+const enigmaRows = render => ENIGMA_ROWS.map(row => h('div', {class: 'enigma-keyrow'}, [...row].map(render)));
 function enigma(host, api) {
   const p = enigmaConfig(api); const result = output(api); const trace = Array.isArray(result.trace) ? result.trace : [];
   const producing = api.snapshot?.()?.parameters;
@@ -240,20 +243,26 @@ function enigma(host, api) {
   const targetChar = selected ? byteCharacter(result.text, selected.offset).toUpperCase() : '';
   const plugId = 'enigma-plugs';
   replace(host, h('div', { class: 'mechanism enigma-machine' },
-    h('div', { class: 'mechanism-settings' }, field('Machine profile', 'enigma-profile', select('enigma-profile', p.profile, ['enigma_i', 'm3'], value => change(api, () => api.setParam('profile', value)))),
+    h('div', {class: 'enigma-console'},
+      h('div', {class: 'enigma-rotor-seat'}, h('h3', {}, 'Rotors'), h('div', { class: 'enigma-rotors' }, [0, 1, 2].map(index => rotorPanel(api, p, index, selected?.windows)))),
+      h('p', { class: 'mechanism-reading' }, selected ? `Inspected post-step windows: ${selected.windows}` : 'Initial windows (editable above)', result.final_windows ? h('span', {}, `Final windows: ${result.final_windows}`) : null),
+      h('section', {class: 'enigma-signal-bank'}, h('h3', {}, 'Output lamps'),
+        h('div', {class: 'enigma-keyfield', role: 'region', tabindex: 0, 'aria-label': 'Output lampboard', 'data-instrument-scroll': 'enigma-lamps'},
+          h('div', { class: 'enigma-keyboard lampboard' }, enigmaRows(letter => h('span', { class: `lamp${targetChar === letter ? ' lit' : ''}` }, letter))))),
+      h('section', {class: 'enigma-composer'}, h('h3', {}, 'Compose input'),
+        h('div', {class: 'enigma-keyfield', role: 'region', tabindex: 0, 'aria-label': 'Input keyboard', 'data-instrument-scroll': 'enigma-keys'},
+          h('div', { class: 'enigma-keyboard' }, enigmaRows(letter => button(letter, () => change(api, () => { api.setText(api.text() + letter); }), { id: `enigma-insert-${letter}`, 'aria-label': `Insert ${letter}`, 'aria-pressed': String(sourceChar.toUpperCase() === letter) }))))),
+      selected ? note(`Input byte offset ${selected.offset}: ${sourceChar || 'unavailable'} → ${targetChar || 'unavailable'}. State belongs to the retained run${api.stale() ? ' with earlier settings' : ''}.`) : null),
+    h('aside', {class: 'enigma-adjustments', 'aria-label': 'Machine setup'}, h('h3', {}, 'Machine setup'),
+      h('div', { class: 'mechanism-settings' }, field('Machine profile', 'enigma-profile', select('enigma-profile', p.profile, ['enigma_i', 'm3'], value => change(api, () => api.setParam('profile', value)))),
       field('Reflector', 'enigma-reflector', select('enigma-reflector', p.reflector, ['B', 'C'], value => change(api, () => api.setParam('reflector', value)))),
       h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(api.param('trace')), onChange: event => change(api, () => api.setParam('trace', event.target.checked)) }), 'Record post-step windows')),
-    h('div', { class: 'enigma-rotors' }, [0, 1, 2].map(index => rotorPanel(api, p, index, selected?.windows))),
-    h('p', { class: 'mechanism-reading' }, selected ? `Inspected post-step windows: ${selected.windows}` : 'Initial windows (editable above)', result.final_windows ? h('span', {}, `Final windows: ${result.final_windows}`) : null),
-    producing?.windows ? disclosure(api, 'recorded-initial', 'Recorded initial settings', note(`Windows: ${producing.windows}. Rotors: ${list(producing.rotors).join(' / ')}. Ring settings: ${list(producing.rings).join(' / ')}.`)) : null,
-    warning(enigmaProblems(p)), settingsWarning(api),
-    field('Plugboard pairs (for example AB CD)', plugId, h('input', { id: plugId, value: p.plugboard?.join(' ') ?? '', spellcheck: false, onChange: event => change(api, () => jsonParam(api, 'plugboard', event.target.value.trim() ? event.target.value.trim().split(/\s+/) : [])) })),
-    p.plugboard === undefined ? note(api.param('plugboard')?.trim?.() ? 'Repair the plugboard JSON in Parameters, or explicitly choose no pairs.' : 'No plugboard configuration supplied. Enter pairs or explicitly choose no pairs.') : null,
-    button('Use no plugboard pairs', () => change(api, () => jsonParam(api, 'plugboard', [])), {id: 'enigma-no-plugs', 'aria-pressed': String(Array.isArray(p.plugboard) && p.plugboard.length === 0)}),
-    h('h3', {}, 'Output lamps'), h('div', { class: 'enigma-keyboard lampboard', 'aria-label': 'Output lampboard' }, [...LETTERS].map(letter => h('span', { class: `lamp${targetChar === letter ? ' lit' : ''}` }, letter))),
-    h('h3', {}, 'Compose input'), h('div', { class: 'enigma-keyboard', 'aria-label': 'Input keyboard' }, [...'QWERTZUIOASDFGHJKPYXCVBNML'].map(letter => button(letter, () => change(api, () => { api.setText(api.text() + letter); }), { id: `enigma-insert-${letter}`, 'aria-label': `Insert ${letter}`, 'aria-pressed': String(sourceChar.toUpperCase() === letter) }))),
-    selected ? note(`Input byte offset ${selected.offset}: ${sourceChar || 'unavailable'} → ${targetChar || 'unavailable'}. State belongs to the retained run${api.stale() ? ' with earlier settings' : ''}.`) : null,
-    traceControls(api, trace, row => `input byte ${row.offset} · post-step ${row.windows}`), note('Windows are the actual post-step Core trace. Electrical paths are not exposed.')));
+      field('Plugboard pairs (for example AB CD)', plugId, h('input', { id: plugId, value: p.plugboard?.join(' ') ?? '', spellcheck: false, onChange: event => change(api, () => jsonParam(api, 'plugboard', event.target.value.trim() ? event.target.value.trim().split(/\s+/) : [])) })),
+      p.plugboard === undefined ? note(api.param('plugboard')?.trim?.() ? 'Repair the plugboard JSON in Parameters, or explicitly choose no pairs.' : 'No plugboard configuration supplied. Enter pairs or explicitly choose no pairs.') : null,
+      button('Use no plugboard pairs', () => change(api, () => jsonParam(api, 'plugboard', [])), {id: 'enigma-no-plugs', 'aria-pressed': String(Array.isArray(p.plugboard) && p.plugboard.length === 0)}),
+      producing?.windows ? disclosure(api, 'recorded-initial', 'Recorded initial settings', note(`Windows: ${producing.windows}. Rotors: ${list(producing.rotors).join(' / ')}. Ring settings: ${list(producing.rings).join(' / ')}.`)) : null,
+      warning(enigmaProblems(p)), settingsWarning(api)),
+    h('div', {class: 'enigma-trace'}, traceControls(api, trace, row => `input byte ${row.offset} · post-step ${row.windows}`), note('Windows are the actual post-step Core trace. Electrical paths are not exposed.'))));
   return playback(host, api, trace);
 }
 
@@ -277,13 +286,13 @@ function solitaire(host, api) {
       event.preventDefault();
       change(api, () => { jsonParam(api, 'deck', moveCard(deck, drag.index, index)); api.ui.card = index; });
     } });
-  replace(host, h('div', { class: 'mechanism solitaire-table' }, h('div', { class: 'row between' }, h('h3', {}, 'Initial deck · 54 cards'), button('Use ordered deck 1–54', () => change(api, () => jsonParam(api, 'deck', Array.from({ length: 54 }, (_, i) => i + 1))))),
-    note('Select a card to move it, or drag it onto a position. The deck is the initial configuration; the Core result is text, without shuffle states.'), warning(deckStatus(deck)),
+  replace(host, h('div', { class: 'mechanism solitaire-table' }, h('div', { class: 'row between solitaire-header' }, h('h3', {}, 'Initial deck · 54 cards'), button('Use ordered deck 1–54', () => change(api, () => jsonParam(api, 'deck', Array.from({ length: 54 }, (_, i) => i + 1))))),
+    note('Select a card to move it, or drag it onto a position. This is the initial deck; no intermediate shuffle states are returned.'), warning(deckStatus(deck)),
     h('div', { class: 'solitaire-deck', 'data-instrument-scroll': 'initial-deck', 'aria-label': 'Initial deck in position order' }, deck.slice(0, 54).map(card)),
-    deck.length ? h('div', {}, h('p', {}, `Selected: position ${selected + 1} · ${cardName(deck[selected])}`), h('div', { class: 'toolbar' }, button('Move earlier', () => move(selected - 1), { id: 'solitaire-move-earlier', disabled: selected <= 0 || Boolean(deckStatus(deck).length) }), button('Move later', () => move(selected + 1), { id: 'solitaire-move-later', disabled: selected >= deck.length - 1 || Boolean(deckStatus(deck).length) })),
+    deck.length ? h('div', {class: 'solitaire-selection'}, h('p', {}, `Selected: position ${selected + 1} · ${cardName(deck[selected])}`), h('div', { class: 'toolbar' }, button('Move earlier', () => move(selected - 1), { id: 'solitaire-move-earlier', disabled: selected <= 0 || Boolean(deckStatus(deck).length) }), button('Move later', () => move(selected + 1), { id: 'solitaire-move-later', disabled: selected >= deck.length - 1 || Boolean(deckStatus(deck).length) })),
       field('Move selected card to position (1–54)', 'solitaire-move-position', h('input', { id: 'solitaire-move-position', type: 'number', min: 1, max: 54, disabled: Boolean(deckStatus(deck).length), value: selected + 1, onChange: event => { const to = int(event.target.value) - 1; if (to >= 0 && to < deck.length) move(to); } }))) : null,
-    field('Passphrase (ASCII letters; ordered deck required)', 'solitaire-passphrase', h('input', { id: 'solitaire-passphrase', type: 'password', autocomplete: 'off', value: api.param('passphrase') ?? '', maxlength: 65536, onChange: event => change(api, () => api.setParam('passphrase', event.target.value)) })),
-    field('Deck-round budget', 'solitaire-max-steps', h('input', { id: 'solitaire-max-steps', type: 'number', min: 0, max: 1048576, value: api.param('max_steps') ?? 1048576, onChange: event => change(api, () => api.setParam('max_steps', event.target.value)) })),
+    h('div', {class: 'mechanism-settings solitaire-options'}, field('Passphrase (ASCII letters; ordered deck required)', 'solitaire-passphrase', h('input', { id: 'solitaire-passphrase', type: 'password', autocomplete: 'off', value: api.param('passphrase') ?? '', maxlength: 65536, onChange: event => change(api, () => api.setParam('passphrase', event.target.value)) })),
+      field('Deck-round budget', 'solitaire-max-steps', h('input', { id: 'solitaire-max-steps', type: 'number', min: 0, max: 1048576, value: api.param('max_steps') ?? 1048576, onChange: event => change(api, () => api.setParam('max_steps', event.target.value)) }))),
     disclosure(api, 'deck-list', 'Accessible deck list and import', field('Card order JSON', 'solitaire-deck-json', h('textarea', { id: 'solitaire-deck-json', rows: 4, value: typeof api.param('deck') === 'string' ? api.param('deck') : JSON.stringify(deck), onChange: event => change(api, () => api.setParam('deck', event.target.value)) })), h('ol', { class: 'deck-list' }, deck.map((value, index) => h('li', {}, `Position ${index + 1}: ${cardName(value)}`))))));
 }
 
@@ -299,13 +308,19 @@ function ringGlyphs(alphabet, radius, shift, cls) {
     return svg('text', { x: 220 + radius * Math.cos(angle), y: 220 + radius * Math.sin(angle), class: cls, 'text-anchor': 'middle', 'dominant-baseline': 'central' }, [letter]);
   });
 }
+function ringGraduations() {
+  return Array.from({length: 24}, (_, index) => {
+    const angle = (index + .5) * Math.PI / 12 - Math.PI / 2;
+    return svg('line', {x1: 220 + 157 * Math.cos(angle), y1: 220 + 157 * Math.sin(angle), x2: 220 + 202 * Math.cos(angle), y2: 220 + 202 * Math.sin(angle), class: 'alberti-graduation'});
+  });
+}
 function albertiDisk(api, index, editable = true) {
   const alignment = Math.max(0, index);
   const ring = svg('g', {}, ringGlyphs(ALBERTI_RINGS.inner, 126, alignment, 'alberti-inner-letter'));
   const disk = svg('svg', { viewBox: '0 0 440 440', role: 'img', 'aria-label': index < 0 ? 'Alberti 24-position rings. No initial alignment configured.' : `Alberti 24-position rings. Inner ${ALBERTI_RINGS.inner[index]} aligned under outer A.`, class: `alberti-disk${editable ? '' : ' inspecting'}` }, [
-    svg('circle', { cx: 220, cy: 220, r: 207, class: 'alberti-outer' }), svg('circle', { cx: 220, cy: 220, r: 150, class: 'alberti-inner' }),
+    svg('circle', { cx: 220, cy: 220, r: 207, class: 'alberti-outer' }), ...ringGraduations(), svg('circle', { cx: 220, cy: 220, r: 150, class: 'alberti-inner' }),
     ...ringGlyphs(ALBERTI_RINGS.outer, 180, 0, 'alberti-outer-letter'), ring,
-    svg('path', { d: 'M211 42 L229 42 L220 62 Z', class: 'alberti-marker' }), svg('circle', { cx: 220, cy: 220, r: 20, class: 'alberti-hub' })]);
+    svg('path', { d: 'M214 56 L226 56 L220 66 Z', class: 'alberti-marker' }), svg('circle', { cx: 220, cy: 220, r: 20, class: 'alberti-hub' })]);
   if (!editable) return disk;
   let start;
   const angle = event => { const bounds = disk.getBoundingClientRect(); return Math.atan2(event.clientY - bounds.top - bounds.height / 2, event.clientX - bounds.left - bounds.width / 2); };
@@ -329,9 +344,9 @@ function alberti(host, api) {
   const initial = ALBERTI_RINGS.inner.indexOf(p.initial_index); const displayed = ALBERTI_RINGS.inner.indexOf(selected?.index ?? p.initial_index);
   const rotate = delta => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: ALBERTI_RINGS.inner[((initial < 0 ? 0 : initial) + delta + 24) % 24] }); });
   replace(host, h('div', { class: 'mechanism alberti-instrument' },
-    h('div', {}, albertiDisk(api, displayed, !selected), note(selected ? `Inspected alignment: ${selected.index} · input byte ${selected.offset}` : initial < 0 ? 'No initial index configured. Choose an inner symbol, or rotate the geometry preview to set the alignment.' : 'Initial alignment. Drag the inner disk to choose an initial index.'),
+    h('div', {class: 'alberti-stage'}, albertiDisk(api, displayed, !selected), note(selected ? `Inspected alignment: ${selected.index} · input byte ${selected.offset}` : initial < 0 ? 'No initial index configured. Choose an inner symbol, or rotate the geometry preview to set the alignment.' : 'Initial alignment. Drag the inner disk to choose an initial index.'),
       h('div', { class: 'toolbar' }, button('Rotate initial index left', () => rotate(-1), {id:'alberti-rotate-left'}), button('Rotate initial index right', () => rotate(1), {id:'alberti-rotate-right'}))),
-    h('div', {}, h('h3', {}, '24-position digit-feedback profile'), note('alberti_di_palma_2009_v1 · Di Palma 2009 museum reconstruction, pp. 11–13. Exact prepared symbols; digits 1–4 are control symbols.'),
+    h('div', {class: 'alberti-controls'}, h('h3', {}, 'Alignment'), note('24 positions · alberti_di_palma_2009_v1. Di Palma 2009, pp. 11–13; digits 1–4 are control symbols.'),
       initial < 0 || p.profile !== 'alberti_di_palma_2009_v1' ? warning(['Load the Core example or supply settings with an explicit initial index and profile.']) : null, settingsWarning(api),
       field('Inner symbol under outer A (initial)', 'alberti-initial', select('alberti-initial', p.initial_index, [...ALBERTI_RINGS.inner], value => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: value }); }))),
       h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(p.trace), onChange: event => change(api, () => patchSettings(api, { trace: event.target.checked })) }), 'Record alignment trace'),
@@ -383,14 +398,14 @@ function m138a(host, api) {
   const move = delta => { const to = selected + delta; if (to < 0 || to >= order.length) return; change(api, () => { patchSettings(api, { order: moveCard(order, selected, to) }); api.ui.strip = to; }); };
   const uploader = h('input', { type: 'file', accept: '.json,application/json', id: 'm138-import', onChange: event => importSettings(api, event.target.files[0]) });
   replace(host, h('div', { class: 'mechanism m138-instrument' },
-    h('div', { class: 'row between' }, h('h3', {}, '30-track strip holder'), h('span', { class: 'tag' }, p.strip_series ?? 'No series loaded')),
-    note('Series and strip alphabets are supplied facts. The Core qualification example is synthetic; it is not a historical standard series.'),
+    h('div', { class: 'row between m138-header' }, h('h3', {}, '30-track strip holder'), h('span', { class: 'tag' }, p.strip_series ?? 'No series loaded')),
+    note('Caller-supplied strip alphabets. Examples are synthetic, not a default historical series.'),
     api.ui.settingsRead ? h('p',{role:'status'},'Reading the selected strip settings…') : null, warning(stripProblems(p, [...api.text()].length)), settingsWarning(api), api.ui.importError ? h('p', { class: 'error', role: 'alert' }, api.ui.importError) : null,
-    h('div', { class: 'mechanism-settings' }, field('Inspect block (1-based)', 'm138-block', h('input', { id: 'm138-block', type: 'number', min: 1, max: blocks, value: block + 1, onChange: event => change(api, () => { api.ui.block = Math.max(0, Math.min(blocks - 1, int(event.target.value) - 1)); }) })),
+    h('div', { class: 'mechanism-settings m138-configuration' }, field('Inspect block (1-based)', 'm138-block', h('input', { id: 'm138-block', type: 'number', min: 1, max: blocks, value: block + 1, onChange: event => change(api, () => { api.ui.block = Math.max(0, Math.min(blocks - 1, int(event.target.value) - 1)); }) })),
       field('Row offsets by 30-character block (JSON)', 'm138-offsets', h('input', { id: 'm138-offsets', value: settingsField(api, 'row_offsets'), onChange: event => patchSettingsArray(api, 'row_offsets', event.target.value) }))),
     h('div', { class: 'm138-holder', 'data-instrument-scroll': 'strip-holder', role: 'region', tabindex: 0, 'aria-label': 'Strip alphabets aligned to current input block. Horizontal and vertical scroll.' }, h('div', { class: 'm138-strips' }, order.slice(0, 30).map((id, index) => m138Strip(api, p, id, index, block, selected, labels[index] ?? String(id))))),
     note('Blue outlined row: source alignment. Shaded row: configured clockwise offset. This is a configuration view, not an execution trace.'),
-    order.length ? h('div', { class: 'toolbar' }, h('strong', {}, `Track ${selected + 1} · strip #${labels[selected] ?? order[selected]}`), button('Move track left', () => move(-1), { id:'m138-move-left', disabled: selected === 0 }), button('Move track right', () => move(1), { id:'m138-move-right', disabled: selected === order.length - 1 })) : null,
+    order.length ? h('div', { class: 'toolbar m138-selection' }, h('strong', {}, `Track ${selected + 1} · strip #${labels[selected] ?? order[selected]}`), button('Move track left', () => move(-1), { id:'m138-move-left', disabled: selected === 0 }), button('Move track right', () => move(1), { id:'m138-move-right', disabled: selected === order.length - 1 })) : null,
     disclosure(api, 'strip-list', 'Series import and accessible track list', field('Import complete settings JSON', 'm138-import', uploader),
       field('Series identifier', 'm138-series', h('input', { id: 'm138-series', value: p.strip_series ?? '', onChange: event => change(api, () => patchSettings(api, { strip_series: event.target.value })) })),
       field('Strip order (30 IDs as JSON)', 'm138-order', h('textarea', { id: 'm138-order', rows: 3, value: settingsField(api, 'order'), onChange: event => patchSettingsArray(api, 'order', event.target.value) })),
@@ -412,14 +427,14 @@ function brainfuckTape(report, api) {
   const cells = Array.isArray(report?.tape) ? report.tape : [];
   const start = Math.max(0, Math.min(Math.max(0, cells.length - 1), api.ui.tapePage ?? 0));
   const shown = tapePage(cells, start);
-  return h('section', {}, h('div', { class: 'row between' }, h('h3', {}, 'Final tape · exact requested range'), h('span', { class: 'tag' }, `Pointer ${report?.final_pointer ?? '—'}`)),
+  return h('section', {class: 'bf-tape-section'}, h('div', { class: 'row between' }, h('h3', {}, 'Final tape · exact requested range'), h('span', { class: 'tag' }, `Pointer ${report?.final_pointer ?? '—'}`)),
     cells.length ? h('div', { class: 'bf-tape', 'aria-label': 'Final recorded tape cells' }, shown.map(cell => h('div', { class: `bf-cell${cell.index === report.final_pointer ? ' pointed' : ''}` }, h('small', {}, `#${cell.index}`), h('strong', {}, cell.value), cell.index === report.final_pointer ? h('span', {}, '▲ pointer') : null))) : note('Run the report action with a positive tape length to request final tape cells.'),
     cells.length > 32 ? h('div', { class: 'toolbar' }, button('Previous tape cells', () => change(api, () => { api.ui.tapePage = Math.max(0, start - 32); }), { id:'bf-tape-previous', disabled: start === 0 }), button('Next tape cells', () => change(api, () => { api.ui.tapePage = Math.min(cells.length - 1, start + 32); }), { id:'bf-tape-next', disabled: start + 32 >= cells.length }), note(`Showing ${start + 1}–${Math.min(cells.length, start + 32)} of ${cells.length} retained cells.`)) : null);
 }
 function sourceSelection(api, selected) {
   const source = selected ? snapshotText(api) : api.text();
   if (typeof source !== 'string') return note('Choose a text source.');
-  if (!selected) return note('Use the source input above to edit the program. A recorded dispatch selects its actual UTF-8 source offset.');
+  if (!selected) return source ? h('div', {}, h('pre', {class: 'bf-source-inspection', 'aria-label': 'Program source preview'}, source.slice(0, 2048)), note(source.length > 2048 ? 'Source preview: first 2,048 characters. The complete program is retained in the input editor.' : 'Edit the program in the input editor. A recorded dispatch selects its actual UTF-8 source offset.')) : note('Empty program. Add instructions in the input editor.');
   const bytes = new TextEncoder().encode(source); const offset = selected.source_offset;
   const before = new TextDecoder().decode(bytes.slice(Math.max(0, offset - 120), offset));
   const command = new TextDecoder().decode(bytes.slice(offset, offset + 1));
@@ -433,19 +448,20 @@ function brainfuck(host, api) {
   const byteOutput = report?.output ?? (result instanceof Uint8Array ? result : []);
   replace(host, h('div', { class: 'mechanism brainfuck-instrument' },
     h('div', { class: 'row between' }, h('h3', {}, 'Program and recorded machine state'), h('span', { class: 'tag' }, '30,000-cell tape · wrapping arithmetic')),
-    !isCompare ? brainfuckOptions(api) : field('Compare cell widths (JSON)', 'bf-widths', h('input', { id: 'bf-widths', value: typeof api.param('widths') === 'string' ? api.param('widths') : JSON.stringify(api.param('widths') ?? []), onChange: event => change(api, () => api.setParam('widths', event.target.value)) })),
-    field('stdin · exact bytes as Base64', 'bf-stdin', h('input', { id: 'bf-stdin', value: api.extra('input'), spellcheck: false, onChange: event => change(api, () => api.setExtra('input', event.target.value)) })),
-    isReport ? h('div', {}, h('div', { class: 'mechanism-settings' }, field('Final tape start (zero-based)', 'bf-tape-start', h('input', { id: 'bf-tape-start', type: 'number', min: 0, max: 30000, value: api.param('tape_start') ?? 0, onChange: event => change(api, () => api.setParam('tape_start', event.target.value)) })),
+    h('div', {class: 'bf-configuration'}, !isCompare ? brainfuckOptions(api) : field('Compare cell widths (JSON)', 'bf-widths', h('input', { id: 'bf-widths', value: typeof api.param('widths') === 'string' ? api.param('widths') : JSON.stringify(api.param('widths') ?? []), onChange: event => change(api, () => api.setParam('widths', event.target.value)) })),
+      field('stdin · exact bytes as Base64', 'bf-stdin', h('input', { id: 'bf-stdin', value: api.extra('input'), spellcheck: false, onChange: event => change(api, () => api.setExtra('input', event.target.value)) }))),
+    isReport ? h('div', {class: 'bf-report-settings'}, h('div', { class: 'mechanism-settings' }, field('Final tape start (zero-based)', 'bf-tape-start', h('input', { id: 'bf-tape-start', type: 'number', min: 0, max: 30000, value: api.param('tape_start') ?? 0, onChange: event => change(api, () => api.setParam('tape_start', event.target.value)) })),
       field('Final tape length', 'bf-tape-length', h('input', { id: 'bf-tape-length', type: 'number', min: 0, max: 30000, value: api.param('tape_len') ?? 0, onChange: event => change(api, () => api.setParam('tape_len', event.target.value)) }))),
       button('Request tape cells 0–31 and recorded dispatches', () => change(api, () => { api.setParam('tape_start', '0'); api.setParam('tape_len', '32'); api.setParam('max_trace_records', '4096'); api.setParam('max_trace_bytes', '1048576'); })), note('Trace budget: at most 4,096 records / 1 MiB. Reaching it truncates the trace, not the execution. Run explicitly after changing options.')) : note('Select the report action to request tape ranges and recorded dispatches. Execute returns exact output bytes; compare retains one report per width.'),
     result?.runs ? field('Inspect completed comparison run', 'bf-run', select('bf-run', api.ui.runIndex ?? 0, result.runs.map((_, i) => i), value => change(api, () => { api.ui.runIndex = Number(value); api.ui.traceCursor = -1; }), 'Comparison run index')) : null,
-    report ? h('p', { class: report.completed ? 'mechanism-reading' : 'warning', role: 'status' }, `${report.completed ? 'Program completed' : 'Execution stopped'} · ${report.stop_reason} · ${report.instructions} dispatched instructions · ${report.options.cell_bits}-bit cells`, report.trace_complete === false ? h('strong', {}, ' · Trace truncated; execution status is separate.') : null) : null,
-    sourceSelection(api, selected), brainfuckTape(report, api),
-    selected ? h('div', { class: 'bf-dispatch' }, h('h3', {}, `Recorded dispatch ${selected.instruction} · ${selected.command}`), h('p', {}, `Source byte ${selected.source_offset}; pointer ${selected.pointer_before} → ${selected.pointer_after}; cell at pointer before ${selected.cell_before}; cell at pointer after ${selected.cell_after}.`), note('Only these observed cells belong to this dispatch; the final tape is a separate state.')) : null,
-    traceControls(api, trace, row => `instruction ${row.instruction} · source byte ${row.source_offset} · ${row.command}`, 'No recorded dispatch selected. The tape shown is the final recorded range.'),
+    report ? h('p', { class: report.completed ? 'mechanism-reading' : 'warning', role: 'status' }, `${report.completed ? 'Program completed' : `Execution stopped · ${report.stop_reason}`} · ${report.instructions} dispatched instructions · ${report.options.cell_bits}-bit cells`, report.trace_complete === false ? h('strong', {}, ' · Trace truncated; execution status is separate.') : null) : null,
+    h('section', {class: 'bf-recorded', 'aria-label': 'Program and recorded dispatch'}, sourceSelection(api, selected),
+      selected ? h('div', { class: 'bf-dispatch' }, h('h3', {}, `Recorded dispatch ${selected.instruction} · ${selected.command}`), h('p', {}, `Source byte ${selected.source_offset}; pointer ${selected.pointer_before} → ${selected.pointer_after}; cell at pointer before ${selected.cell_before}; cell at pointer after ${selected.cell_after}.`), note('Only these observed cells belong to this dispatch; the final tape is a separate state.')) : null,
+      isReport || report ? traceControls(api, trace, row => `instruction ${row.instruction} · source byte ${row.source_offset} · ${row.command}`, 'No recorded dispatch selected. The tape shown is the final recorded range.') : null),
+    h('div', {class: `bf-evidence-grid${isReport || report ? '' : ' output-only'}`}, isReport || report ? brainfuckTape(report, api) : null,
     h('section', { class: 'bf-output' }, h('h3', {}, 'Output bytes'), h('p', { class: 'small muted' }, result === undefined ? 'No execution output retained. Run the selected action.' : `${byteOutput.length} bytes · full output is retained by the result export`),
-      h('pre', { 'aria-label': 'Output byte preview in hexadecimal' }, Array.from(byteOutput.slice(0, 1024), byte => byte.toString(16).padStart(2, '0').toUpperCase()).join(' ')),
-      h('pre', { 'aria-label': 'Output text preview decoded as UTF-8' }, new TextDecoder().decode(Uint8Array.from(byteOutput.slice(0, 1024)))))));
+      h('div', {class: 'bf-output-preview'}, h('h4', {}, 'Hex'), h('pre', { 'aria-label': 'Output byte preview in hexadecimal' }, Array.from(byteOutput.slice(0, 1024), byte => byte.toString(16).padStart(2, '0').toUpperCase()).join(' '))),
+      h('div', {class: 'bf-output-preview'}, h('h4', {}, 'UTF-8 preview'), h('pre', { 'aria-label': 'Output text preview decoded as UTF-8' }, new TextDecoder().decode(Uint8Array.from(byteOutput.slice(0, 1024)))))))));
   return playback(host, api, trace);
 }
 

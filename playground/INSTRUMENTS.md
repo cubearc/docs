@@ -5,6 +5,10 @@ tool from its normal catalog entry. **Load Core example** loads a labeled,
 synthetic conformance example. It does not run it. Review the input and press
 **Run tools** to execute the installed local SDK in its dedicated worker.
 
+On wide screens, input and results sit beside the instrument. On smaller screens,
+they follow the order input, instrument, results. The action selector and
+**Visual / Parameters** controls stay above the work area.
+
 **Visual** and **Parameters** share one configuration. Selecting a cell, card,
 node, byte or recorded trace step inspects data. Insertion, movement of cards,
 mask edits and changes to graph edges explicitly edit the input or settings.
@@ -18,7 +22,8 @@ the actual SDK worker termination; it does not establish Core completion or
 cooperative cancellation. Secondary file/settings reads also disable Run and
 reject completions after a newer read, an edit, Stop or leaving the instrument.
 
-Select an exact named result before copying, exporting or continuing. The normal
+The main result is selected initially. Use **Choose an output** to inspect another
+named result before copying, exporting or continuing. The normal
 result viewer retains complete outputs even when a preview is shortened. Byte
 exports retain bytes, and continuing as UTF-8 requires an explicit conversion.
 Image decoding also uses a retained Session continuation, keeping the original

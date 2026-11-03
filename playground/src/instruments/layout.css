@@ -1,0 +1,133 @@
+/* A working surface with its input and evidence in a single adjacent rail.
+   DOM order remains controls → input → instrument → output at every width. */
+.heading.instrument-heading { margin-bottom: 1.25rem; max-width: 68rem; }
+.instrument-heading h1 { font-size: 2rem; letter-spacing: -.04em; }
+.instrument-heading p { max-width: 75ch; font-size: .95rem; }
+.section-jumps.instrument-jumps { display: none; }
+.play-grid.visual-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas: 'commands commands' 'stage input' 'stage result';
+  gap: 1.5rem;
+  align-items: start;
+}
+.visual-workspace > * { min-width: 0; max-width: 100%; }
+.instrument-command-bar {
+  grid-area: commands;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 2rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--line);
+}
+.visual-workspace .instrument-action {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex: 0 1 30rem;
+  min-width: 0;
+  margin: 0;
+}
+.instrument-action label { margin: 0; color: var(--muted); }
+.instrument-action select { flex: 1; width: auto; border-color: var(--line); }
+.visual-workspace .instrument-tabs {
+  align-self: center;
+  flex: 0 1 17rem;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  gap: 1.25rem;
+}
+.visual-workspace .instrument-tabs button {
+  border-radius: 0;
+  border-bottom: 3px solid transparent;
+  padding: .6rem .25rem;
+  color: var(--muted);
+}
+.visual-workspace .instrument-tabs button[aria-pressed=true] {
+  background: transparent;
+  border-bottom-color: var(--blue);
+  color: var(--blue);
+}
+.visual-workspace .input-panel {
+  grid-area: input;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.visual-workspace .input-main { min-width: 0; }
+.visual-workspace .input-text { min-height: 112px; max-height: 320px; background: white; }
+.visual-workspace .input-main > .toolbar { gap: .4rem; margin-top: .5rem; }
+.visual-workspace .input-main > .toolbar button { flex: 1; padding: .5rem; font-size: .85rem; }
+.visual-workspace .input-main > p { font-size: .8rem; margin: .6rem 0 1rem; }
+.visual-workspace .input-options { margin: 0; }
+.visual-workspace .input-options > .toolbar { padding-top: 1rem; border-top: 1px solid var(--line); }
+.visual-workspace #run-tools { flex: 1; }
+.visual-workspace #load-core-example { width: 100%; background: transparent; }
+.visual-workspace .input-options > [role=status] { font-size: .85rem; margin: .75rem 0; }
+.visual-workspace .instrument-surface,
+.visual-workspace .instrument-options {
+  grid-area: stage;
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+.instrument { min-width: 0; max-width: 100%; }
+.visual-workspace .instrument-options .params {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 0 1.25rem;
+  border: 0;
+  padding: 0;
+}
+.visual-workspace #results-section { grid-area: result; }
+.visual-workspace .result-header { margin-bottom: .75rem; }
+.visual-workspace .result-header h2 { font-size: 1.1rem; margin: 0; }
+.visual-workspace .result-header .segmented { border: 0; background: transparent; padding: 0; }
+.visual-workspace .result-header .segmented button { padding: .4rem .6rem; font-size: .85rem; }
+.visual-workspace .result-grid { display: grid; grid-template-columns: minmax(0,1fr); }
+.visual-workspace .result-card { padding: 1rem; border-radius: 8px; width: 100%; }
+.visual-workspace .result-card > .row h3 { font-size: .95rem; }
+.visual-workspace .result-card .viewer { background: #f1f5fa; border-radius: 4px; padding: .85rem; }
+.visual-workspace .result-card .viewer pre { font-size: 1.1rem; line-height: 1.6; }
+.visual-workspace .result-card .toolbar { gap: .35rem; }
+.visual-workspace .result-card details { border-top: 1px solid var(--line); margin-top: .5rem; }
+.visual-workspace #results-section > details { border: 0; padding: 0; background: transparent; }
+.visual-workspace .empty-state { text-align: left; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 1rem 0; font-size: .9rem; }
+.workspace-navigation { border-top: 1px solid var(--line); padding-top: 1rem; }
+.workspace-navigation button { background: transparent; font-size: .85rem; }
+
+@media (max-width: 1100px) {
+  .play-grid.visual-workspace { grid-template-columns: minmax(0,1fr) 290px; gap: 1.25rem; }
+  .visual-workspace .instrument-surface { padding: 1rem; }
+}
+@media (max-width: 900px) {
+  .play-grid.visual-workspace {
+    grid-template-columns: minmax(0,1fr);
+    grid-template-rows: auto;
+    grid-template-areas: 'commands' 'input' 'stage' 'result';
+  }
+  .visual-workspace .input-panel { display: grid; grid-template-columns: minmax(0,1fr) minmax(200px,.6fr); gap: 1.25rem; }
+  .visual-workspace .input-options > .toolbar { padding-top: 1.5rem; border: 0; }
+  .section-jumps.instrument-jumps { display: flex; }
+}
+@media (max-width: 550px) {
+  .heading.instrument-heading { margin-bottom: 1rem; }
+  .instrument-heading h1 { font-size: 1.75rem; }
+  .instrument-command-bar { gap: .5rem; }
+  .visual-workspace .instrument-action { flex-basis: 100%; }
+  .visual-workspace .instrument-tabs { flex-basis: 100%; }
+  .visual-workspace .input-panel { display: block; }
+  .visual-workspace .input-text { min-height: 96px; }
+  .visual-workspace .input-options > .toolbar { border-top: 1px solid var(--line); padding-top: .75rem; }
+  .visual-workspace .instrument-surface,.visual-workspace .instrument-options { padding: .85rem; }
+  .visual-workspace .instrument-options .params { display: block; }
+}

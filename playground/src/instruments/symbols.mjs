@@ -14,6 +14,8 @@ const note = text => h('p', { class: 'small muted' }, text);
 const warn = text => h('p', { class: 'warning', role: 'status' }, text);
 const label = (id, title, control) => h('div', { class: 'field' }, h('label', { for: id }, title), control);
 const isDecode = api => api.action.id.endsWith('.decode');
+const details = (api, title, ...content) => h('details', { class: 'symbol-notes', open: Boolean(api.ui[`notes:${title}`]), onToggle: event => { if (event.currentTarget.isConnected) api.ui[`notes:${title}`] = event.currentTarget.open; } }, h('summary', { onClick: event => { if (event.currentTarget.isConnected && !event.defaultPrevented) api.ui[`notes:${title}`] = !event.currentTarget.parentElement.open; } }, title), ...content);
+const sectionTitle = (title, detail) => h('div', { class: 'symbol-section-title' }, h('h3', {}, title), detail ? h('span', { class: 'small muted' }, detail) : null);
 
 function parseArray(raw) {
   try { const value = typeof raw === 'string' ? JSON.parse(raw) : raw; return Array.isArray(value) ? value : null; }
@@ -111,13 +113,16 @@ function gridWindow(api, chars, columns, { rows, holes, onToggle, output } = {})
     { id: `visual-${api.kind}-cell-${index}`, class: `symbol-cell${open ? ' is-hole' : ''}${selected ? ' is-inspected' : ''}${ch === undefined ? ' is-empty' : ''}`,
       'aria-label': `${visibleLabel}. ${onToggle ? open ? 'Close hole' : 'Open hole' : 'Inspect'} row ${row}, column ${col}, position ${index}, ${ch ?? 'empty'}${open ? ', open' : ''}`, 'aria-pressed': String(onToggle ? Boolean(open) : selected), disabled: ch === undefined && !onToggle });
   });
-  return h('div', {}, h('div', { class: 'toolbar' },
-    button('Rows ↑', () => { api.ui.rowStart = Math.max(0, rowStart - 10); api.refresh(); }, { disabled: !rowStart }),
-    button('Rows ↓', () => { api.ui.rowStart = rowStart + 10; api.refresh(); }, { disabled: rowStart + 10 >= totalRows }),
-    button('Columns ←', () => { api.ui.colStart = Math.max(0, colStart - 16); api.refresh(); }, { disabled: !colStart }),
-    button('Columns →', () => { api.ui.colStart = colStart + 16; api.refresh(); }, { disabled: colStart + 16 >= columns })),
-  h('div', { class: 'symbol-grid-scroll', role: 'region', tabindex: 0, 'aria-label': 'Character grid' }, h('div', { class: 'symbol-grid', style: `grid-template-columns:repeat(${Math.max(1, visibleCols)},minmax(48px,1fr))` }, cells)),
-  note(`Rows ${rowStart}–${Math.max(rowStart, rowStart + visibleRows - 1)}, columns ${colStart}–${Math.max(colStart, colStart + visibleCols - 1)}. Coordinate labels are zero-based. Empty cells are unfilled; no padding is added.`));
+  return h('div', { class: 'symbol-grid-view' },
+    h('div', { class: 'symbol-grid-scroll', role: 'region', tabindex: 0, 'aria-label': 'Character grid' }, h('div', { class: 'symbol-grid', style: `grid-template-columns:repeat(${Math.max(1, visibleCols)},minmax(3.5rem,4.6rem))` }, cells)),
+    h('div', { class: 'symbol-grid-caption' }, h('span', {}, `${totalRows} rows × ${columns} columns`), h('span', {}, 'Row / column · zero-based')),
+    h('details', { class: 'symbol-grid-navigation', open: api.ui.gridNavigation ?? (totalRows > 10 || columns > 16), onToggle: event => { if (event.currentTarget.isConnected) api.ui.gridNavigation = event.currentTarget.open; } }, h('summary', { onClick: event => { if (event.currentTarget.isConnected && !event.defaultPrevented) api.ui.gridNavigation = !event.currentTarget.parentElement.open; } }, 'Grid navigation'),
+      h('div', { class: 'toolbar' },
+        button('Rows ↑', () => { api.ui.rowStart = Math.max(0, rowStart - 10); api.refresh(); }, { disabled: !rowStart }),
+        button('Rows ↓', () => { api.ui.rowStart = rowStart + 10; api.refresh(); }, { disabled: rowStart + 10 >= totalRows }),
+        button('Columns ←', () => { api.ui.colStart = Math.max(0, colStart - 16); api.refresh(); }, { disabled: !colStart }),
+        button('Columns →', () => { api.ui.colStart = colStart + 16; api.refresh(); }, { disabled: colStart + 16 >= columns })),
+      note(`Visible rows ${rowStart}–${Math.max(rowStart, rowStart + visibleRows - 1)}, columns ${colStart}–${Math.max(colStart, colStart + visibleCols - 1)}. Empty cells are unfilled; no padding is added.`)));
 }
 
 function scytale(host, api) {
@@ -127,14 +132,21 @@ function scytale(host, api) {
   const gridChars = isDecode(api) && !api.stale() && typeof output === 'string' ? [...output] : chars;
   const selection = api.ui.selection ?? 0;
   const ribbon = displayWindow(chars, Math.floor(selection / 96) * 96);
-  replace(host, h('div', { class: 'symbol-settings row' }, textParam(api, 'columns', 'Columns', { min: 1, max: 4096 }),
-    h('div', { class: 'segmented' }, button('Wrapped strip', () => { api.ui.wrapped = true; api.refresh(); }, { 'aria-pressed': String(api.ui.wrapped !== false) }),
-      button('Flat grid', () => { api.ui.wrapped = false; api.refresh(); }, { 'aria-pressed': String(api.ui.wrapped === false) }))),
-  note('Row-major fill, column-major read. The strip uses the same discrete columns setting as Parameters; opening the view changes presentation only.'),
-  api.ui.wrapped !== false ? h('div', { class: 'scytale-cylinder', role: 'region', tabindex: 0, 'aria-label': 'Input strip around cylinder' }, h('div', { class: 'scytale-ribbon' }, ribbon.items.map((ch, n) => button(ch === ' ' ? '␠' : ch, () => { api.ui.selection = ribbon.start + n; api.refresh(); }, { 'aria-label': `${ch === ' ' ? '␠' : ch}. Inspect input character ${ribbon.start + n}: ${ch}`, 'aria-pressed': String(selection === ribbon.start + n) })))) : null,
-  columns ? gridWindow(api, gridChars, columns) : warn('Set Columns to an integer from 1 to 4096. The exact value in Parameters is preserved.'),
-  note(isDecode(api) ? 'The flat grid shows decoded text only after a current Core execution; until then it shows the untransformed input. No source-to-output mapping is inferred.' : 'The grid is the original input in row-major order. Reading columns is the Core operation; the result below remains separate.'),
-  positionField(api, chars.length), chars.length ? note(`Input position ${selection}: ${chars[selection] ?? '(outside input)'}`) : note('Enter text or load the example to populate the strip.'));
+  const wrapped = api.ui.wrapped !== false;
+  const strip = h('div', { class: 'scytale-drum-stage' }, sectionTitle('Wrapped strip', 'Original input'),
+    h('div', { class: 'scytale-cylinder', role: 'region', tabindex: 0, 'aria-label': 'Input strip around cylinder' },
+      h('div', { class: 'scytale-ribbon' }, ribbon.items.map((ch, n) => button(ch === ' ' ? '␠' : ch, () => { api.ui.selection = ribbon.start + n; api.refresh(); },
+        { 'aria-label': `${ch === ' ' ? '␠' : ch}. Inspect input character ${ribbon.start + n}: ${ch}`, 'aria-pressed': String(selection === ribbon.start + n) })))),
+    note(chars.length ? `Input positions ${ribbon.start}–${ribbon.start + ribbon.items.length - 1}` : 'Enter text to fill the strip.'));
+  replace(host,
+    h('div', { class: 'symbol-settings symbol-control-bar' }, textParam(api, 'columns', 'Columns', { min: 1, max: 4096 }),
+      h('div', { class: 'segmented' }, button('Wrapped strip', () => { api.ui.wrapped = true; api.refresh(); }, { 'aria-pressed': String(wrapped) }),
+        button('Flat grid', () => { api.ui.wrapped = false; api.refresh(); }, { 'aria-pressed': String(!wrapped) }))),
+    h('div', { class: `scytale-layout${wrapped ? ' is-wrapped' : ' is-flat'}` }, wrapped ? strip : null,
+      h('section', { class: 'scytale-flat-stage' }, sectionTitle('Flat grid', 'Row-major fill'), columns ? gridWindow(api, gridChars, columns) : warn('Set Columns to an integer from 1 to 4096. The exact value in Parameters is preserved.'))),
+    h('div', { class: 'symbol-inspector' }, positionField(api, chars.length), h('p', {}, h('span', { class: 'small muted' }, 'Original character'), h('strong', { class: 'symbol-inspected-character' }, chars[selection] === ' ' ? '␠' : chars[selection] ?? '—'))),
+    details(api, 'Reading order', note('Row-major fill, column-major read. Columns is the operation setting; opening the strip changes presentation only. The final row stays incomplete, without padding.'),
+      note(isDecode(api) ? 'The flat grid uses decoded text after a current run. Until then it shows the untransformed input. Source and result are inspected independently.' : 'The grid shows your original input. Run the operation to read its columns; the result remains separate.')));
 }
 
 function cardan(host, api) {
@@ -148,16 +160,21 @@ function cardan(host, api) {
   };
   const pos = api.ui.selection ?? 0;
   const output = !api.stale() && typeof api.result()?.text === 'string' && api.action.id.endsWith('.overlay') ? [...api.result().text] : null;
-  replace(host, h('div', { class: 'symbol-settings row' }, textParam(api, 'rows', 'Rows', { min: 1, max: 65536 }), textParam(api, 'columns', 'Columns', { min: 1, max: 65536 })),
-    note('Fixed row-major mask. Click a cell or use Space/Enter to open or close a hole. Changing the inspection position does not edit the mask.'),
-    h('div', { class: 'row between' }, note(`${holes?.length ?? 'Invalid'} holes · ${chars.length} original characters${valid ? ` · ${rows * columns} cells` : ''}`),
+  replace(host,
+    h('div', { class: 'symbol-settings symbol-control-bar' }, textParam(api, 'rows', 'Rows', { min: 1, max: 65536 }), textParam(api, 'columns', 'Columns', { min: 1, max: 65536 }),
+      h('div', { class: 'cardan-mask-count' }, h('strong', {}, holes?.length ?? '—'), h('span', {}, 'open holes')),
       button('Set empty mask', () => { api.setParam('holes', '[]'); api.refresh(); })),
+    h('div', { class: 'cardan-stage-heading' }, sectionTitle('Grille', 'Click a character to open or close a hole'),
+      h('div', { class: 'cardan-legend' }, h('span', {}, h('i', { class: 'cardan-swatch open', 'aria-hidden': 'true' }), 'Open'), h('span', {}, h('i', { class: 'cardan-swatch', 'aria-hidden': 'true' }), 'Covered'))),
     !holes ? warn('Holes must be a strictly increasing list of distinct nonnegative integer positions. Repair the exact list in Parameters before editing visually.') : null,
     valid ? gridWindow(api, chars, columns, { rows, holes, output, onToggle: holes ? change : null }) : warn('Set positive Rows and Columns whose product is at most 65,536; values are preserved until you repair them.'),
-    h('div', { class: 'symbol-settings row' }, positionField(api, valid ? rows * columns : chars.length), button(holes?.includes(pos) ? 'Close inspected hole' : 'Open inspected hole', () => change(pos), { disabled: !holes || !valid || pos >= rows * columns })),
-    note(`Inspected position ${pos}: original ${JSON.stringify(chars[pos] ?? '')}${holes?.includes(pos) ? ' · Open hole' : ' · Covered'}${output && output[pos] !== chars[pos] ? ` · Replacement ${JSON.stringify(output[pos] ?? '')}` : ''}`),
+    h('div', { class: 'symbol-inspector' }, positionField(api, valid ? rows * columns : chars.length),
+      h('p', {}, h('span', { class: 'small muted' }, holes?.includes(pos) ? 'Open hole' : 'Covered position'), h('strong', { class: 'symbol-inspected-character' }, chars[pos] === ' ' ? '␠' : chars[pos] ?? '—')),
+      button(holes?.includes(pos) ? 'Close inspected hole' : 'Open inspected hole', () => change(pos), { disabled: !holes || !valid || pos >= rows * columns })),
+    output && output[pos] !== chars[pos] ? note(`Replacement at ${pos}: ${JSON.stringify(output[pos] ?? '')}. Original: ${JSON.stringify(chars[pos] ?? '')}.`) : null,
     api.action.id.endsWith('.overlay') ? label('visual-cardan-replacements', 'Replacement text', h('input', { id: 'visual-cardan-replacements', value: api.param('replacements') ?? '', onChange: event => { api.setParam('replacements', event.target.value); api.refresh(); } })) : null,
-    note('The original text stays in the input. Extract and overlay use their own named outputs; no rotation is applied.'));
+    details(api, 'Mask and source details', note(`${chars.length} original characters${valid ? ` · ${rows * columns} cells` : ''}. The original text stays in the input.`),
+      note('This is a fixed row-major mask. Space or Enter toggles a focused cell. The inspection position does not edit the mask. Extract and overlay keep their own named outputs; no rotation is applied.')));
 }
 
 function directionPoint(direction, radius = 84) {
@@ -181,6 +198,8 @@ function flagFigure(api, left, right) {
         onPointerdown: event => event.currentTarget.setPointerCapture(event.pointerId), onPointerup: setDirection }));
   };
   return svg('svg', { viewBox: '0 0 300 260', class: 'semaphore-figure', role: 'img', 'aria-label': `Facing sender. Anatomical left arm ${left}, right arm ${right}. Adjust with the direction selectors.` },
+    svg('circle', { cx: 150, cy: 120, r: 102, fill: '#f6f8fc', stroke: '#d8e0ea', 'stroke-width': 1 }),
+    ...DIRECTIONS.map(direction => { const [x1, y1] = directionPoint(direction, 96); const [x2, y2] = directionPoint(direction, 102); return svg('line', { x1, y1, x2, y2, stroke: '#aab8ca', 'stroke-width': 2 }); }),
     ...DIRECTIONS.map(d => { const [x, y] = directionPoint(d, 113); const el = svg('text', { x, y: y + 4, 'text-anchor': 'middle', fill: '#59677b', 'font-size': 13 }); el.textContent = d; return el; }),
     svg('circle', { cx: 150, cy: 77, r: 18, fill: '#d9e0e9', stroke: '#142033', 'stroke-width': 2 }),
     svg('path', { d: 'M150 100 L150 190 M150 190 L125 240 M150 190 L175 240', stroke: '#142033', 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }), drawArm(left, 'left'), drawArm(right, 'right'));
@@ -203,18 +222,28 @@ function semaphore(host, api) {
       api.ui.pairResult = { pair, unit: result.output }; api.ui.pairError = ''; api.refresh();
     } catch (error) { if (!api.revision || api.revision() === revision) { api.ui.pairError = error.message; api.refresh(); } }
   }
-  replace(host, note('Receiver-facing view. LH and RH are the sender’s anatomical left and right arms, not screen order. Blue flag = LH; outlined flag = RH.'),
-    h('div', { class: 'semaphore-workbench' }, flagFigure(api, left, right), h('div', {}, selector('left', left, 'Sender left hand (LH)'), selector('right', right, 'Sender right hand (RH)'),
-      h('p', { class: 'symbol-pair' }, h('code', {}, pair), h('strong', {}, unit ?? 'Uninterpreted pair')),
-      h('div', { class: 'toolbar' }, button('Interpret pair', interpret), button('Add symbol', () => add(isDecode(api) ? pair : unit), { disabled: !unit }), button('Add space', () => add(isDecode(api) ? '/' : ' '))),
-      api.ui.pairError ? warn(api.ui.pairError) : null, note('Drag a flag to a direction, or use the selectors. Interpret checks the pair with Core; adding explicitly edits the input.'))),
-    h('div', { class: 'symbol-sequence', role: 'group', 'aria-label': 'Semaphore input sequence' }, visible.items.map((token, n) => button(token === ' ' ? 'Space' : token, () => {
+  replace(host,
+    h('div', { class: 'semaphore-workbench' },
+      h('div', { class: 'semaphore-stage' }, sectionTitle('Sender’s signal', 'Receiver-facing view'), flagFigure(api, left, right),
+        h('div', { class: 'semaphore-arm-legend' }, h('span', {}, h('i', { class: 'left', 'aria-hidden': 'true' }), 'LH · sender left'), h('span', {}, h('i', { class: 'right', 'aria-hidden': 'true' }), 'RH · sender right'))),
+      h('div', { class: 'semaphore-controls' },
+        h('div', { class: 'semaphore-directions' }, selector('left', left, 'Sender left hand (LH)'), selector('right', right, 'Sender right hand (RH)')),
+        h('div', { class: 'semaphore-reading' }, h('span', { class: 'small muted' }, 'Selected pair'), h('p', { class: 'symbol-pair' }, h('code', {}, pair), h('strong', {}, unit ?? '—'))),
+        h('div', { class: 'toolbar semaphore-compose-actions' }, button('Add symbol', () => add(isDecode(api) ? pair : unit), { disabled: !unit, class: 'primary' }), button('Add space', () => add(isDecode(api) ? '/' : ' '))),
+        button('Interpret pair', interpret, { class: 'quiet semaphore-interpret' }),
+        api.ui.pairError ? warn(api.ui.pairError) : null,
+        note('Drag a flag or choose directions. Add symbol edits the input.'))),
+    sectionTitle('Input sequence', selected === undefined ? 'Select a symbol to inspect its arms' : `Position ${selected} selected`),
+    h('div', { class: 'symbol-sequence semaphore-sequence', role: 'group', 'aria-label': 'Semaphore input sequence' }, visible.items.map((token, n) => button(token === ' ' ? 'Space' : token, () => {
       const index = visible.start + n; api.ui.selection = index;
       const actual = isDecode(api) ? token : alphabet.find(entry => entry.unit === token.toUpperCase())?.token;
       if (actual?.includes(',')) [api.ui.left, api.ui.right] = actual.split(',');
       api.ui.pairResult = null; api.ui.pairError = ''; api.refresh();
     }, { 'aria-pressed': String(selected === visible.start + n), 'aria-label': `${token === ' ' ? 'Space' : token}. Inspect position ${visible.start + n}: ${token}` }))),
-    windowControls(api, 'sequenceStart', sequence.length), note(selected === undefined ? 'Select an input symbol to inspect its arms. Selection never executes the sequence.' : `Selected input position ${selected}.`));
+    windowControls(api, 'sequenceStart', sequence.length),
+    details(api, 'Viewpoint and direction convention', note('Directions are viewed facing the sender. LH and RH refer to the sender’s anatomical left and right arms, not screen order. The blue flag marks LH; the outlined flag marks RH.'),
+      note('Interpret pair validates the selected directions. Selecting a sequence position inspects without editing or executing. Spaces and exact separators remain in the input.')));
+
 }
 
 function jsonSequence(api) {
@@ -241,23 +270,41 @@ function pigpen(host, api) {
     if (next >= 0) api.ui.palette = next; api.refresh();
   };
   const tokenFor = value => isDecode(api) ? value : entries.find(item => item.alternatives.includes(value))?.codes?.[0];
-  replace(host, h('div', { class: 'row between' }, h('p', {}, h('strong', {}, 'Pigpen · Haverhill paired cells')), profile?.source_url ? h('a', { href: profile.source_url, target: '_blank', rel: 'noreferrer' }, 'Profile reference') : null),
-    note(PIGPEN), !active ? h('div', {}, warn('This visual palette uses the Haverhill paired profile. Select it explicitly before composing with this palette.'), button('Use Haverhill profile', () => { api.setParam('profile', PIGPEN); api.refresh(); })) : null,
-    h('div', { class: 'pigpen-palette', role: 'group', 'aria-label': 'Haverhill glyph palette' }, entries.map((item, index) => button(h('span', {}, pigpenGlyph(item.codes[0]), h('span', { class: 'pigpen-unit' }, item.alternatives[0] === ' ' ? 'Space' : item.alternatives[0])), () => { api.ui.palette = index; api.refresh(); },
-      { 'aria-pressed': String((api.ui.palette ?? 0) === index), 'aria-label': `${item.alternatives.map(value => value === ' ' ? 'Space' : value).join(' or ')}: ${item.codes.map(value => value === ' ' ? 'space token' : value).join(', ')}`, title: item.codes[0] }))),
-    token ? h('div', { class: 'symbol-selected' }, pigpenGlyph(token), h('div', {}, h('strong', {}, unit === ' ' ? 'Space' : unit), h('code', {}, token),
-      h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: token.endsWith(':dot'), disabled: token === ' ', onChange: event => chooseDot(event.target.checked) }), 'With dot'))) : warn('Canonical Pigpen profile data is unavailable.'),
-    h('div', { class: 'toolbar' }, button('Add glyph', () => update(isDecode(api) ? token : unit), { disabled: !sequence || !active || !entry }),
-      button('Replace selected', () => update(isDecode(api) ? token : unit, api.ui.selection), { disabled: !sequence || !active || !Number.isInteger(api.ui.selection) || api.ui.selection >= sequence.length }),
-      button('Delete selected', () => update(null, api.ui.selection), { disabled: !sequence || !Number.isInteger(api.ui.selection) || api.ui.selection >= sequence.length })),
+  const paletteKey = ({ item, index }) => button(h('span', {}, pigpenGlyph(item.codes[0]), h('span', { class: 'pigpen-unit' }, item.alternatives[0] === ' ' ? 'Space' : item.alternatives[0])), () => { api.ui.palette = index; api.refresh(); },
+    { class: item.codes[0] === ' ' ? 'pigpen-space-key' : 'pigpen-key', 'aria-pressed': String((api.ui.palette ?? 0) === index), 'aria-label': `${item.alternatives.map(value => value === ' ' ? 'Space' : value).join(' or ')}: ${item.codes.map(value => value === ' ' ? 'space token' : value).join(', ')}`, title: item.codes[0] });
+  const pairs = prefix => {
+    const grouped = new Map();
+    entries.forEach((item, index) => {
+      const code = item.codes[0]; if (!code.startsWith(prefix)) return;
+      const base = code.replace(/:dot$/, '');
+      if (!grouped.has(base)) grouped.set(base, []);
+      grouped.get(base).push({ item, index });
+    });
+    return [...grouped].map(([base, pair]) => h('div', { class: 'pigpen-letter-pair', 'data-sector': base.split(':')[1] }, pair.map(paletteKey)));
+  };
+  const space = entries.findIndex(item => item.codes[0] === ' ');
+  replace(host,
+    h('div', { class: 'symbol-section-title pigpen-profile' }, h('h3', {}, 'Haverhill paired alphabet'), profile?.source_url ? h('a', { href: profile.source_url, target: '_blank', rel: 'noreferrer' }, 'Profile reference') : null),
+    !active ? h('div', {}, warn('This visual palette uses the Haverhill paired profile. Select it explicitly before composing with this palette.'), button('Use Haverhill profile', () => { api.setParam('profile', PIGPEN); api.refresh(); })) : null,
+    h('div', { class: 'pigpen-workbench' },
+      h('div', { class: 'pigpen-palette', role: 'group', 'aria-label': 'Haverhill glyph palette' },
+        h('section', { class: 'pigpen-bank' }, sectionTitle('Nine cells', 'A–R'), h('div', { class: 'pigpen-grid-bank' }, pairs('grid:'))),
+        h('section', { class: 'pigpen-bank' }, sectionTitle('Four sectors', 'S–Z'), h('div', { class: 'pigpen-cross-bank' }, pairs('wedge:')), space >= 0 ? paletteKey({ item: entries[space], index: space }) : null)),
+      h('div', { class: 'pigpen-compose-station' }, token ? h('div', { class: 'symbol-selected' }, pigpenGlyph(token), h('div', {}, h('strong', {}, unit === ' ' ? 'Space' : unit), h('code', {}, token),
+        h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: token.endsWith(':dot'), disabled: token === ' ', onChange: event => chooseDot(event.target.checked) }), 'With dot'))) : warn('Canonical Pigpen profile data is unavailable.'),
+        h('div', { class: 'toolbar pigpen-compose-actions' }, button('Add glyph', () => update(isDecode(api) ? token : unit), { disabled: !sequence || !active || !entry, class: 'primary' }),
+          button('Replace selected', () => update(isDecode(api) ? token : unit, api.ui.selection), { disabled: !sequence || !active || !Number.isInteger(api.ui.selection) || api.ui.selection >= sequence.length }),
+          button('Delete selected', () => update(null, api.ui.selection), { disabled: !sequence || !Number.isInteger(api.ui.selection) || api.ui.selection >= sequence.length })))),
     !sequence ? warn('Use a JSON list of exact units or tokens in the input. Invalid input is preserved until you repair it; composing will not replace it.') : null,
+    sectionTitle('Composed sequence', 'Select to inspect · Add or Replace to edit'),
     h('div', { class: 'symbol-sequence pigpen-sequence', role: 'group', 'aria-label': 'Pigpen input sequence' }, visible.items.map((value, local) => button(h('span', {}, pigpenGlyph(tokenFor(value) ?? ''), h('code', {}, value === ' ' ? 'Space' : value)), () => {
       api.ui.selection = visible.start + local;
       const idx = entries.findIndex(item => item.codes[0] === tokenFor(value)); if (idx >= 0) api.ui.palette = idx;
       api.refresh();
     }, { 'aria-pressed': String(api.ui.selection === visible.start + local), 'aria-label': `Inspect input position ${visible.start + local}: ${value === ' ' ? 'Space' : value}` }))),
     windowControls(api, 'sequenceStart', sequence?.length ?? 0),
-    note('Selection inspects; Add and Replace edit the exact input list. Grid sides follow N/E/S/W walls; wedge names identify the occupied sector of the X. The Core result retains profile provenance.'));
+    details(api, 'Profile and glyph convention', note(PIGPEN), note('Grid walls use N/E/S/W sides. A wedge names the occupied sector of the X; its point faces inward. Each Haverhill cell pairs an unmarked letter with a dotted letter. The result retains the selected profile’s provenance.')));
+
 }
 
 function brailleValues(api) {
@@ -286,28 +333,36 @@ function braille(host, api) {
     if (isDecode(api)) api.setText(api.text() + chart[mask]); else api.setInput({ type: 'bytes', data: Uint8Array.from([...values, mask]) });
     api.ui.selection = values.length; api.refresh();
   };
-  const numberField = (base, title, value) => label(`visual-braille-${base}`, title, h('input', { id: `visual-braille-${base}`, value,
+  const numberField = (base, title, value) => label(`visual-braille-${base}`, title, h('input', { id: `visual-braille-${base}`, class: 'braille-mask-input', value,
     spellcheck: false, disabled: !values || chart.length !== 256, maxlength: base === 16 ? 2 : 8, onChange: event => {
       const raw = event.target.value; const valid = base === 16 ? /^[0-9a-f]{1,2}$/i.test(raw) : /^[01]{1,8}$/.test(raw);
       if (valid) { api.ui.maskError = ''; edit(parseInt(raw, base)); } else { api.ui.maskError = `Use ${base === 16 ? 'two hexadecimal digits' : 'up to eight binary digits'}.`; api.refresh(); }
     } }));
   const visible = displayWindow(values ?? [], api.ui.sequenceStart ?? 0);
-  replace(host, note('Byte masks, not language transcription. Dot numbers follow rows 1–4 / 2–5 / 3–6 / 7–8; bit n−1 controls dot n.'),
-    h('div', { class: 'braille-workbench' }, h('div', { class: 'braille-cell', role: 'group', 'aria-label': 'Eight-dot byte editor' }, brailleDots(mask).map(dot => button(h('span', {}, h('span', { class: 'braille-dot', 'aria-hidden': 'true' }), h('small', {}, dot.number)), () => edit(mask ^ (1 << (dot.number - 1))),
-      { id: `visual-braille-dot-${dot.number}`, 'aria-pressed': String(dot.active), 'aria-label': `Dot ${dot.number}, ${dot.active ? 'on' : 'off'}`, disabled: !values || chart.length !== 256 }))),
-      h('div', {}, h('div', { class: 'braille-unicode', role: 'img', 'aria-label': chart[mask] ? `Unicode cell U+${chart[mask].codePointAt(0).toString(16).toUpperCase()}` : 'Unicode cell unavailable' }, chart[mask] ?? 'Run to inspect'), h('p', {}, `U+${chart[mask]?.codePointAt(0).toString(16).toUpperCase() ?? '—'}`),
-        numberField(16, 'Byte (hexadecimal)', mask.toString(16).toUpperCase().padStart(2, '0')), numberField(2, 'Byte (binary, most significant bit first)', mask.toString(2).padStart(8, '0')),
-        note(`Active dots: ${brailleDots(mask).filter(dot => dot.active).map(dot => dot.number).sort((a, b) => a - b).join(', ') || 'none'}`))),
+  replace(host,
+    sectionTitle('Eight-dot cell', 'Tap a dot to edit the selected byte'),
+    h('div', { class: 'braille-workbench' },
+      h('div', { class: 'braille-cell', role: 'group', 'aria-label': 'Eight-dot byte editor' }, brailleDots(mask).map(dot => button(h('span', {}, h('span', { class: 'braille-dot', 'aria-hidden': 'true' }), h('small', {}, dot.number)), () => edit(mask ^ (1 << (dot.number - 1))),
+        { id: `visual-braille-dot-${dot.number}`, 'aria-pressed': String(dot.active), 'aria-label': `Dot ${dot.number}, ${dot.active ? 'on' : 'off'}`, disabled: !values || chart.length !== 256 }))),
+      h('div', { class: 'braille-readout' },
+        h('div', { class: 'braille-unicode-sample' }, h('div', { class: 'braille-unicode', role: 'img', 'aria-label': chart[mask] ? `Unicode cell U+${chart[mask].codePointAt(0).toString(16).toUpperCase()}` : 'Unicode cell unavailable' }, chart[mask] ?? '—'),
+          h('code', {}, `U+${chart[mask]?.codePointAt(0).toString(16).toUpperCase() ?? '—'}`)),
+        h('div', { class: 'braille-values' }, numberField(16, 'Byte (hexadecimal)', mask.toString(16).toUpperCase().padStart(2, '0')), numberField(2, 'Byte (binary, most significant bit first)', mask.toString(2).padStart(8, '0'))),
+        h('p', { class: 'braille-active-dots' }, h('span', { class: 'small muted' }, 'Active dots'), h('strong', {}, brailleDots(mask).filter(dot => dot.active).map(dot => dot.number).sort((a, b) => a - b).join(' · ') || 'None')))),
     api.ui.maskError ? warn(api.ui.maskError) : null,
     !values ? h('div', {}, warn(isDecode(api) ? 'The input includes a character outside the canonical Braille cells. Repair it in Parameters; the original input is preserved.' : 'Choose exact bytes for Encode, or explicitly start a byte sequence.'),
       !isDecode(api) ? button('Start empty byte sequence', () => { api.setInput({ type: 'bytes', data: new Uint8Array() }); api.refresh(); }) : null) : null,
-    h('div', { class: 'toolbar' }, button('Append cell', add, { disabled: !values || chart.length !== 256 }), button('Delete selected cell', () => {
-      const next = values.filter((_, index) => index !== selection);
-      if (isDecode(api)) api.setText(next.map(n => chart[n]).join('')); else api.setInput({ type: 'bytes', data: Uint8Array.from(next) });
-      api.ui.selection = Math.max(0, selection - 1); api.refresh();
-    }, { disabled: !values?.length })),
+    h('div', { class: 'symbol-section-title braille-sequence-header' }, h('h3', {}, 'Byte sequence'),
+      h('div', { class: 'toolbar' }, button('Append cell', add, { disabled: !values || chart.length !== 256, class: 'primary' }), button('Delete selected cell', () => {
+        const next = values.filter((_, index) => index !== selection);
+        if (isDecode(api)) api.setText(next.map(n => chart[n]).join('')); else api.setInput({ type: 'bytes', data: Uint8Array.from(next) });
+        api.ui.selection = Math.max(0, selection - 1); api.refresh();
+      }, { disabled: !values?.length }))),
     h('div', { class: 'symbol-sequence braille-sequence', role: 'group', 'aria-label': 'Braille input cells' }, visible.items.map((value, local) => button(h('span', {}, h('span', { class: 'braille-sequence-glyph' }, chart[value]), h('code', {}, value.toString(16).toUpperCase().padStart(2, '0'))), () => { api.ui.selection = visible.start + local; api.refresh(); }, { 'aria-pressed': String(selection === visible.start + local), 'aria-label': `${chart[value]}${value.toString(16).toUpperCase().padStart(2, '0')}. Inspect cell ${visible.start + local}, mask ${value}` }))),
-    windowControls(api, 'sequenceStart', values?.length ?? 0), note('Unicode previews use the 256-entry table generated by the installed Core SDK. Selecting a cell does not execute or edit it.'));
+    windowControls(api, 'sequenceStart', values?.length ?? 0),
+    details(api, 'Byte and dot convention', note('These are byte masks, not language transcription. Physical rows are 1–4 / 2–5 / 3–6 / 7–8; bit n−1 controls dot n.'),
+      note('Unicode previews follow the canonical byte-mask table. Selecting a sequence cell inspects it; toggling a dot edits the selected byte. No execution is triggered.')));
+
 }
 
 function morseEdit(api, operation) {
@@ -326,19 +381,27 @@ function morse(host, api) {
     api.setText(api.ui[mode === 'signals' ? 'signalsDraft' : 'textDraft'] ?? '');
     api.selectAction?.(`symbol.morse.${mode === 'signals' ? 'decode' : 'encode'}`);
   };
-  replace(host, h('div', { class: 'segmented' }, button('Compose signals', () => switchMode('signals'), { 'aria-pressed': String(decode), disabled: !api.selectAction }),
-    button('Enter text', () => switchMode('text'), { 'aria-pressed': String(!decode), disabled: !api.selectAction })),
-    decode ? h('div', { class: 'morse-composer toolbar', role: 'group', 'aria-label': 'Morse signal composer' },
-      button(h('span', {}, h('span', { class: 'morse-mark' }, '•'), 'Dot'), () => morseEdit(api, 'dot')),
-      button(h('span', {}, h('span', { class: 'morse-mark' }, '━'), 'Dash'), () => morseEdit(api, 'dash')),
-      button('Next letter', () => morseEdit(api, 'letter')), button('Next word', () => morseEdit(api, 'word')), button('Delete', () => morseEdit(api, 'delete'))) : note('Enter letters and digits in the source input, then run Encode to get the exact dot/dash groups.'),
-    h('div', { class: 'morse-sequence symbol-sequence', role: 'group', 'aria-label': decode ? 'Input Morse letter groups' : 'Recorded output Morse letter groups' }, visible.items.map((group, local) => button(h('span', {},
-      h('span', { class: 'morse-group', 'aria-hidden': 'true' }, group === '/' ? '／' : [...group].map(mark => mark === '.' ? '•' : mark === '-' ? '━' : mark).join(' ')), h('code', {}, group || '(empty token)')),
-    () => { api.ui.selection = visible.start + local; api.refresh(); }, { 'aria-pressed': String(api.ui.selection === visible.start + local), 'aria-label': `Inspect letter group ${visible.start + local}: ${group || 'empty token'}` }))),
+  const marks = group => group === '/' ? h('span', { class: 'morse-word-gap' }, '/') : [...group].map(mark =>
+    mark === '.' || mark === '-' ? h('span', { class: mark === '.' ? 'morse-dot-shape' : 'morse-dash-shape' }) : h('span', {}, mark));
+  replace(host,
+    h('div', { class: 'symbol-control-bar morse-mode' }, h('div', { class: 'segmented' }, button('Compose signals', () => switchMode('signals'), { 'aria-pressed': String(decode), disabled: !api.selectAction }),
+      button('Enter text', () => switchMode('text'), { 'aria-pressed': String(!decode), disabled: !api.selectAction }))),
+    sectionTitle('Signal sequence', decode ? 'Your composed symbols' : 'Recorded Encode output'),
+    h('div', { class: 'morse-sequence symbol-sequence', role: 'group', 'aria-label': decode ? 'Input Morse letter groups' : 'Recorded output Morse letter groups' },
+      visible.items.length ? visible.items.map((group, local) => button(h('span', {},
+        h('span', { class: 'morse-group', 'aria-hidden': 'true' }, marks(group)), h('code', {}, group || '(empty token)')),
+      () => { api.ui.selection = visible.start + local; api.refresh(); }, { 'aria-pressed': String(api.ui.selection === visible.start + local), 'aria-label': `Inspect letter group ${visible.start + local}: ${group || 'empty token'}` })) : h('p', { class: 'morse-empty muted' }, decode ? 'Start a letter with Dot or Dash.' : 'Enter text in the input and run Encode.')),
     windowControls(api, 'sequenceStart', groups.length),
-    raw ? h('div', { class: 'viewer' }, h('pre', { role: 'region', tabindex: 0, 'aria-label': 'Exact Morse text preview' }, raw.slice(0, 4096))) : note(decode ? 'Start with Dot or Dash. Next letter inserts one ASCII space; Next word inserts a slash word separator.' : 'No recorded Morse output yet.'),
-    note('Selection inspects a recorded or composed group. It never executes. Symbol editing is explicit; this composer does not infer key timing or analyze sound.'),
-    raw.length > 4096 ? note('Preview limited to 4,096 characters; the full input and exported Core result are retained.') : null);
+    decode ? h('div', { class: 'morse-composer', role: 'group', 'aria-label': 'Morse signal composer' },
+      h('div', { class: 'morse-key-pair' },
+        button(h('span', {}, h('span', { class: 'morse-mark' }, '•'), 'Dot'), () => morseEdit(api, 'dot')),
+        button(h('span', {}, h('span', { class: 'morse-mark' }, '━'), 'Dash'), () => morseEdit(api, 'dash'))),
+      h('div', { class: 'morse-navigation' }, button('Next letter', () => morseEdit(api, 'letter')), button('Next word', () => morseEdit(api, 'word')), button('Delete', () => morseEdit(api, 'delete')))) : null,
+    raw ? h('section', { class: 'morse-exact' }, h('span', { class: 'small muted' }, 'Exact symbols'), h('pre', { role: 'region', tabindex: 0, 'aria-label': 'Exact Morse text preview' }, raw.slice(0, 4096))) : null,
+    raw.length > 4096 ? note('Preview limited to 4,096 characters; the full input and exported result are retained.') : null,
+    details(api, 'Letter and word separators', note('Next letter adds one ASCII space. Next word adds a slash separator. Delete removes the last input character. Selecting a group inspects without editing or executing.'),
+      note('This is explicit symbol composition. It does not infer key timing or analyze sound.')));
+
 }
 
 const instruments = { scytale, cardan, semaphore, pigpen, braille, morse };

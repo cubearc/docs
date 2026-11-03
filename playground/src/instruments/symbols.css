@@ -1,9 +1,224 @@
-/* Symbol instruments share source/configuration with the parameter form. */
-.symbol-instrument{min-width:0}.symbol-instrument .symbol-settings{align-items:end}.symbol-instrument .symbol-settings>.field{flex:1;min-width:7rem;max-width:18rem}.symbol-instrument .symbol-settings>.field>input{width:100%}.symbol-instrument .symbol-grid-scroll{overflow:auto;max-width:100%;border-block:1px solid var(--line);margin:1rem 0;background:#fafbfc;padding:.6rem}.symbol-instrument .symbol-grid{display:grid;gap:4px;min-width:max-content}.symbol-instrument .symbol-cell{padding:.5rem;min-width:48px;min-height:62px;border-radius:4px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.symbol-instrument .symbol-cell>span{display:grid;gap:.25rem;text-align:center}.symbol-instrument .symbol-cell-value{font-size:1.35rem;line-height:1.25}.symbol-instrument .symbol-cell small{font:inherit;font-size:.7rem;color:var(--muted)}.symbol-instrument .symbol-cell.is-hole{background:#e5efff;border:2px solid var(--blue);box-shadow:inset 0 0 0 3px white}.symbol-instrument .symbol-cell.is-inspected{outline:3px solid var(--ink);outline-offset:0}.symbol-instrument .symbol-cell.is-empty{background:#f1f3f6;border-style:dashed}.symbol-instrument .symbol-overlay-value{font-size:.8rem;color:var(--blue);font-weight:700}.symbol-instrument .symbol-window-controls{margin:.7rem 0}.symbol-instrument .symbol-window-controls p{margin:0}.symbol-instrument .symbol-sequence{display:flex;flex-wrap:wrap;gap:.5rem;max-height:22rem;overflow:auto;margin:1rem 0}.symbol-instrument .symbol-sequence button{min-width:44px;max-width:100%;overflow-wrap:anywhere}.symbol-instrument button[aria-pressed=true]{border-color:var(--blue);background:var(--pale);box-shadow:inset 0 0 0 1px var(--blue)}.symbol-instrument .segmented button[aria-pressed=true]{background:var(--blue);color:white}.symbol-instrument .symbol-sequence button[aria-pressed=true]{outline:2px solid var(--blue);outline-offset:1px}.symbol-instrument .symbol-selected{display:flex;gap:1rem;align-items:center;margin:1rem 0;border-block:1px solid var(--line);padding:1rem 0}.symbol-instrument .symbol-selected>div{display:grid;gap:.5rem;min-width:0}.symbol-instrument .symbol-selected code{overflow-wrap:anywhere}
-.symbol-scytale .scytale-cylinder{margin:1rem 0;border:1px solid #bfa889;border-radius:28px;background:linear-gradient(90deg,#e8d6bb,#f6eddf 10%,#f6eddf 90%,#dcc5a5);padding:1.5rem 1rem;overflow:auto;max-height:15rem}.symbol-scytale .scytale-ribbon{display:flex;flex-wrap:wrap;gap:3px;min-width:18rem;max-width:50rem;padding:.6rem;background:#fffcf6;transform:skewY(-3deg);border-block:1px solid #c6bda9}.symbol-scytale .scytale-ribbon button{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;min-width:44px;padding:.5rem;border-radius:2px;background:transparent;border-color:#dad2c5}.symbol-scytale .scytale-ribbon button[aria-pressed=true]{background:var(--pale);border-color:var(--blue)}
-.symbol-semaphore .semaphore-workbench{display:grid;grid-template-columns:minmax(220px,1fr) minmax(200px,.75fr);gap:1.5rem;align-items:center}.symbol-semaphore .semaphore-figure{display:block;width:100%;max-width:420px;margin:auto;background:#f8fafc;border:1px solid var(--line);border-radius:var(--radius);aspect-ratio:300/260}.symbol-semaphore .semaphore-handle{cursor:grab;touch-action:none}.symbol-semaphore .symbol-pair{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.symbol-semaphore .symbol-pair strong{font-size:1.5rem}.symbol-semaphore .symbol-pair code{font-size:1.25rem}
-.symbol-pigpen .pigpen-palette{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:.5rem}.symbol-pigpen .pigpen-palette button{padding:.4rem;min-height:78px}.symbol-pigpen .pigpen-palette button>span{display:grid;place-items:center;gap:.35rem}.symbol-pigpen .pigpen-unit{font-weight:600}.symbol-pigpen .pigpen-glyph{display:block;width:40px;height:40px;flex-shrink:0;color:var(--ink)}.symbol-pigpen .symbol-selected>.pigpen-glyph{width:70px;height:70px}.symbol-pigpen .pigpen-sequence button>span{display:grid;place-items:center;gap:.3rem;min-width:0}.symbol-pigpen .pigpen-sequence code{font-size:.75rem;word-break:break-word}.symbol-pigpen .pigpen-sequence button{max-width:9rem;min-height:84px}
-.symbol-braille .braille-workbench{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(160px,1fr);gap:2rem;align-items:center;max-width:44rem;margin:1rem auto}.symbol-braille .braille-cell{display:grid;grid-template-columns:repeat(2,minmax(64px,1fr));gap:.65rem;max-width:230px;background:#f3f6fa;padding:1rem;border:1px solid var(--line);border-radius:var(--radius)}.symbol-braille .braille-cell button{min-height:64px;padding:.5rem;background:white}.symbol-braille .braille-cell button>span{display:flex;align-items:center;gap:.4rem}.symbol-braille .braille-dot{display:block;border:2px solid var(--muted);width:20px;height:20px;border-radius:50%;background:white}.symbol-braille .braille-cell button[aria-pressed=true] .braille-dot{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 2px white,0 0 0 3px var(--blue)}.symbol-braille .braille-unicode{font-size:4.5rem;line-height:1;min-height:4.5rem;font-family:system-ui,sans-serif}.symbol-braille .braille-sequence-glyph{display:block;font-size:2rem;line-height:1.25}.symbol-braille .braille-sequence code{display:block;font-size:.8rem}
-.symbol-morse .morse-composer{margin:1rem 0}.symbol-morse .morse-composer button{min-width:100px;min-height:64px}.symbol-morse .morse-composer button>span{display:flex;align-items:center;justify-content:center;gap:.7rem;flex-wrap:wrap;min-width:0;max-width:100%}.symbol-morse .morse-mark{font-size:1.7rem;line-height:1}.symbol-morse .morse-sequence{min-height:110px;align-items:stretch;padding:1rem 0;border-block:1px solid var(--line)}.symbol-morse .morse-sequence button{padding:1rem;min-width:80px}.symbol-morse .morse-sequence button>span{display:grid;align-content:center;gap:.6rem}.symbol-morse .morse-group{font-size:1.6rem;letter-spacing:.15em;line-height:1.5}.symbol-morse .morse-sequence code{font-size:.85rem}
-@media(max-width:700px){.symbol-semaphore .semaphore-workbench{grid-template-columns:minmax(0,1fr);gap:.5rem}.symbol-semaphore .semaphore-figure{max-width:340px}.symbol-braille .braille-workbench{grid-template-columns:minmax(0,1fr);gap:1rem}.symbol-braille .braille-cell{justify-self:center;width:100%;max-width:240px}.symbol-braille .braille-workbench>div:last-child{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 1rem;align-items:center}.symbol-braille .braille-workbench>div:last-child>.field,.symbol-braille .braille-workbench>div:last-child>.small{grid-column:1/-1}.symbol-instrument .symbol-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}.symbol-instrument .symbol-settings>.field{min-width:0;max-width:none}.symbol-instrument .symbol-settings>.segmented{grid-column:1/-1}.symbol-instrument .symbol-grid-scroll{margin:1rem -.2rem;max-width:calc(100% + .4rem)}.symbol-instrument .symbol-window-controls{gap:.4rem}.symbol-instrument .symbol-window-controls button{flex:1;font-size:.85rem}.symbol-instrument .symbol-window-controls p{flex-basis:100%;order:3}.symbol-morse .morse-composer button{min-width:0;flex:1 1 8rem}.symbol-morse .morse-group{font-size:1.3rem}.symbol-pigpen .pigpen-palette{grid-template-columns:repeat(auto-fit,minmax(54px,1fr))}}
+/* Each instrument uses its own working surface; controls share the site tokens. */
+.symbol-instrument{min-width:0;container-type:inline-size;--symbol-paper:#f7f9fc;--symbol-rule:#dce3ec}
+.symbol-instrument .symbol-section-title{display:flex;justify-content:space-between;align-items:baseline;gap:.75rem;flex-wrap:wrap;margin:0 0 .9rem}
+.symbol-instrument .symbol-section-title h3{font-size:.95rem;margin:0;font-weight:650;letter-spacing:-.01em}
+.symbol-instrument .symbol-section-title>.small{font-size:.8rem}
+.symbol-instrument .symbol-control-bar{display:flex;align-items:end;gap:.85rem;flex-wrap:wrap;padding-bottom:1rem;margin-bottom:1.4rem;border-bottom:1px solid var(--symbol-rule)}
+.symbol-instrument .symbol-settings>.field{flex:0 1 7rem;min-width:0;max-width:12rem;margin:0}
+.symbol-instrument .symbol-settings>.field>input{width:100%}
+.symbol-instrument .symbol-settings .segmented{margin-left:auto}
+.symbol-instrument .field label{font-size:.8rem;line-height:1.4}
+.symbol-instrument .symbol-notes{margin-top:1.2rem;border-top:1px solid var(--symbol-rule)}
+.symbol-instrument .symbol-notes summary,.symbol-instrument .symbol-grid-navigation summary{font-size:.8rem;color:var(--muted);font-weight:550}
+.symbol-instrument .symbol-notes p{max-width:65ch;font-size:.85rem}
+.symbol-instrument .symbol-inspector{display:flex;align-items:end;flex-wrap:wrap;gap:1rem 1.5rem;padding-top:1rem;margin-top:1rem;border-top:1px solid var(--symbol-rule)}
+.symbol-instrument .symbol-inspector>.field{margin:0;max-width:13rem;flex:0 1 13rem;min-width:0}
+.symbol-instrument .symbol-inspector>p{display:grid;gap:.3rem;margin:0;min-width:5rem}
+.symbol-instrument .symbol-inspected-character{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:1.75rem;line-height:1.3;font-weight:600}
+.symbol-instrument .symbol-grid-view{min-width:0}
+.symbol-instrument .symbol-grid-scroll{overflow:auto;max-width:100%;padding:1rem;background:var(--symbol-paper);border-radius:8px;overscroll-behavior:contain}
+.symbol-instrument .symbol-grid{display:grid;gap:4px;width:max-content;min-width:0;margin:auto}
+.symbol-instrument .symbol-cell{padding:.5rem;min-width:3.5rem;min-height:4.6rem;border-radius:3px;background:white;border:1px solid #d8e0ea;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.symbol-instrument .symbol-cell>span{display:grid;gap:.4rem;text-align:center}
+.symbol-instrument .symbol-cell-value{font-size:1.7rem;line-height:1.15;font-weight:550}
+.symbol-instrument .symbol-cell small{font-family:inherit;font-size:.75rem;color:var(--muted);font-weight:400}
+.symbol-instrument .symbol-cell.is-hole{background:#fff;border:2px solid var(--blue);box-shadow:inset 0 0 0 4px #e8f1ff}
+.symbol-instrument .symbol-cell.is-inspected{outline:3px solid var(--ink);outline-offset:1px}
+.symbol-instrument .symbol-cell.is-empty{background:transparent;border-style:dashed}
+.symbol-instrument .symbol-overlay-value{font-size:.85rem;color:var(--blue);font-weight:650}
+.symbol-instrument .symbol-grid-caption{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin:.65rem 0;color:var(--muted);font-size:.75rem}
+.symbol-instrument .symbol-grid-navigation{margin-top:.25rem}
+.symbol-instrument .symbol-grid-navigation>.toolbar button{font-size:.8rem;min-height:44px;padding:.4rem .65rem}
+.symbol-instrument .symbol-window-controls{gap:.5rem;margin:.6rem 0 1rem}
+.symbol-instrument .symbol-window-controls button{font-size:.8rem;min-height:44px;padding:.4rem .65rem}
+.symbol-instrument .symbol-window-controls p{font-size:.8rem;margin:0 auto;color:var(--muted)}
+.symbol-instrument .symbol-sequence{display:flex;flex-wrap:wrap;gap:.5rem;max-height:22rem;overflow:auto;margin:.5rem 0;padding:.8rem 0;border-block:1px solid var(--symbol-rule)}
+.symbol-instrument .symbol-sequence button{min-width:44px;max-width:100%;overflow-wrap:anywhere}
+.symbol-instrument button[aria-pressed=true]{border-color:var(--blue);background:var(--pale);box-shadow:inset 0 0 0 1px var(--blue)}
+.symbol-instrument .segmented button[aria-pressed=true]{background:var(--blue);color:white;box-shadow:none}
+.symbol-instrument .symbol-sequence button[aria-pressed=true]{outline:2px solid var(--blue);outline-offset:1px}
+
+/* A strip and its unfolded grid are two views of the same input. */
+.symbol-scytale .scytale-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:1.5rem;align-items:start}
+.symbol-scytale .scytale-layout.is-flat{grid-template-columns:minmax(0,1fr)}
+.symbol-scytale .scytale-drum-stage,.symbol-scytale .scytale-flat-stage{min-width:0}
+.symbol-scytale .scytale-cylinder{position:relative;display:flex;align-items:center;min-height:250px;max-height:340px;overflow:auto;padding:2.8rem 1.5rem;background:linear-gradient(90deg,#d9c3a1,#eee0c9 12%,#f4e8d6 50%,#e9d8bc 88%,#ceb68e);border:1px solid #c5af8b;border-radius:28px;box-shadow:inset 0 1px 0 #fff8ec,inset 0 -12px 18px #b89f7520}
+.symbol-scytale .scytale-cylinder::before,.symbol-scytale .scytale-cylinder::after{content:'';position:absolute;pointer-events:none;top:10px;bottom:10px;width:20px;border:1px solid #b9a17b;border-radius:50%;opacity:.5}
+.symbol-scytale .scytale-cylinder::before{left:7px}.symbol-scytale .scytale-cylinder::after{right:7px}
+.symbol-scytale .scytale-ribbon{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:0;min-width:0;padding:.6rem;background:#fffdf7;transform:rotate(-7deg);border-block:1px solid #c7bda7;box-shadow:0 3px 8px #816c4420}
+.symbol-scytale .scytale-ribbon button{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:1.1rem;min-width:44px;min-height:50px;padding:.45rem;border:0;border-right:1px solid #ddd5c5;border-radius:0;background:transparent}
+.symbol-scytale .scytale-ribbon button[aria-pressed=true]{background:var(--pale);outline:2px solid var(--blue);outline-offset:-2px;box-shadow:none}
+.symbol-scytale .scytale-drum-stage>.small{font-size:.75rem}
+.symbol-scytale .scytale-flat-stage .symbol-grid-scroll{background:#faf9f5;min-height:250px;display:flex;align-items:center}
+
+/* A fixed grille has a clear distinction between its cover and open holes. */
+.symbol-cardan .cardan-mask-count{display:flex;align-items:baseline;gap:.4rem;margin-left:auto;color:var(--muted);font-size:.8rem}
+.symbol-cardan .cardan-mask-count strong{font-size:1.7rem;font-weight:600;color:var(--ink)}
+.symbol-cardan .cardan-stage-heading{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.symbol-cardan .cardan-legend{display:flex;gap:.9rem;color:var(--muted);font-size:.75rem;margin-bottom:.8rem}
+.symbol-cardan .cardan-legend>span{display:flex;align-items:center;gap:.35rem}
+.symbol-cardan .cardan-swatch{display:inline-block;width:14px;height:14px;background:#e4eaf2;border:1px solid #b8c5d5;border-radius:2px}
+.symbol-cardan .cardan-swatch.open{background:white;border:2px solid var(--blue)}
+.symbol-cardan .symbol-grid-scroll{padding:1.5rem;background:#f0f3f8}
+.symbol-cardan .symbol-grid{gap:7px;padding:.65rem;background:#dce4ef;border:1px solid #c7d2e1;border-radius:5px}
+.symbol-cardan .symbol-cell{background:#e9eef5;border-color:transparent}
+.symbol-cardan .symbol-cell.is-hole{background:#fffdf8;border-color:var(--blue)}
+.symbol-cardan .symbol-cell.is-inspected{outline-color:var(--ink)}
+
+/* Flags are manipulated on the compass; direction controls stay beside it. */
+.symbol-semaphore .semaphore-workbench{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(200px,.7fr);gap:1.5rem;align-items:center;margin-bottom:1.5rem}
+.symbol-semaphore .semaphore-stage{min-width:0}
+.symbol-semaphore .semaphore-figure{display:block;width:100%;max-width:440px;aspect-ratio:300/260;margin:auto;background:none;border:0}
+.symbol-semaphore .semaphore-handle{cursor:grab;touch-action:none}
+.symbol-semaphore .semaphore-arm-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:.9rem;color:var(--muted);font-size:.75rem;margin:.3rem 0}
+.symbol-semaphore .semaphore-arm-legend>span{display:flex;gap:.4rem;align-items:center}
+.symbol-semaphore .semaphore-arm-legend i{display:block;width:11px;height:11px;border:1px solid var(--ink)}
+.symbol-semaphore .semaphore-arm-legend .left{background:var(--blue);border-color:var(--blue)}
+.symbol-semaphore .semaphore-arm-legend .right{background:white}
+.symbol-semaphore .semaphore-controls{min-width:0}
+.symbol-semaphore .semaphore-directions .field{margin:.6rem 0}
+.symbol-semaphore .semaphore-directions select{width:100%}
+.symbol-semaphore .semaphore-reading{border-block:1px solid var(--symbol-rule);padding:.8rem 0;margin:1rem 0}
+.symbol-semaphore .symbol-pair{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin:.25rem 0}
+.symbol-semaphore .symbol-pair strong{font-size:4.5rem;font-weight:650;line-height:1.1}
+.symbol-semaphore .symbol-pair code{font-size:1.1rem}
+.symbol-semaphore .semaphore-compose-actions button{flex:1}
+.symbol-semaphore .semaphore-interpret{font-size:.85rem;padding:.4rem 0;text-decoration:underline;text-underline-offset:4px;justify-content:flex-start}
+.symbol-semaphore .semaphore-controls>.small{font-size:.8rem;max-width:28ch}
+.symbol-semaphore .semaphore-sequence button{min-width:52px;min-height:56px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:1.1rem;background:transparent;border-color:transparent;border-radius:4px}
+.symbol-semaphore .semaphore-sequence button[aria-pressed=true]{background:var(--pale);border-color:var(--blue)}
+
+/* Haverhill's letters are paired in nine grid cells and four X sectors. */
+.symbol-pigpen .pigpen-profile{margin-bottom:1.3rem}
+.symbol-pigpen .pigpen-profile a{font-size:.8rem}
+.symbol-pigpen .pigpen-workbench{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:1.5rem;align-items:start;margin-bottom:1.6rem}
+.symbol-pigpen .pigpen-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;min-width:0}
+.symbol-pigpen .pigpen-bank{min-width:0}
+.symbol-pigpen .pigpen-bank .symbol-section-title{font-size:.8rem;max-width:288px}
+.symbol-pigpen .pigpen-bank h3{font-size:.8rem;color:var(--muted);font-weight:550}
+.symbol-pigpen .pigpen-grid-bank,.symbol-pigpen .pigpen-cross-bank{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;max-width:288px}
+.symbol-pigpen .pigpen-letter-pair{display:flex;gap:2px;min-width:0;border-bottom:1px solid #e2e8f0;padding-bottom:.25rem}
+.symbol-pigpen .pigpen-key{width:44px;min-width:44px;min-height:66px;border:1px solid transparent;border-radius:4px;background:transparent;padding:.3rem .1rem}
+.symbol-pigpen .pigpen-key>span{display:grid;justify-items:center;gap:.35rem}
+.symbol-pigpen .pigpen-key:hover{background:#f0f5fc}
+.symbol-pigpen .pigpen-key[aria-pressed=true]{background:var(--pale);border-color:var(--blue);box-shadow:none}
+.symbol-pigpen .pigpen-unit{font-size:.85rem;line-height:1.25;font-weight:600;white-space:nowrap}
+.symbol-pigpen .pigpen-cross-bank [data-sector=north]{grid-area:1/2}
+.symbol-pigpen .pigpen-cross-bank [data-sector=west]{grid-area:2/1}
+.symbol-pigpen .pigpen-cross-bank [data-sector=east]{grid-area:2/3}
+.symbol-pigpen .pigpen-cross-bank [data-sector=south]{grid-area:3/2}
+.symbol-pigpen .pigpen-glyph{display:block;width:36px;height:36px;flex-shrink:0;color:var(--ink)}
+.symbol-pigpen .pigpen-space-key{display:flex;min-width:100px;min-height:44px;margin:.8rem auto 0;background:transparent;border-color:#d7e0ec;padding:.45rem 1rem}
+.symbol-pigpen .pigpen-space-key .pigpen-glyph{display:none}
+.symbol-pigpen .pigpen-compose-station{border-left:1px solid var(--symbol-rule);padding-left:1.25rem;min-width:0}
+.symbol-pigpen .symbol-selected{display:grid;justify-items:start;gap:.75rem;margin:0 0 1rem}
+.symbol-pigpen .symbol-selected>.pigpen-glyph{width:104px;height:104px}
+.symbol-pigpen .symbol-selected>div{display:grid;gap:.5rem;min-width:0;max-width:100%}
+.symbol-pigpen .symbol-selected strong{font-size:2rem;line-height:1.15;font-weight:600}
+.symbol-pigpen .symbol-selected code{font-size:.8rem;overflow-wrap:anywhere}
+.symbol-pigpen .symbol-selected .check{font-size:.85rem;margin:0}
+.symbol-pigpen .pigpen-compose-actions{display:grid;gap:.45rem}
+.symbol-pigpen .pigpen-compose-actions button{min-width:0;padding:.55rem .6rem;font-size:.85rem}
+.symbol-pigpen .pigpen-sequence{gap:.35rem}
+.symbol-pigpen .pigpen-sequence button{min-width:64px;max-width:112px;min-height:80px;padding:.45rem;border:1px solid transparent;border-radius:4px;background:transparent}
+.symbol-pigpen .pigpen-sequence button>span{display:grid;justify-items:center;gap:.5rem;min-width:0}
+.symbol-pigpen .pigpen-sequence code{font-size:.75rem;overflow-wrap:anywhere}
+
+/* A physical 2×4 dot face and an exact byte readout. */
+.symbol-braille .braille-workbench{display:grid;grid-template-columns:260px minmax(0,1fr);gap:2rem;align-items:center;margin:1.4rem 0 1.8rem;min-height:310px}
+.symbol-braille .braille-cell{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem 1.3rem;padding:1.5rem 1rem;background:#f2f6fc;border:1px solid #dee6f1;border-radius:14px}
+.symbol-braille .braille-cell button{min-width:64px;min-height:64px;padding:.5rem .15rem;border:1px solid transparent;border-radius:50%;background:transparent}
+.symbol-braille .braille-cell button>span{display:flex;justify-content:center;align-items:center;gap:.45rem}
+.symbol-braille .braille-cell small{font-size:.8rem;color:var(--muted);font-weight:400}
+.symbol-braille .braille-dot{display:block;width:34px;height:34px;border:2px solid #788aa4;border-radius:50%;background:white;flex-shrink:0}
+.symbol-braille .braille-cell button[aria-pressed=true]{background:transparent;border-color:transparent;box-shadow:none}
+.symbol-braille .braille-cell button[aria-pressed=true] .braille-dot{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 3px #f2f6fc,0 0 0 4px var(--blue)}
+.symbol-braille .braille-readout{min-width:0}
+.symbol-braille .braille-unicode-sample{display:flex;align-items:center;gap:1.1rem;min-height:100px;margin-bottom:.65rem}
+.symbol-braille .braille-unicode{font-family:system-ui,sans-serif;font-size:6rem;line-height:1.1;min-width:1.2em}
+.symbol-braille .braille-unicode-sample code{font-size:.9rem;color:var(--muted)}
+.symbol-braille .braille-values{display:grid;grid-template-columns:7rem minmax(0,1fr);gap:1.1rem}
+.symbol-braille .braille-values .field{margin:.5rem 0;min-width:0}
+.symbol-braille .braille-mask-input{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:transparent;border:0;border-bottom:1px solid #aebed2;border-radius:0;padding:.4rem 0;min-height:54px;max-width:100%}
+.symbol-braille #visual-braille-16{font-size:2rem;line-height:1.1;width:100%}
+.symbol-braille #visual-braille-2{font-size:1.2rem;line-height:1.4;width:100%;letter-spacing:.035em}
+.symbol-braille .braille-active-dots{display:grid;gap:.3rem;margin-top:.85rem}
+.symbol-braille .braille-active-dots strong{font-size:1.1rem;font-weight:550;letter-spacing:.05em}
+.symbol-braille .braille-sequence-header{align-items:center}
+.symbol-braille .braille-sequence-header button{font-size:.8rem;padding:.45rem .65rem}
+.symbol-braille .braille-sequence button{background:transparent;border:1px solid transparent;border-radius:4px;min-width:64px;padding:.5rem .7rem}
+.symbol-braille .braille-sequence-glyph{display:block;font-size:2.6rem;line-height:1.2}
+.symbol-braille .braille-sequence code{display:block;font-size:.85rem;margin-top:.4rem}
+
+/* The signal line is the work; the two keys compose it explicitly. */
+.symbol-morse .morse-mode .segmented{max-width:25rem;width:100%}
+.symbol-morse .morse-mode{padding-bottom:1rem;margin-bottom:.5rem;border:0}
+.symbol-morse .morse-sequence{min-height:160px;align-items:center;gap:.8rem;padding:1rem 0;margin:.75rem 0}
+.symbol-morse .morse-sequence button{min-width:94px;min-height:108px;padding:.65rem .9rem;border:1px solid transparent;border-radius:5px;background:transparent}
+.symbol-morse .morse-sequence button>span{display:grid;align-content:center;gap:1rem}
+.symbol-morse .morse-group{display:flex;justify-content:center;align-items:center;gap:.55rem;min-height:40px}
+.symbol-morse .morse-dot-shape{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);flex-shrink:0}
+.symbol-morse .morse-dash-shape{display:inline-block;width:34px;height:8px;border-radius:2px;background:var(--ink);flex-shrink:0}
+.symbol-morse .morse-word-gap{font-size:2rem;color:var(--muted)}
+.symbol-morse .morse-sequence code{font-size:.8rem;line-height:1.4}
+.symbol-morse .morse-empty{font-size:.95rem;margin:0 auto;text-align:center;padding:1rem}
+.symbol-morse .morse-composer{display:grid;grid-template-columns:minmax(0,1fr) 165px;gap:1rem;margin:1.3rem 0}
+.symbol-morse .morse-key-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.symbol-morse .morse-key-pair button{min-width:0;min-height:116px;padding:1rem;background:#f6f9fd;border:1px solid #cdd9e9;border-radius:8px}
+.symbol-morse .morse-key-pair button>span{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.7rem;min-width:0;max-width:100%;font-size:1rem}
+.symbol-morse .morse-mark{font-size:2.5rem;line-height:1}
+.symbol-morse .morse-navigation{display:grid;gap:.45rem}
+.symbol-morse .morse-navigation button{min-width:0;min-height:44px;font-size:.8rem;padding:.45rem .6rem}
+.symbol-morse .morse-exact{display:grid;gap:.5rem;padding:1rem 0;margin-top:1rem;border-top:1px solid var(--symbol-rule)}
+.symbol-morse .morse-exact pre{font-size:1rem;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+
+@container(max-width:760px){
+  .symbol-pigpen .pigpen-workbench{grid-template-columns:minmax(0,1fr)}
+  .symbol-pigpen .pigpen-compose-station{display:flex;align-items:center;gap:1.5rem;border-left:0;border-top:1px solid var(--symbol-rule);padding:1rem 0 0}
+  .symbol-pigpen .symbol-selected{display:flex;align-items:center;margin:0;flex:1;min-width:0}
+  .symbol-pigpen .symbol-selected>.pigpen-glyph{width:80px;height:80px}
+  .symbol-pigpen .pigpen-compose-actions{flex:0 1 160px}
+}
+@container(max-width:620px){
+  .symbol-scytale .scytale-layout{grid-template-columns:minmax(0,1fr)}
+  .symbol-scytale .scytale-cylinder{min-height:190px}
+  .symbol-scytale .scytale-flat-stage .symbol-grid-scroll{min-height:0}
+  .symbol-semaphore .semaphore-workbench{grid-template-columns:minmax(0,1fr);gap:.8rem}
+  .symbol-semaphore .semaphore-figure{max-width:360px}
+  .symbol-semaphore .semaphore-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 1rem;align-items:center}
+  .symbol-semaphore .semaphore-directions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;grid-column:1/-1}
+  .symbol-semaphore .semaphore-reading{margin:0;grid-row:2/4}
+  .symbol-semaphore .semaphore-controls>.small,.symbol-semaphore .semaphore-controls>.warning{grid-column:1/-1;max-width:none}
+  .symbol-braille .braille-workbench{grid-template-columns:minmax(0,1fr);gap:1.2rem}
+  .symbol-braille .braille-cell{max-width:260px;width:100%;justify-self:center}
+  .symbol-braille .braille-readout{max-width:420px;width:100%;justify-self:center}
+  .symbol-morse .morse-composer{grid-template-columns:minmax(0,1fr)}
+  .symbol-morse .morse-navigation{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@container(max-width:560px){
+  .symbol-semaphore .semaphore-reading{grid-row:auto;grid-column:1/-1}
+  .symbol-semaphore .semaphore-compose-actions{grid-column:1/-1}
+  .symbol-pigpen .pigpen-palette{grid-template-columns:minmax(0,1fr);gap:1.2rem}
+  .symbol-pigpen .pigpen-bank{max-width:288px;width:100%;justify-self:center}
+  .symbol-pigpen .pigpen-compose-station{flex-wrap:wrap;gap:.8rem}
+  .symbol-pigpen .pigpen-compose-actions{flex:1 1 100%;display:flex;flex-wrap:wrap}
+  .symbol-pigpen .pigpen-compose-actions button{flex:1 1 8rem}
+  .symbol-instrument .symbol-inspector{gap:.8rem}
+  .symbol-instrument .symbol-inspector>.field{flex:1 1 10rem}
+  .symbol-instrument .symbol-settings .segmented{margin-left:0;flex:1 1 100%}
+  .symbol-cardan .cardan-mask-count{margin-left:auto}
+  .symbol-cardan .symbol-grid-scroll{padding:.7rem}
+  .symbol-braille .braille-sequence-header>.toolbar{width:100%}
+  .symbol-braille .braille-sequence-header button{flex:1}
+}
+@media(max-width:700px){
+  .symbol-instrument .symbol-window-controls{gap:.4rem}
+  .symbol-instrument .symbol-window-controls button{flex:1}
+  .symbol-instrument .symbol-window-controls p{flex-basis:100%;order:3}
+  .symbol-instrument .symbol-control-bar{gap:.7rem}
+  .symbol-instrument .symbol-section-title>.small{max-width:100%}
+  .symbol-morse .morse-key-pair{grid-template-columns:repeat(auto-fit,minmax(min(100%,8rem),1fr))}
+  .symbol-morse .morse-key-pair button{min-height:96px;padding:.7rem}
+  .symbol-morse .morse-navigation{grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr))}
+}
 @media(prefers-reduced-motion:reduce){.symbol-scytale .scytale-ribbon{transform:none}}

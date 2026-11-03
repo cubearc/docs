@@ -78,7 +78,7 @@ export function mountPlayground(container, context) {
     try { token = session.begin(); }
     catch (error) { notify(error.message); return; }
     page.running = true; page.errors = []; page.pendingNext = false; page.showRound = null;
-    page.status = automatic ? 'Updating recently measured fast tools…' : 'Comparing independent alternatives…';
+    page.status = automatic ? 'Updating recently measured fast tools…' : descriptor ? 'Running locally…' : 'Comparing independent alternatives…';
     page.redraw?.();
     const rootInput = session.inputFor(token);
     const sourceName = page.sourceName;
@@ -111,7 +111,8 @@ export function mountPlayground(container, context) {
     } finally {
       if (page.revision === revision) {
         page.running = false;
-        page.status = controller.signal.aborted ? 'This attempt will add no further results. Worker termination does not confirm Core completion or cooperative cancellation.' : `${session.current?.results.length ?? 0} results ready from the same input.`;
+        const count = session.current?.results.length ?? 0;
+        page.status = controller.signal.aborted ? 'This attempt will add no further results. Worker termination does not confirm Core completion or cooperative cancellation.' : descriptor ? count ? 'Result ready.' : 'No result. Review the execution details below.' : `${count} results ready from the same input.`;
         page.redraw?.();
       }
     }
@@ -143,7 +144,8 @@ export function mountPlayground(container, context) {
   function card(result) {
     const action = runtime.action(result.operation);
     const names = Object.keys(result.outputs);
-    const selectedName = names.length === 1 ? names[0] : page.outputChoices[result.id];
+    const defaultName = descriptor ? [descriptor.primaryOutputs[result.operation], 'output', 'text'].find(name => names.includes(name)) ?? names[0] : undefined;
+    const selectedName = names.length === 1 ? names[0] : page.outputChoices[result.id] ?? defaultName;
     const pinned = session.pins.some(row => row.id === result.id);
     const view = selectedName ? resultViewer(result.outputs[selectedName], result.views[selectedName], {
       title: action?.title ?? 'Result', id: `result-${result.id}`, pinned,
@@ -168,9 +170,9 @@ export function mountPlayground(container, context) {
     replace(results, h('div', { class: 'result-header' }, h('div', { class: 'row between' }, h('h2', {}, 'Results'), h('div', { class: 'segmented' },
       button('All', () => { page.filter = 'all'; renderResults(); }, { id: 'result-filter-all', 'aria-pressed': String(page.filter !== 'pinned') }),
       button('Pinned', () => { page.filter = 'pinned'; renderResults(); }, { id: 'result-filter-pinned', 'aria-pressed': String(page.filter === 'pinned') }))),
-      h('p', { class: 'small muted' }, 'Every alternative starts from the same frozen round input.')),
+      descriptor ? null : h('p', { class: 'small muted' }, 'Every alternative starts from the same frozen round input.')),
       retained && !page.showRound ? h('p',{class:'small muted'},`Showing retained evidence from round ${retained.id}; the latest attempt has no accepted result.`) : null,
-      records.length ? h('div', { class: 'result-grid' }, records.map(card)) : h('div', { class: 'empty-state' }, page.running ? 'Running the real local tools…' : page.pendingNext ? 'Next input ready. Run the next round when you are ready.' : 'Paste text or choose a file, then run tools to compare results.'),
+      records.length ? h('div', { class: 'result-grid' }, records.map(card)) : h('div', { class: 'empty-state' }, page.running ? 'Running the real local tools…' : page.pendingNext ? 'Next input ready. Run the next round when you are ready.' : descriptor ? 'Your output will appear here. Add input or load an example, then run.' : 'Paste text or choose a file, then run tools to compare results.'),
       page.errors.length ? h('details', { class: 'panel spacer' }, h('summary', {}, `Not applicable or needs options (${page.errors.length})`), h('ul', { class: 'compact-list' }, page.errors.map(error => h('li', {}, h('strong', {}, error.title), h('p', { class: 'small' }, error.message))))) : null,
       history.length ? h('details', { class: 'panel spacer' }, h('summary', {}, `Previous rounds and original input (${history.length})`),
         history.map(item => h('div', {}, button(`Round ${item.id} · ${item.input.type} · ${item.results.length} results`, () => { page.showRound = item.id; page.pendingNext = false; page.filter = 'all'; renderResults(); }, { class: 'round-button' }), h('details', {}, h('summary', {}, `Retained input · round ${item.id}`), h('p', {class:'small muted'},`${item.input.type} · ${bytesOf(item.input).toLocaleString()} bytes. Original bytes and text are retained independently of later edits.`), button(`Download input from round ${item.id}`,()=>download(item.input.data instanceof Uint8Array ? item.input.data : item.input.type==='text'?item.input.data:JSON.stringify(item.input.data,null,2),`cube-round-${item.id}-input.${item.input.type==='bytes'?'bin':'txt'}`)), button(`Download original for round ${item.id}`,()=>download(item.root.data instanceof Uint8Array ? item.root.data : item.root.type==='text'?item.root.data:JSON.stringify(item.root.data,null,2),`cube-round-${item.id}-original.${item.root.type==='bytes'?'bin':'txt'}`))))),
@@ -188,7 +190,7 @@ export function mountPlayground(container, context) {
   const inputMain = !hasInput ? h('div', { class: 'input-main' }, h('p', { class: 'muted' }, 'This tool uses the options below. No starting input is required.')) : h('div', { class: 'input-main' }, h('label', { for: 'playground-input' }, inputLabel), inputControl,
     h('div', { class: 'toolbar spacer' }, button('Paste', async () => { try { const text = await navigator.clipboard.readText(); changed({ input: { type: 'text', data: text } }); page.sourceName = null; render(); } catch { notify('Use your keyboard or system paste command in the text field.'); } }),
       button('Open file', () => fileInput.click()), button('Clear', () => { changed({ input: { type: 'text', data: '' } }); page.sourceName = null; render(); }), fileInput),
-    h('p', { class: 'small muted' }, 'Up to 128 KiB. Choose a file to retain exact bytes, including line endings.'));
+    h('p', { class: 'small muted' }, descriptor ? '128 KiB limit. Files preserve original bytes.' : 'Up to 128 KiB. Choose a file to retain exact bytes, including line endings.'));
   if (selected) {
     page.parameters[selected.id] ??= {};
     function form() { return parametersForm(selected, page.parameters[selected.id], (name, value) => { page.parameters[selected.id][name] = value; changed(); if (presentationFor(originalAction,page.parameters[selected.id])?.kind !== descriptor?.kind) render(); else instrument?.refresh(); }, 'playground-options'); }
@@ -272,13 +274,21 @@ export function mountPlayground(container, context) {
     h('div', { class: 'toolbar' }, runButton, button('Stop', () => { clearTimeout(page.autoTimer); page.controller?.abort(); page.auxiliary?.abort(); page.running = false; page.readingFile = null; page.secondaryReading = null; page.status = 'Stop requested; pending input and results are revoked. Core completion is not confirmed; the previous input is retained.'; page.redraw?.(); })), status,
     hasInput && !descriptor ? button('Try an example', () => { changed({ input: { type: 'text', data: page.mode === 'Decode' ? 'SGVsbG8sIEN1YmUh' : 'Hello, Cube!' } }); page.tool = null; render(); }) : null,
     descriptor ? button('Load Core example', loadExample, {id:'load-core-example'}) : null,
-    selected ? button('Compare common tools', () => { page.tool = null; changed(); render(); }) : null);
-  replace(container, h('div', { class: 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, selected ? selected.description : page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),
+    selected && !descriptor ? button('Compare common tools', () => { page.tool = null; changed(); render(); }) : null);
+  const actionControl = descriptor ? h('div', {class:'field instrument-action'}, h('label',{for:'instrument-action'},'Action'), h('select',{id:'instrument-action',onChange:event=>selectAction(event.target.value)}, descriptor.operations.map(id=>runtime.action(id)).filter(Boolean).map(action=>h('option',{value:action.id,selected:action.id===selected.id},action.title)))) : null;
+  const editorTabs = descriptor ? h('div', {class:'instrument-tabs segmented',role:'group','aria-label':'Editor view'}, ['Visual','Parameters'].map(tab=>button(tab,()=>{ page.instrumentTab=tab; updateTab(); },{id:`instrument-tab-${tab.toLowerCase()}`,'aria-pressed':String((page.instrumentTab ?? 'Visual')===tab)}))) : null;
+  const inputPanel = h('section', { class: 'panel input-panel', id: 'input-section', tabindex: -1, 'aria-label': 'Input and options' },
+    descriptor ? null : h('div', { class: 'segmented mode-control' }, ['Decode', 'Encode'].map(mode => button(mode, () => { page.mode = mode; page.tool = null; changed(); render(); }, { 'aria-pressed': String(page.mode === mode) }))), inputMain, inputOptions);
+  replace(container, h('div', { class: descriptor ? 'heading instrument-heading' : 'heading' }, h('h1', { id: 'playground-heading' }, selected ? selected.title : `${page.mode} text`), h('p', {}, selected ? selected.description : page.mode === 'Decode' ? 'Paste a message. Compare the possibilities.' : 'One message, several formats.'),
     session.path.length ? h('div', { class: 'row spacer' }, h('span', { class: 'tag' }, `${session.path.length} chosen steps`), button('Save chosen sequence', () => fromSequence(session.path, session.originalInput, session.input.type))) : null),
-    h('div', { class: 'section-jumps toolbar' }, h('a', { class: 'button', href: '#input-section' }, 'Input'), h('a', { class: 'button', href: '#results-section' }, 'Results')),
-    h('div', { class: descriptor ? 'play-grid visual-workspace' : 'play-grid' }, h('section', { class: 'panel input-panel', id: 'input-section', tabindex: -1, 'aria-label': 'Input and options' },
-      descriptor ? h('div', {class:'field instrument-action'}, h('label',{for:'instrument-action'},'Action'), h('select',{id:'instrument-action',onChange:event=>selectAction(event.target.value)}, descriptor.operations.map(id=>runtime.action(id)).filter(Boolean).map(action=>h('option',{value:action.id,selected:action.id===selected.id},action.title)))) : h('div', { class: 'segmented mode-control' }, ['Decode', 'Encode'].map(mode => button(mode, () => { page.mode = mode; page.tool = null; changed(); render(); }, { 'aria-pressed': String(page.mode === mode) }))), inputMain, inputOptions), ...(descriptor ? [h('div', {class:'instrument-tabs segmented',role:'group','aria-label':'Editor view'}, ['Visual','Parameters'].map(tab=>button(tab,()=>{ page.instrumentTab=tab; updateTab(); },{id:`instrument-tab-${tab.toLowerCase()}`,'aria-pressed':String((page.instrumentTab ?? 'Visual')===tab)}))), instrument.surface, h('section',{class:'panel instrument-options',id:'instrument-parameter-panel','aria-label':'Operation parameters'},parameterRegion)] : []), results),
-    h('div', { class: 'toolbar spacer' }, button('Browse all tools', () => navigate('tools')), button('Clear session history', () => context.clearSession())));
+    h('div', { class: descriptor ? 'section-jumps toolbar instrument-jumps' : 'section-jumps toolbar' }, h('a', { class: 'button', href: '#input-section' }, 'Input'), h('a', { class: 'button', href: '#results-section' }, 'Results')),
+    h('div', { class: descriptor ? 'play-grid visual-workspace' : 'play-grid' },
+      descriptor ? h('div', {class:'instrument-command-bar'}, actionControl, editorTabs) : null,
+      inputPanel,
+      ...(descriptor ? [instrument.surface, h('section',{class:'panel instrument-options',id:'instrument-parameter-panel','aria-label':'Operation parameters'},parameterRegion)] : []), results),
+    h('div', { class: 'toolbar spacer workspace-navigation' }, button('Browse all tools', () => navigate('tools')),
+      descriptor ? button('Compare common tools', () => { page.tool = null; changed(); render(); }) : null,
+      button('Clear session history', () => context.clearSession())));
   function updateTab() {
     if (!instrument) return;
     const visual = (page.instrumentTab ?? 'Visual') === 'Visual';

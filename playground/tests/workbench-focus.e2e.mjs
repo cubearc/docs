@@ -40,6 +40,8 @@ test('graph layout treats prototype-like vertex IDs as ordinary Core labels',{ti
  const page=await open('graph.shortest_path','graph');
  const data={directed:false,vertices:['__proto__','constructor','toString'],edges:[]};
  await page.locator('#playground-input').fill(JSON.stringify(data));
+ const labels=await page.locator('#graph-source option').evaluateAll((options,names)=>names.map(name=>options.find(option=>option.value===name)?.textContent),data.vertices);
+ assert.deepEqual(labels,data.vertices,'Graph selectors preserve exact user vertex labels.');
  const transforms=await page.locator('.graph-node').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('transform')));
  assert.equal(transforms.length,3);assert.ok(transforms.every(s=>!s.includes('undefined')&&!s.includes('NaN')),transforms.join(','));
  const calls=await page.evaluate(()=>window.instrumentCalls);

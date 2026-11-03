@@ -13,7 +13,7 @@ const select = (label, value, options, change) => {
   const pending = !options.includes(current) ? h('option', { value: current, selected: true }, current === '' ? 'Choose an option' : `${current} (unavailable for these samples)`) : null;
   return h('div', { class: 'media-field' }, h('label', { for: id }, label), h('select', { id, value: current, onChange: e => change(e.target.value) }, pending, options.map(option => h('option', { value: option, selected: option === current }, option))));
 };
-const note = message => h('p', { class: 'small muted' }, message);
+const note = (message, className = '') => h('p', { class: `small muted ${className}`.trim() }, message);
 const table = (labels, rows, label) => h('div', { class: 'media-scroll', role: 'region', tabindex: 0, 'aria-label': label }, h('table', { class: 'media-table' }, h('thead', {}, h('tr', {}, labels.map(title => h('th', { scope: 'col' }, title)))), h('tbody', {}, rows)));
 const row = cells => h('tr', {}, cells.map(cell => h('td', {}, cell)));
 
@@ -145,11 +145,11 @@ function imageCoordinates(api, image) {
     }), state.pixel ? note(`Read (${state.pixel.x}, ${state.pixel.y}): ${Array.from(state.pixel.values ?? []).map(HEX).join(' ')}${state.pixel.key !== currentKey(api) ? ' · previous input/settings' : ''}`) : null);
 }
 function imageSurface(api, image, title, { plane = false, point = true, origin = { x: 0, y: 0 } } = {}) {
-  if (!image) return h('section', { class: 'media-image-panel' }, h('h3', {}, title), note('Run the operation to inspect this output.'));
+  if (!image) return h('section', { class: 'media-image-panel media-image-empty' }, h('h3', {}, title), h('div', { class: 'media-image-placeholder' }, note('Run the operation to inspect this output.')));
   const state = cache(api);
   const width = Math.min(2048, image.width), height = Math.min(2048, image.height);
   const canvas = h('canvas', { width, height, class: 'media-raster', role: 'img', 'aria-label': `${title}: ${image.width} by ${image.height} pixels. Use the pixel coordinate controls for exact inspection.` });
-  const cssWidth = Math.min(32768, image.width * (state.zoom ?? 24));
+  const cssWidth = Math.min(32768, image.width * (state.zoom ?? 48));
   canvas.style.width = `${cssWidth}px`;
   canvas.style.height = `${cssWidth / image.width * image.height}px`;
   canvas.style.maxWidth = 'none';
@@ -177,12 +177,12 @@ function imageSurface(api, image, title, { plane = false, point = true, origin =
     api.refresh();
   });
   const full = image.width * image.height;
-  return h('section', { class: 'media-image-panel' }, h('h3', {}, title), scroll, note(`${image.width} × ${image.height} · ${image.color_model}${plane ? ' · raw 0/1 displayed as 0/255' : ' · original sample values'}${width !== image.width || height !== image.height ? ' · reduced only for drawing; exact samples retained' : ''}`),
+  return h('section', { class: 'media-image-panel' }, h('h3', {}, title), scroll, note(`${image.width} × ${image.height} · ${image.color_model}${plane ? ' · raw 0/1 displayed as 0/255' : ''}${width !== image.width || height !== image.height ? ' · reduced only for drawing; exact samples retained' : ''}`),
     h('details', {}, h('summary', {}, 'Accessible sample values'), h('pre', { tabindex: 0 }, `${JSON.stringify(image).slice(0, 8192)}${full > 1024 ? '\nPreview limited to 8,192 characters. Export retains the complete image.' : ''}`)));
 }
 function imageZoom(api) {
   const state = cache(api);
-  return number('Synchronized zoom (CSS pixels per sample)', state.zoom ?? 24, value => { state.zoom = Math.max(1, Math.min(64, Number(value))); api.refresh(); }, { min: 1, max: 64 });
+  return number('Synchronized zoom (CSS pixels per sample)', state.zoom ?? 48, value => { state.zoom = Math.max(1, Math.min(64, Number(value))); api.refresh(); }, { min: 1, max: 64 });
 }
 function planeImage(result) {
   if (!result?.output?.pixels || !result.data) return null;
@@ -205,8 +205,8 @@ function bitPlane(host, api) {
   const result = rawResult(api);
   const channelOptions = source ? channels[source.color_model === 'indexed' && api.param('expand_palette') ? 'rgba' : source.color_model] ?? [] : ['red', 'green', 'blue', 'alpha', 'gray', 'index'];
   const selectedChannel = api.param('channel') ?? '';
-  const controls = h('div', { class: 'toolbar' }, select('Channel', selectedChannel, channelOptions, value => { api.setParam('channel', value); api.refresh(); }),
-    h('div', { class: 'media-bits', role: 'group', 'aria-label': 'Bit plane' }, Array.from({ length: 8 }, (_, bit) => button(String(bit), () => { api.setParam('bit', bit); api.refresh(); }, { id: `media-bit-${bit}`, 'aria-pressed': String(Number(api.param('bit')) === bit), 'aria-label': `Bit ${bit}${bit === 0 ? ', least significant' : ''}` }))), imageZoom(api));
+  const controls = h('div', { class: 'media-settings-bar media-plane-settings' }, select('Channel', selectedChannel, channelOptions, value => { api.setParam('channel', value); api.refresh(); }),
+    h('div', { class: 'media-bit-control' }, h('span', { class: 'media-control-label' }, 'Bit plane'), h('div', { class: 'media-bits', role: 'group', 'aria-label': 'Bit plane' }, Array.from({ length: 8 }, (_, bit) => button(String(bit), () => { api.setParam('bit', bit); api.refresh(); }, { id: `media-bit-${bit}`, 'aria-pressed': String(Number(api.param('bit')) === bit), 'aria-label': `Bit ${bit}${bit === 0 ? ', least significant' : ''}` })))), imageZoom(api));
   let output;
   try { output = planeImage(result); } catch (error) { state.error = error.message; }
   const thumbnailControls = source ? asyncAction(api, 'Load selected plane thumbnail', async () => {
@@ -217,7 +217,7 @@ function bitPlane(host, api) {
     const next = state.thumbnailsKey === thumbnailKey ? state.thumbnails ?? {} : {};
     return { thumbnails: { ...next, [bit]: value }, thumbnailsKey: thumbnailKey };
   }) : null;
-  host.replaceChildren(h('div', { class: 'media-workspace' }, controls, decodeControl(api),
+  host.replaceChildren(h('div', { class: 'media-workspace media-image-workspace media-bit-workspace' }, controls, decodeControl(api),
     source ? h('div', { class: 'media-image-pair' }, imageSurface(api, source, 'Original samples'), imageSurface(api, output, `Plane ${result.output?.bit ?? api.param('bit') ?? '—'}${api.stale() ? ' · previous settings' : ''}`, { plane: true, origin: result.output?.pixels?.region ?? { x: 0, y: 0 } })) : note('Load an image-samples example, enter exact sample JSON, or open a file and decode it with Core.'),
     source ? imageCoordinates(api, source) : null,
     inspectedPlaneBit(result, state.x ?? 0, state.y ?? 0) !== null ? note(`Plane inspection (${state.x ?? 0}, ${state.y ?? 0}): bit ${result.output.bit} = ${inspectedPlaneBit(result, state.x ?? 0, state.y ?? 0)} (raw); display ${inspectedPlaneBit(result, state.x ?? 0, state.y ?? 0) * 255}${api.stale() ? ' · previous settings' : ''}.`) : null,
@@ -252,7 +252,7 @@ function changeColors(api, selected) {
 }
 function colorPalette(api, histogram) {
   const selected = colorSelection(api);
-  return h('section', {}, h('h3', {}, 'Exact palette'), histogram ? h('div', { class: 'media-palette' }, histogram.colors.map(color => {
+  return h('section', { class: 'media-palette-strip' }, h('h3', {}, 'Exact palette'), histogram ? h('div', { class: 'media-palette' }, histogram.colors.map(color => {
     const hex = color.values.map(HEX).join('');
     const active = selected.includes(hex) || selected.includes(hex.toLowerCase());
     return button(h('span', {}, h('span', { class: 'media-swatch', style: `background:${color.values.length >= 3 ? `#${hex.slice(0, 6)}` : `rgb(${color.values[0]} ${color.values[0]} ${color.values[0]})`}`, 'aria-hidden': true }), h('strong', {}, hex), h('span', {}, ` ${color.count} pixels`)), () => changeColors(api, active ? selected.filter(v => v.toLowerCase() !== hex.toLowerCase()) : [...selected, hex]), { id: `media-color-${hex}`, 'aria-pressed': String(active), 'aria-label': `${hex}, ${color.count} pixels${active ? ', selected' : ''}` });
@@ -260,7 +260,7 @@ function colorPalette(api, histogram) {
 }
 function colorOutputs(api, exports) {
   if (!exports?.images) return null;
-  return h('section', {}, h('h3', {}, 'PNG exports from Core'), exports.output.outputs.map((item, i) => button(`Download ${item.name} · ${item.selected_pixels} pixels`, () => download(bytes(exports.images[i]), item.name, 'image/png'))));
+  return h('section', { class: 'media-exports' }, h('h3', {}, 'PNG exports from Core'), exports.output.outputs.map((item, i) => button(`Download ${item.name} · ${item.selected_pixels} pixels`, () => download(bytes(exports.images[i]), item.name, 'image/png'))));
 }
 function colors(host, api) {
   const state = cache(api);
@@ -272,7 +272,7 @@ function colors(host, api) {
   const layer = producingView(api, result.output?.representation === 'layer' ? result : undefined, state.layer);
   const exports = producingView(api, result.images ? result : undefined, state.exports);
   const colorChanged = state.maskSelection && !sameColorConfiguration(state.maskSelection, colorConfiguration(api)) || state.exportSelection && !sameColorConfiguration(state.exportSelection, colorConfiguration(api, true));
-  const sourceControls = source ? h('div', { class: 'toolbar' }, asyncAction(api, 'Analyze palette', async () => ({ histogram: (await api.execute('image.histogram', { input: source }, { ...ownParameters(api, ['region', 'channels', 'expand_palette', 'max_colors']) })).output })),
+  const sourceControls = source ? h('div', { class: 'media-color-actions toolbar' }, asyncAction(api, 'Analyze palette', async () => ({ histogram: (await api.execute('image.histogram', { input: source }, { ...ownParameters(api, ['region', 'channels', 'expand_palette', 'max_colors']) })).output })),
     asyncAction(api, 'Build mask and transparent layer', async () => {
       const parameters = colorConfiguration(api);
       const mask = await api.execute('image.colors.extract', { input: source }, { ...parameters, representation: 'mask' });
@@ -286,7 +286,7 @@ function colors(host, api) {
       return { exports, exportSelection: parameters };
     }), imageZoom(api)) : null;
   const sample = state.pixel?.key === currentKey(api) ? state.pixel.values : null;
-  host.replaceChildren(h('div', { class: 'media-workspace' }, decodeControl(api), sourceControls, evidenceLabel(api, state, ['histogram', 'mask', 'layer', 'exports'], colorChanged), colorPalette(api, histogram),
+  host.replaceChildren(h('div', { class: 'media-workspace media-image-workspace media-color-workspace' }, decodeControl(api), sourceControls, evidenceLabel(api, state, ['histogram', 'mask', 'layer', 'exports'], colorChanged), colorPalette(api, histogram),
     source ? h('div', { class: 'media-image-triple' }, imageSurface(api, source, 'Original samples'), imageSurface(api, mask?.image, 'Selection mask'), imageSurface(api, layer?.image, 'Transparent layer')) : note('Enter exact image samples or decode a selected file with Core.'),
     source ? imageCoordinates(api, source) : null,
     sample ? button(`Select sampled exact tuple ${Array.from(sample).map(HEX).join('')}`, () => changeColors(api, [Array.from(sample).map(HEX).join('')])) : null,
@@ -311,17 +311,17 @@ function png(host, api) {
   const segments = pngSegments(report);
   const selected = segments[state.segment ?? 0];
   const page = state.chunkPage ?? 0;
-  const map = h('div', { class: 'media-png-map', role: 'group', 'aria-label': 'PNG byte structure' }, segments.map((segment, i) => button(h('span', {}, h('strong', {}, segment.label), ' ', h('span', {}, `${segment.offset} + ${segment.length} bytes`)), () => { state.segment = i; api.refresh(); }, { id: `media-png-segment-${segment.offset}`, 'aria-pressed': String((state.segment ?? 0) === i), style: `flex-grow:${Math.max(1, Math.log2(segment.length + 1))}`, 'aria-label': `${segment.label} ${segment.offset} + ${segment.length} bytes, zero-based offset and total size` })));
+  const map = h('div', { class: 'media-png-map', role: 'group', 'aria-label': 'PNG byte structure' }, segments.map((segment, i) => button(h('span', {}, h('strong', {}, segment.label), ' ', h('span', {}, `${segment.offset} + ${segment.length} bytes`)), () => { state.segment = i; api.refresh(); }, { class: 'media-png-segment', 'data-chunk': segment.label, id: `media-png-segment-${segment.offset}`, 'aria-pressed': String((state.segment ?? 0) === i), style: `flex-grow:${Math.max(1, segment.length)}`, 'aria-label': `${segment.label} ${segment.offset} + ${segment.length} bytes, zero-based offset and total size` })));
   const selectedChunk = selected?.index !== undefined ? chunks[selected.index] : null;
   const extraction = (label, offset, length, filename) => asyncAction(api, label, async () => {
     const source = bytesForEvidence(api);
     const value = await api.execute('file.range.extract', { input: source }, { offset, length });
     download(bytes(value.output), filename); return {};
   });
-  host.replaceChildren(h('div', { class: 'media-workspace' }, h('div', { class: 'toolbar' },
+  host.replaceChildren(h('div', { class: 'media-workspace media-png-workspace' }, h('div', { class: 'media-settings-bar media-png-settings' },
     h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(api.param('strict') ?? true), onChange: e => { api.setParam('strict', e.target.checked); api.refresh(); } }), 'Reject CRC mismatches'),
     number('Payload export budget (bytes)', api.param('payload_budget') ?? 0, value => { api.setParam('payload_budget', value); api.refresh(); }, { min: 0, max: 1048576 })),
-    report ? h('div', {}, map,
+    report ? h('div', { class: 'media-file-report' }, map,
       note(`Signature: ${Array.from(bytesForEvidence(api).slice(0, 8)).map(HEX).join(' ')}. CRC ${report.crc_valid ? 'matches for every chunk' : 'mismatch reported'}.`),
       table(['Chunk', 'Offset', 'Payload bytes', 'Total bytes', 'Stored CRC', 'Calculated CRC', 'CRC'], viewportRows(chunks, page * 40, 40).map((chunk, i) => row([
         button(chunk.kind, () => { state.segment = i + page * 40 + 1; api.refresh(); }, { id: `media-png-chunk-${chunk.offset}`, 'aria-pressed': String(selected?.index === i + page * 40) }), chunk.offset, chunk.length, chunk.length + 12, `0x${Number(chunk.stored_crc).toString(16).padStart(8, '0').toUpperCase()}`, `0x${Number(chunk.calculated_crc).toString(16).padStart(8, '0').toUpperCase()}`, chunk.valid ? 'Match' : 'Mismatch',
@@ -340,8 +340,8 @@ function png(host, api) {
 }
 function hexTable(leftRows, rightRows, differences, selection, choose) {
   const aligned = rightRows?.length > leftRows.length ? rightRows.map((right, i) => leftRows[i] ?? { offset: right.offset, hex: '', ascii: '' }) : leftRows;
-  return table(rightRows ? ['Offset', 'Left hex', 'Left ASCII', 'Right hex', 'Right ASCII'] : ['Offset', 'Hex', 'ASCII'], aligned.map((left, index) => {
-    const right = rightRows?.[index];
+  const paired = Boolean(rightRows);
+  const rows = aligned.flatMap((left, index) => {
     const values = (record, side) => {
       const cells = record?.hex.match(/.{1,2}/g) ?? [];
       return h('div', { class: 'media-hex-cells' }, cells.map((value, position) => {
@@ -351,10 +351,15 @@ function hexTable(leftRows, rightRows, differences, selection, choose) {
         return button(value.toUpperCase(), e => choose(offset, e.shiftKey, side), { id: `media-byte-${side}-${offset}`, class: `${changed ? 'media-byte-changed ' : ''}${selected ? 'media-byte-selected' : ''}`, 'aria-pressed': String(Boolean(selected)), 'aria-label': `${side} byte 0x${offset.toString(16).toUpperCase()}: ${value.toUpperCase()}${changed ? ', changed' : ''}` });
       }));
     };
-    const cells = [`0x${BigInt(left.offset).toString(16).padStart(8, '0').toUpperCase()}`, values(left, 'Left'), h('code', {}, left.ascii)];
-    if (rightRows) cells.push(values(right, 'Right'), h('code', {}, right?.ascii ?? ''));
-    return row(cells);
-  }), 'Exact hexadecimal and printable ASCII bytes by offset');
+    const sourceRow = (record, side) => h('tr', { class: `media-hex-source media-hex-${side.toLowerCase()}` },
+      h('td', {}, h('span', { class: 'media-source-offset' }, paired ? h('strong', {}, side) : null, h('span', {}, `0x${BigInt(left.offset).toString(16).padStart(8, '0').toUpperCase()}`))),
+      h('td', {}, values(record, side)), h('td', {}, h('code', {}, record?.ascii ?? '')));
+    return paired ? [sourceRow(left, 'Left'), sourceRow(rightRows[index], 'Right')] : [sourceRow(left, 'Left')];
+  });
+  const view = table(paired ? ['Offset / source', 'Hex bytes', 'ASCII'] : ['Offset', 'Hex bytes', 'ASCII'], rows, 'Exact hexadecimal and printable ASCII bytes by offset');
+  view.classList.add('media-hex-table');
+  if (paired) view.classList.add('media-hex-pair');
+  return view;
 }
 function rightBytes(api) {
   const snapshot = api.snapshot?.();
@@ -408,11 +413,11 @@ function hex(host, api) {
     else download(bytes(output.output), `cube-${side.toLowerCase()}-selection.bin`);
     return {};
   });
-  host.replaceChildren(h('div', { class: 'media-workspace' },
-    h('div', { class: 'toolbar' }, number('Start offset (zero-based)', api.param('offset') ?? 0, value => { if (api.action.contract.parameters.properties.offset) api.setParam('offset', value); api.refresh(); }, { min: 0 }),
+  host.replaceChildren(h('div', { class: 'media-workspace media-binary-workspace' },
+    h('div', { class: 'media-settings-bar media-hex-settings' }, number('Start offset (zero-based)', api.param('offset') ?? 0, value => { if (api.action.contract.parameters.properties.offset) api.setParam('offset', value); api.refresh(); }, { min: 0 }),
       api.action.contract.parameters.properties.length ? number('Comparison / inspection length', api.param('length') ?? '', value => { api.setParam('length', value); api.refresh(); }, { min: 0 }) : null,
       api.action.contract.parameters.properties.max_results ? number('Difference listing limit', api.param('max_results') ?? 1000, value => { api.setParam('max_results', value); api.refresh(); }, { min: 1, max: 10000 }) : null),
-    isCompare ? h('div', {}, h('label', { class: 'media-field' }, 'Right file (exact bytes)', h('input', { type: 'file', onChange: async e => {
+    isCompare ? h('div', { class: 'media-source-bar' }, h('label', { class: 'media-field' }, 'Right file (exact bytes)', h('input', { type: 'file', onChange: async e => {
       const file = e.target.files[0]; if (!file) return;
       const revision = api.revision?.();
       const token = state.rightRead = {};
@@ -421,13 +426,13 @@ function hex(host, api) {
       catch (error) { if (api.revision?.() === revision && state.rightRead === token) { state.error = error.message; api.refresh(); } }
       finally { if (state.rightRead === token) { state.rightReading = false; api.pendingInputRead?.(null, token); api.refresh(); } }
     } })), state.rightReading ? h('p', { role: 'status' }, 'Reading the right file… Run will wait for the accepted selection.') : state.rightName ? note(`Right source: ${state.rightName}`) : null) : null,
-    h('div', { class: 'toolbar' }, inspect, button('Previous byte page', () => { state.bytePage = Math.max(0, state.bytePage - 1); api.refresh(); }, { disabled: state.bytePage === 0 }), number('Byte page (256 bytes)', state.bytePage, value => { state.bytePage = Math.max(0, Number(value)); api.refresh(); }, { min: 0 }), button('Next byte page', () => { state.bytePage++; api.refresh(); })),
+    h('div', { class: 'toolbar media-byte-controls' }, inspect, button('Previous byte page', () => { state.bytePage = Math.max(0, state.bytePage - 1); api.refresh(); }, { disabled: state.bytePage === 0 }), number('Byte page (256 bytes)', state.bytePage, value => { state.bytePage = Math.max(0, Number(value)); api.refresh(); }, { min: 0 }), button('Next byte page', () => { state.bytePage++; api.refresh(); })),
     compare ? note(`${compare.differing_bytes} differing bytes in total · listing ${compare.complete ? 'complete' : 'incomplete'} (${compare.differences.length} retained differences). Left ${compare.left_size} bytes · right ${compare.right_size} bytes. Comparison is by position.`) : null,
     rows.length ? hexTable(rows, state.rightRows, differences, state.range, selectByte) : h('div', { class: 'empty-state' }, 'Open exact bytes, run the operation, then load aligned byte rows. No textual realignment is applied.'),
     state.leftRows ? h('div', {}, note(`Loaded byte viewport starts at offset ${state.viewOffset}.`), evidenceLabel(api, state, ['leftRows', 'rightRows'])) : null,
     compare?.differences.length ? h('div', { class: 'toolbar' }, navigateDifference('Previous difference', previousDifference), navigateDifference('Next difference', nextDifference), selectedDiff ? note(`Offset 0x${BigInt(selectedDiff.offset).toString(16).toUpperCase()}: ${HEX(selectedDiff.left)} → ${HEX(selectedDiff.right)}. Missing bytes are null (––), distinct from 00.`) : null) : null,
-    h('section', { class: 'media-selection' }, h('h3', {}, 'Exact byte selection'), h('div', { class: 'toolbar' }, text('Selection start', state.range.offset, value => { state.range.offset = value; api.refresh(); }), number('Selection length', state.range.length, value => { state.range.length = value; api.refresh(); }, { min: 0 })),
-      note('Selected bytes use a blue outline. Changed bytes use an amber background and an underline. Shift-click extends a selection. Download/copy asks Core for the complete range, independent of this viewport.'),
+    h('section', { class: 'media-selection media-range-selection' }, h('h3', {}, 'Exact byte selection'), h('div', { class: 'toolbar' }, text('Selection start', state.range.offset, value => { state.range.offset = value; api.refresh(); }), number('Selection length', state.range.length, value => { state.range.length = value; api.refresh(); }, { min: 0 })),
+      h('details', { class: 'media-selection-help' }, h('summary', {}, 'Selection and differences'), note('Selected bytes use a blue outline. Changed bytes use an amber background and an underline. Shift-click extends a selection. Download/copy asks Core for the complete range, independent of this viewport.')),
       h('div', { class: 'toolbar' }, exportRange('Left'), exportRange('Left', true), isCompare ? exportRange('Right') : null, isCompare ? exportRange('Right', true) : null)), status(api)));
   if (state.revealOffset !== undefined) {
     const offset = state.revealOffset; delete state.revealOffset;
@@ -635,18 +640,19 @@ function audio(host, api) {
   });
   const extent = frameExtent(state, waveform ?? { start_frame: start, frames });
   host.replaceChildren(h('div', { class: 'media-workspace media-audio' }, controls,
-    h('div', { class: 'toolbar' }, analyze, button('Load synthetic 1 kHz WAVE example', () => { api.setInput({ type: 'bytes', data: syntheticWave() }); state.example = true; state.audio_frames = 1024; state.audio_start_frame = 0; state.audio_fft_size = 256; api.refresh(); })),
+    h('div', { class: 'toolbar media-audio-commandbar' }, analyze, button('Load synthetic 1 kHz WAVE example', () => { api.setInput({ type: 'bytes', data: syntheticWave() }); state.example = true; state.audio_frames = 1024; state.audio_start_frame = 0; state.audio_fft_size = 256; api.refresh(); })),
     suppliedPcm ? note('For supplied PCM, start frame, frame count and available channels come from the named input. Channel selection inspects stored results; choose a WAVE source for frame extraction.') : null,
-    state.example ? note('Example: synthetic 1 kHz sine, mono signed PCM16, 8,000 Hz, 1,024 frames. This is generated example data; analysis below comes from Core.') : null,
-    wave ? note(`${wave.container} · ${wave.format.sample_rate} Hz · ${wave.format.channels} channels · ${wave.format.bits_per_sample}-bit · ${wave.frames} frames · ${wave.data_bytes} original PCM bytes.`) : note('Analysis accepts WAVE PCM supported by Core. Metadata for other formats does not imply audio decoding. Browser playback is not used for numerical analysis.'),
+    h('div', { class: 'media-source-info' }, state.example ? note('Example: synthetic 1 kHz sine, mono signed PCM16, 8,000 Hz, 1,024 frames. This is generated example data; analysis below comes from Core.') : null,
+    wave ? note(`${wave.container} · ${wave.format.sample_rate} Hz · ${wave.format.channels} channels · ${wave.format.bits_per_sample}-bit · ${wave.frames} frames · ${wave.data_bytes} original PCM bytes.`) : note('Analysis accepts WAVE PCM supported by Core. Metadata for other formats does not imply audio decoding. Browser playback is not used for numerical analysis.')),
     evidenceLabel(api, state, ['wave', 'waveform', 'pcm', 'spectrum', 'spectrogram']),
     state.analysisConfiguration && !sameAnalysisConfiguration(state.analysisConfiguration, configuration) ? h('p', { class: 'warning' }, 'The audio views belong to earlier analysis settings. Analyze again to refresh them.') : null,
-    state.analysisConfiguration ? h('details', {}, h('summary', {}, 'Analysis settings used by these views'), h('pre', {}, JSON.stringify(state.analysisConfiguration, null, 2))) : null,
-    h('div', { class: 'toolbar media-selection' }, text('Shared cursor (absolute frame)', state.cursor ?? start, value => { state.cursor = value; api.refresh(); }, { inputmode: 'numeric' }),
-      text('Time viewport start (frame)', extent.from, value => { state.timeFrom = value; api.refresh(); }, { inputmode: 'numeric' }), text('Time viewport end (frame)', extent.to, value => { state.timeTo = value; api.refresh(); }, { inputmode: 'numeric' }), note(`Cursor ${frameSeconds(state.cursor ?? start, sampleRate, 6)} s. Viewport and cursor inspect stored results; analysis runs only on explicit request.`)),
     !extent.valid ? h('p', { class: 'error', role: 'alert' }, 'Use whole non-negative frame positions and a time viewport of 1–1,048,576 frames.') : null,
-    waveformPanel(api, waveform), h('div', { class: 'media-audio-frequency' }, spectrumPanel(api, spectrum), spectrogramPanel(api, spectrogram)),
-    h('div', { class: 'toolbar' }, auxiliaryExport(api, 'waveform', waveform), auxiliaryExport(api, 'spectrum', spectrum), auxiliaryExport(api, 'spectrogram', spectrogram),
+    waveformPanel(api, waveform),
+    h('div', { class: 'toolbar media-selection media-timeline-controls' }, text('Shared cursor (absolute frame)', state.cursor ?? start, value => { state.cursor = value; api.refresh(); }, { inputmode: 'numeric' }),
+      text('Time viewport start (frame)', extent.from, value => { state.timeFrom = value; api.refresh(); }, { inputmode: 'numeric' }), text('Time viewport end (frame)', extent.to, value => { state.timeTo = value; api.refresh(); }, { inputmode: 'numeric' }), note(`Cursor ${frameSeconds(state.cursor ?? start, sampleRate, 6)} s. Viewport and cursor inspect stored results; analysis runs only on explicit request.`)),
+    h('div', { class: 'media-audio-frequency' }, spectrumPanel(api, spectrum), spectrogramPanel(api, spectrogram)),
+    state.analysisConfiguration ? h('details', {}, h('summary', {}, 'Analysis settings used by these views'), h('pre', {}, JSON.stringify(state.analysisConfiguration, null, 2))) : null,
+    h('div', { class: 'toolbar media-export-actions' }, auxiliaryExport(api, 'waveform', waveform), auxiliaryExport(api, 'spectrum', spectrum), auxiliaryExport(api, 'spectrogram', spectrogram),
       state.pcm ? button('Download exact extracted PCM bytes', () => download(bytes(state.pcm.data), 'cube-original-pcm.bin')) : null), status(api)));
 }
 
