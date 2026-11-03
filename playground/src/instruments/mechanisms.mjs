@@ -227,10 +227,14 @@ function rotorPanel(api, config, index, inspected) {
   try { ring = rawJsonMembers(api.param('rings') ?? [], 'array')[index]?.source; } catch { ring = ''; }
   const setWindow = letter => {
     const next = [...windows]; next[index] = letter;
-    api.ui.traceCursor = -1; api.ui.playing = false;
     api.setParam('windows', next.join(''));
   };
-  const stepWindow = direction => change(api, () => setWindow(LETTERS[(LETTERS.indexOf(windows[index]) + direction + 26) % 26]));
+  const stepWindow = direction => change(api, () => {
+    // Turning a wheel explicitly returns its display to initial settings.
+    // Editing the separate form keeps any retained trace inspection selected.
+    api.ui.traceCursor = -1; api.ui.playing = false;
+    setWindow(LETTERS[(LETTERS.indexOf(windows[index]) + direction + 26) % 26]);
+  });
   const invalidWindows = !/^[A-Z]{3}$/.test(config.windows ?? '');
   return h('section', { class: 'enigma-rotor', 'aria-label': `${['Left', 'Middle', 'Right'][index]} rotor` },
     h('span', { class: 'small muted' }, `${index + 1} · ${['Left', 'Middle', 'Right · fast'][index]}`),
