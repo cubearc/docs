@@ -4,6 +4,7 @@
 .instrument-heading h1 { font-size: 2rem; letter-spacing: -.04em; }
 .instrument-heading p { max-width: 75ch; font-size: .95rem; }
 .section-jumps.instrument-jumps { display: none; }
+.section-jumps.instrument-jumps a { flex: 1 1 7rem; }
 .play-grid.visual-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -32,10 +33,11 @@
   margin: 0;
 }
 .instrument-action label { margin: 0; color: var(--muted); }
-.instrument-action select { flex: 1; width: auto; border-color: var(--line); }
+.visual-workspace .instrument-action select { flex: 1 1 0%; width: 0; border-color: var(--line); }
 .visual-workspace .instrument-tabs {
   align-self: center;
   flex: 0 1 17rem;
+  flex-wrap: wrap;
   border: 0;
   padding: 0;
   background: transparent;
@@ -43,6 +45,7 @@
   gap: 1.25rem;
 }
 .visual-workspace .instrument-tabs button {
+  flex: 1 1 7rem;
   border-radius: 0;
   border-bottom: 3px solid transparent;
   padding: .6rem .25rem;
@@ -64,11 +67,11 @@
 .visual-workspace .input-main { min-width: 0; }
 .visual-workspace .input-text { min-height: 112px; max-height: 320px; background: white; }
 .visual-workspace .input-main > .toolbar { gap: .4rem; margin-top: .5rem; }
-.visual-workspace .input-main > .toolbar button { flex: 1; padding: .5rem; font-size: .85rem; }
+.visual-workspace .input-main > .toolbar button { flex: 1 1 5rem; padding: .5rem; font-size: .85rem; }
 .visual-workspace .input-main > p { font-size: .8rem; margin: .6rem 0 1rem; }
 .visual-workspace .input-options { margin: 0; }
 .visual-workspace .input-options > .toolbar { padding-top: 1rem; border-top: 1px solid var(--line); }
-.visual-workspace #run-tools { flex: 1; }
+.visual-workspace #run-tools { flex: 1 1 8rem; }
 .visual-workspace #load-core-example { width: 100%; background: transparent; }
 .visual-workspace .input-options > [role=status] { font-size: .85rem; margin: .75rem 0; }
 .visual-workspace .instrument-surface,

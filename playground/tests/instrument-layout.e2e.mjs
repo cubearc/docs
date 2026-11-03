@@ -13,6 +13,76 @@ const geometry = page => page.evaluate(() => Object.fromEntries([
   return [name, {x:rect.x + scrollX, y:rect.y + scrollY, width:rect.width, height:rect.height}];
 })));
 
+test('action menus and paired glyph targets fit narrow enlarged-text views', {timeout:120000}, async t => {
+  const {context, base} = await instrumentBrowser(t);
+  const folder = process.env.PLAYGROUND_EVIDENCE;
+  if (folder) await mkdir(folder, {recursive:true});
+  for (const kind of ['pigpen', 'keyboard', 'book', 'audio']) {
+    await t.test(kind, async () => {
+      const page = await context.newPage();
+      try {
+        await page.goto(base + '#/tools');
+        await page.getByText('Visual instruments · 20 workbenches', {exact:true}).click({timeout:45000});
+        await page.locator(`[data-open-instrument="${kind}"]`).click();
+        await page.locator('#load-core-example').click();
+        await page.getByText('Synthetic Core example loaded. Run to produce your own result.', {exact:true}).waitFor();
+        await page.setViewportSize({width:320, height:1000});
+        for (const size of [100, 200]) {
+          await page.evaluate(size => { document.documentElement.style.fontSize = `${size}%`; }, size);
+          const layout = await page.evaluate(() => {
+            const keys = [...document.querySelectorAll('.pigpen-letter-pair button')];
+            const overlaps = keys.flatMap((a, index) => keys.slice(index + 1).filter(b => {
+              const x = a.getBoundingClientRect(), y = b.getBoundingClientRect();
+              return Math.min(x.right,y.right) - Math.max(x.left,y.left) > 1 && Math.min(x.bottom,y.bottom) - Math.max(x.top,y.top) > 1;
+            }).map(b => [a.id,b.id]));
+            return {width:innerWidth, scroll:document.documentElement.scrollWidth, overlaps};
+          });
+          if (folder) await page.screenshot({path:`${folder}/${kind}-menu-text${size}-320.png`, fullPage:true});
+          assert.ok(layout.scroll <= layout.width, `${kind} ${size}% reflow: ${JSON.stringify(layout)}`);
+          assert.deepEqual(layout.overlaps, [], `${kind} ${size}% glyph targets remain separate`);
+          if (kind === 'audio') {
+            const clippedValues = await page.evaluate(() => {
+              const context = document.createElement('canvas').getContext('2d');
+              return [...document.querySelectorAll('.media-audio-controls input, .media-audio-controls select')].flatMap(control => {
+                const style = getComputedStyle(control);
+                context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+                const value = control.selectedOptions?.[0]?.textContent ?? control.value;
+                const available = control.getBoundingClientRect().width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth) - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+                return context.measureText(value).width > available + 1 ? [{id:control.id, value, available}] : [];
+              });
+            });
+            assert.deepEqual(clippedValues, [], `${size}% audio example values remain readable`);
+          }
+          const fragmentedWords = await page.evaluate(() => {
+            const broken = [];
+            for (const control of document.querySelectorAll('#run-tools, #instrument-tab-visual, #instrument-tab-parameters, #input-section .input-main .toolbar button, .instrument-jumps a, .media-audio-commandbar button, .site-header nav a')) {
+              const walker = document.createTreeWalker(control, NodeFilter.SHOW_TEXT);
+              while (walker.nextNode()) {
+                const node = walker.currentNode;
+                for (const match of node.textContent.matchAll(/[A-Za-z]+/g)) {
+                  const range = document.createRange();
+                  range.setStart(node,match.index); range.setEnd(node,match.index + match[0].length);
+                  if ([...range.getClientRects()].filter(rect => rect.width > 0).length > 1) broken.push(match[0]);
+                }
+              }
+            }
+            return broken;
+          });
+          assert.deepEqual(fragmentedWords, [], `${kind} ${size}% essential labels preserve whole words`);
+        }
+        const action = page.locator('#instrument-action');
+        const original = await action.inputValue();
+        await page.locator('.section-jumps a').last().focus();
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'instrument-action', 'The native menu remains in the keyboard focus order.');
+        const next = await action.locator('option').evaluateAll((options, current) => options.find(option => option.value !== current).value, original);
+        await action.selectOption(next);
+        assert.equal(await page.locator('#instrument-action').inputValue(), next, 'A native menu selection changes the action.');
+      } finally { await page.close(); }
+    });
+  }
+});
+
 test('an instrument immediately shows its main output without losing named outputs', {timeout:60000}, async t => {
   const {open} = await instrumentBrowser(t);
   const page = await open('cipher.enigma', 'enigma');

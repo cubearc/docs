@@ -97,7 +97,7 @@
 .symbol-pigpen .pigpen-bank .symbol-section-title{font-size:.8rem;max-width:288px}
 .symbol-pigpen .pigpen-bank h3{font-size:.8rem;color:var(--muted);font-weight:550}
 .symbol-pigpen .pigpen-grid-bank,.symbol-pigpen .pigpen-cross-bank{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;max-width:288px}
-.symbol-pigpen .pigpen-letter-pair{display:flex;gap:2px;min-width:0;border-bottom:1px solid #e2e8f0;padding-bottom:.25rem}
+.symbol-pigpen .pigpen-letter-pair{display:flex;flex-wrap:wrap;gap:2px;min-width:0;border-bottom:1px solid #e2e8f0;padding-bottom:.25rem}
 .symbol-pigpen .pigpen-key{width:44px;min-width:44px;min-height:66px;border:1px solid transparent;border-radius:4px;background:transparent;padding:.3rem .1rem}
 .symbol-pigpen .pigpen-key>span{display:grid;justify-items:center;gap:.35rem}
 .symbol-pigpen .pigpen-key:hover{background:#f0f5fc}

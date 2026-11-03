@@ -7,7 +7,7 @@
 .instrument .media-workspace .toolbar{gap:.5rem;min-width:0;max-width:100%}
 .instrument .media-field{display:flex;flex-direction:column;gap:.4rem;min-width:0;max-width:100%;margin:0;font-size:.8rem;font-weight:600}
 .instrument .media-field>label{margin:0;font-size:inherit}
-.instrument .media-field input,.instrument .media-field select{width:100%;min-width:0;max-width:19rem;min-height:40px;padding:.55rem .65rem;border-radius:5px;background:var(--surface);font-size:.9rem;font-weight:450}
+.instrument .media-field input,.instrument .media-field select{width:100%;min-width:0;max-width:19rem;min-height:40px;padding:.55rem .65rem;border-radius:5px;background-color:var(--surface);font-size:.9rem;font-weight:450}
 .instrument .media-control-label{font-size:.8rem;font-weight:600;line-height:1.35}
 .instrument .media-settings-bar{display:flex;gap:.8rem;align-items:end;flex-wrap:wrap;padding:.85rem;background:#f3f6fa;border-bottom:1px solid var(--line);border-radius:7px}
 .instrument .media-settings-bar .media-field{flex:0 1 175px}
@@ -168,7 +168,8 @@
  .instrument .media-byte-controls .media-field{flex:1 1 100px;max-width:none}
  .instrument .media-source-bar .media-field{flex-basis:100%}
  .instrument .media-hex-cells button{min-height:34px;min-width:25px}
- .instrument .media-audio-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .instrument .media-audio-controls{grid-template-columns:repeat(auto-fit,minmax(min(100%,6rem),1fr))}
+ .instrument .media-audio-commandbar button{padding-inline:.25rem}
  .instrument .media-audio-controls .media-field:last-child{grid-column:1/-1}
  .instrument .media-audio-frequency{grid-template-columns:minmax(0,1fr)}
  .instrument .media-timeline-controls .media-field{max-width:none;flex:1 1 125px}
