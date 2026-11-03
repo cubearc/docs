@@ -38,8 +38,12 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
     await mkdir(dirname(process.env.PLAYGROUND_A11Y_REPORT), { recursive: true });
     await writeFile(process.env.PLAYGROUND_A11Y_REPORT, JSON.stringify({ browser: engine, browserVersion: browser.version(), harness: { name: require((process.env.PLAYWRIGHT_MODULE ?? 'playwright') + '/package.json').name, version: require((process.env.PLAYWRIGHT_MODULE ?? 'playwright') + '/package.json').version }, scope: 'Six symbol instruments. Automated rules only; manual screen reader/native zoom remain separate.', reports }, null, 2));
   });
+  let documentRevision = 0;
+  const toolUrl = id => `${base}?instrument-document=${documentRevision}#/tools/${id}/1`;
   async function open(id, kind) {
-    await page.goto(`${base}#/tools/${id}/1`); await page.reload();
+    // Reset through one full navigation; a second reload can abort module startup.
+    documentRevision++;
+    await page.goto(toolUrl(id));
     await page.getByRole('button', { name: 'Use tool', exact: true }).waitFor({ timeout: 45000 });
     await page.getByRole('button', { name: 'Use tool', exact: true }).click();
     if (kind) await page.locator(`[data-instrument="${kind}"]`).waitFor();
@@ -170,7 +174,7 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
     // Selecting a supported profile is a configuration edit; remount the selected action to resolve its presentation.
     const openVisual = page.getByRole('button', { name: /Open visual|Use visual|Visual instrument/ }).first();
     if (await openVisual.count()) await openVisual.click();
-    else { await page.getByRole('link', { name: 'All tools', exact: true }).click(); await page.goto(`${base}#/tools/symbol.alphabet.encode/1`); await page.getByRole('button', {name:'Use tool',exact:true}).click(); }
+    else { await page.getByRole('link', { name: 'All tools', exact: true }).click(); await page.goto(toolUrl('symbol.alphabet.encode')); await page.getByRole('button', {name:'Use tool',exact:true}).click(); }
     await page.locator('[data-instrument="pigpen"] .pigpen-palette').waitFor();
     await page.locator('#playground-input').fill('[]');
     await page.getByRole('button', { name: 'A: grid:ES', exact: true }).click();
