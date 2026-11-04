@@ -42,12 +42,12 @@ function customLayout(name) {
 function geometry(api,value) {return api.data.layouts[value] ?? parse(value);}
 function keyLayout(api,layout,title,selectedKey,target=false,layoutControl=null) {
   const entries=layout?.entries;
-  const header=h('div',{class:'keyboard-case-label'},h('h3',{},title),layoutControl,h('span',{class:'keyboard-case-detail'},'Physical key positions'));
+  const header=h('div',{class:'keyboard-case-label'},h('div',{class:'keyboard-nameplate'},h('h3',{},title),layoutControl),h('span',{class:'keyboard-case-detail'},'Physical key positions'));
   if(!Array.isArray(entries)||entries.length>512) return h('section',{class:'key-layout','aria-label':title},header,h('p',{class:'warning'},'Choose a canonical layout or a valid custom definition in Parameters.'));
   const layer=api.ui.layer ?? 'base';
   const visible=entries.filter(e=>e.layer===layer);
   const rows=[...new Set(visible.map(e=>e.row ?? 0))];
-  return h('section',{class:'key-layout','aria-label':title},header,h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
+  return h('section',{class:'key-layout','aria-label':title},instrumentFasteners(),header,h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
     api.ui.key=entry.key;api.ui.layer=entry.layer;
     const offset=api.text().indexOf(entry.symbol);
     api.ui.textPosition=offset<0?null:Array.from(api.text().slice(0,offset)).length;
@@ -128,6 +128,25 @@ function polybiusRules(api) {
     if(event.currentTarget.isConnected&&!event.defaultPrevented)api.ui.polybiusRules=!event.currentTarget.parentElement.open;
   }},'Matching and spaces'),note('Presets fold ASCII case. Each literal space is retained as / (a null token). Custom squares match exact scalars.'));
 }
+// Decorative fasteners and coordinate dials are presentation only. They never
+// change configuration or infer an operation result.
+function instrumentFasteners() {
+  return ['top-left','top-right','bottom-left','bottom-right'].map(corner=>h('span',{class:`instrument-fastener ${corner}`,'aria-hidden':'true'}));
+}
+function coordinateDial(side,base,index) {
+  if (!side || base===null) return null;
+  const angle=value=>(side===1?0:-140+value*280/(side-1))*Math.PI/180;
+  const point=(value,radius)=>[50+Math.sin(angle(value))*radius,50-Math.cos(angle(value))*radius];
+  const marks=Array.from({length:side},(_,value)=>{
+    const [x1,y1]=point(value,36),[x2,y2]=point(value,40),[x,y]=point(value,28);
+    const labeled=side<=8 || value%Math.ceil(side/8)===0 || value===side-1;
+    return [svg('line',{x1,y1,x2,y2,class:'dial-tick'}),labeled?svg('text',{x,y:y+3,'text-anchor':'middle',class:'dial-number'},value+base):null];
+  });
+  return svg('svg',{viewBox:'0 0 100 100',class:'polybius-dial','aria-hidden':'true',focusable:'false'},
+    svg('circle',{cx:50,cy:50,r:47,class:'dial-rim'}),svg('circle',{cx:50,cy:50,r:43,class:'dial-face'}),marks,
+    index===undefined?null:svg('g',{transform:`rotate(${side===1?0:-140+index*280/(side-1)} 50 50)`},svg('path',{d:'M47 54 L50 30 L53 54 Z',class:'dial-needle'})),
+    svg('circle',{cx:50,cy:50,r:5,class:'dial-hub'}));
+}
 function polybius(host,api) {
   const custom=api.param('alphabet');
   const preset=api.data.squares[api.param('preset')??'polybius'];
@@ -144,14 +163,15 @@ function polybius(host,api) {
     api.ui.rowPage=0;api.refresh();})),
     field('polybius-base','Index origin',choice('polybius-base',base,[0,1],v=>patch(api,'index_base',v))));
   const grid=valid?h('div',{class:'instrument-scroll polybius-board','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected!==undefined&&selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:selected!==undefined&&Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>polybiusCell(api,alphabet,(r+start)*side+c,side,base,selected))))))):h('p',{class:'warning'},'A custom square requires side² unique scalars and valid aliases. Review Parameters.');
-  const inspection=h('aside',{class:'polybius-inspection','aria-label':'Selected cell coordinates'},h('h3',{},'Selected cell'),
+  const reading=h('div',{class:'polybius-reading'},instrumentFasteners(),h('h3',{},'Selected cell'),
     h('div',{class:'polybius-coordinate-readout'},h('strong',{id:'polybius-selected-symbol'},selected===undefined?'—':alphabet[selected]),
-      h('dl',{},h('div',{},h('dt',{},'Row'),h('dd',{id:'polybius-selected-row'},selected===undefined?'—':Math.floor(selected/side)+base)),h('div',{},h('dt',{},'Column'),h('dd',{id:'polybius-selected-column'},selected===undefined?'—':selected%side+base)))),
+      h('dl',{},h('div',{},h('dt',{},'Row'),coordinateDial(side,base,selected===undefined?undefined:Math.floor(selected/side)),h('dd',{id:'polybius-selected-row'},selected===undefined?'—':Math.floor(selected/side)+base)),h('div',{},h('dt',{},'Column'),coordinateDial(side,base,selected===undefined?undefined:selected%side),h('dd',{id:'polybius-selected-column'},selected===undefined?'—':selected%side+base)))));
+  const inspection=h('aside',{class:'polybius-inspection','aria-label':'Selected cell coordinates'},reading,
     h('p',{class:'polybius-aliases'},h('span',{},'Aliases'),h('strong',{},Array.isArray(aliases)?aliases.join(', ')||'none':'Review Parameters')),
     field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})),
     note('Arrow keys inspect adjacent cells. Choose Insert, then activate a cell to compose.'),controls,
     polybiusRules(api));
-  replace(host,h('div',{class:'polybius-instrument'},h('div',{class:'polybius-stage'},grid,side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null),inspection),
+  replace(host,h('div',{class:'polybius-instrument'},h('div',{class:'polybius-stage'},h('div',{class:'polybius-case'},instrumentFasteners(),h('h3',{class:'polybius-case-title'},custom?'Custom square':api.param('preset')==='tap'?'Tap square':'Polybius square'),grid,h('p',{class:'polybius-case-foot'},'Coordinate instrument')),side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null),inspection),
     custom?h('div',{class:'toolbar polybius-custom'},field('polybius-alphabet','Custom alphabet',h('textarea',{id:'polybius-alphabet',rows:2,value:custom,onChange:e=>patch(api,'alphabet',e.target.value)})),field('polybius-side','Side',h('input',{id:'polybius-side',type:'number',min:1,max:64,value:api.param('side'),onChange:e=>patch(api,'side',e.target.value)}))):null,
     h('p',{class:'selection-caption'},selected!==undefined?`Selected ${alphabet[selected]} ↔ ${Math.floor(selected/side)+base},${selected%side+base}. Inspection does not edit or run.`:'Select a cell to inspect its coordinates.'));
 }

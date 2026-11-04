@@ -1,104 +1,74 @@
 .instrument-scroll{max-width:100%;overflow:auto;overscroll-behavior:contain}.instrument .toolbar>.field{margin:.5rem 0;min-width:9rem;max-width:100%;flex:0 1 auto}.instrument button[aria-pressed=true],.instrument .inspected{border:2px solid var(--blue);background:var(--pale);box-shadow:inset 0 -3px var(--blue)}.selection-caption{border-left:4px solid var(--blue);padding:.75rem 1rem;background:var(--pale);font-family:ui-monospace,monospace}
 .graph-canvas{width:100%;min-width:480px;max-height:540px;display:block;background:#f8fafd;border:1px solid var(--line);border-radius:9px;touch-action:none}.graph-node{cursor:grab}.graph-node text{fill:var(--ink);font-size:17px;font-family:Inter,system-ui}.graph-edge-label{fill:#455469;font-size:13px}.graph-node-list{display:grid;gap:0}.graph-node-list>.row{padding:.5rem 0;border-bottom:1px solid var(--line)}.graph-node-list>.row>button:first-child{min-width:44px;background:var(--pale);border-color:transparent}.graph-node-list>.row>button:last-child{margin-left:auto}.book-reference{padding:1.25rem 1.5rem;margin:1rem 0;background:#fffdf7;border:1px solid #e4dfd2;border-left:3px solid #cbbd9f}.book-reference h3{font-size:.85rem;color:#665d4c}.book-source-preview{font-family:Georgia,serif;font-size:1.4rem;line-height:1.8;white-space:pre-wrap;max-height:22rem;overflow:auto}.book-source-grid{display:flex;flex-wrap:wrap;gap:3px;padding:1rem 0;white-space:pre-wrap}.book-source-grid button{min-width:60px;min-height:62px;padding:.3rem;border-radius:3px;background:#fffdf7;border-color:#dfdacd}.book-source-grid strong{font-size:1.2rem}.book-source-grid small{font-size:.75rem;color:var(--muted)}.visual-launcher{margin-bottom:1rem}.visual-instrument-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.5rem}.visual-instrument-links button{text-align:left;justify-content:flex-start;font-size:.9rem}.instrument h2,.instrument h3{margin-bottom:.7rem}.instrument canvas{max-width:100%}
 
-/* The two keyboard cases share the same physical key selection. */
-.keyboard-touch-controls { justify-content: flex-end; gap: 1.25rem; margin-bottom: .8rem; }
-.instrument .keyboard-touch-controls > .field { display: flex; align-items: center; gap: .6rem; margin: 0; }
-.keyboard-touch-controls label { margin: 0; white-space: nowrap; }
-.keyboard-touch-controls select { width: auto; min-width: 7rem; }
-.keyboard-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
-.key-layout { display: grid; grid-template-columns: minmax(9rem, .2fr) minmax(0, 1fr); align-items: center; gap: 1rem; min-width: 0; padding: 1rem; border: 3px solid #24354d; border-radius: 14px; background: linear-gradient(130deg, #fffcf6, #f1eee7); box-shadow: 0 4px 0 #24354d12, 0 8px 16px #1420330a; }
-.keyboard-case-label { min-width: 0; padding: .5rem 1rem .5rem .5rem; border-right: 1px solid #d6d1c7; }
-.instrument .keyboard-case-label h3 { margin: 0 0 .75rem; text-transform: uppercase; font-size: .75rem; letter-spacing: .14em; color: #50617b; }
-.keyboard-case-label .field { margin: 0; }
-.keyboard-case-label .field label { font-size: .75rem; color: #50617b; }
-.keyboard-case-label select { font-weight: 750; font-size: 1rem; background-color: #fffcf7; border-color: #b9b8b4; }
-.keyboard-case-detail { display: block; color: #50617b; font-size: .75rem; line-height: 1.5; margin-top: .75rem; }
-.keyboard-board { --key-size: clamp(44px, 4vw, 60px); width: max-content; min-width: 680px; margin: auto; padding: .25rem .3rem .6rem; }
-.keyboard-row { display: flex; gap: 5px; margin: 5px 0; }
-.keycap { width: var(--key-size); min-width: var(--key-size); height: 50px; padding: .3rem; border-radius: 7px; background: linear-gradient(#fffefb, #f2ece0); box-shadow: inset 0 0 0 2px #fffdf6, 0 3px 0 #b7b1a5, 0 4px 5px #1b2e4526; border: 1px solid #c4beb3; color: #172b44; }
-.keycap span, .book-source-grid button span { display: grid; gap: 3px; }
-.keycap strong { font-size: 1.25rem; }
-.instrument .keycap[aria-pressed=true] { color: #fff; background: linear-gradient(#0968e3, #0056c9); border-color: #0056c9; box-shadow: inset 0 0 0 2px #71a9ff, 0 3px 0 #163b73, 0 0 0 2px #bdceee; }
-.keycap:focus-visible { outline-offset: 4px; }
-.keyboard-correspondence { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; padding: .4rem; color: #50617b; font-size: .8rem; }
-.keyboard-correspondence-glyphs { display: flex; align-items: center; justify-content: center; gap: .5rem; min-width: 0; width: 9rem; max-width: 100%; padding: .25rem .4rem; background: #eaf2ff; border: 1px solid #9dbdea; border-radius: 50px; color: #173659; }
-.keyboard-correspondence-glyphs strong { font-size: 1.7rem; font-family: ui-monospace, monospace; }
-.keyboard-correspondence-glyphs > span { font-size: 1.5rem; }
-.keyboard-text-inspection { margin-top: 1rem; display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; }
-.instrument .keyboard-text-inspection h3 { margin: 0; font-size: .8rem; }
-.keyboard-text-inspection > p { flex-basis: 100%; order: 3; margin: 0; font-size: .75rem; }
-.keyboard-text-strip { display: flex; gap: 4px; flex-wrap: wrap; }
-.keyboard-text-strip button { min-width: 44px; padding: .4rem; }
-.keyboard-text-strip button.inspected { outline: 2px solid var(--blue); outline-offset: 1px; }
+/* Crafted enclosures are presentation; keys and coordinates remain live DOM. */
+.instrument-fastener{position:absolute;width:16px;height:16px;border-radius:50%;border:1px solid #715025;background:linear-gradient(135deg,#fff2c4 5%,#ce9f53 35%,#755022 48%,#ecd09a 60%,#9d722f 90%);box-shadow:0 1px 2px #0008,inset 0 0 0 2px #f1d99d88;pointer-events:none;z-index:2}
+.instrument-fastener:after{content:'';position:absolute;inset:7px 3px;border-top:1px solid #513b20;box-shadow:0 1px #fff6d199;transform:rotate(-35deg)}
+.instrument-fastener.top-left{left:13px;top:13px}.instrument-fastener.top-right{right:13px;top:13px}.instrument-fastener.bottom-left{left:13px;bottom:13px}.instrument-fastener.bottom-right{right:13px;bottom:13px}
+.keyboard-touch-controls{justify-content:flex-end;gap:1.25rem;margin-bottom:.8rem}
+.instrument .keyboard-touch-controls>.field{display:flex;align-items:center;gap:.6rem;margin:0}
+.keyboard-touch-controls label{margin:0;white-space:nowrap;font-size:.8rem}.keyboard-touch-controls select{width:auto;min-width:7rem}
+.keyboard-pair{display:grid;grid-template-columns:minmax(0,1fr);gap:.55rem;padding:22px;border:1px solid #654321;border-radius:36px;background:linear-gradient(115deg,#26120644,#b47b3510 45%,#21100877),url('./assets/premium-walnut.png') center/cover,#5e351d;box-shadow:inset 0 0 0 3px #e9c17e55,inset 0 0 0 7px #27180d99,inset 0 0 0 9px #d4a15a66,0 9px 0 #3b2515,0 17px 28px #1a23362b;margin-bottom:1.6rem}
+.key-layout{position:relative;display:grid;grid-template-columns:minmax(8rem,.2fr) minmax(0,1fr);align-items:center;gap:1.25rem;min-width:0;padding:1.65rem 1.8rem;border:3px solid transparent;border-radius:24px;background:radial-gradient(ellipse at 30% 0,#28435d,#11273d 70%) padding-box,linear-gradient(130deg,#f9e7bd,#a37a3c 16%,#fff4d3 36%,#826238 64%,#e5c897 92%) border-box;box-shadow:0 2px 3px #120c0888,inset 0 0 0 2px #071827,inset 0 0 0 4px #63809a44}
+.keyboard-case-label{min-width:0;text-align:center}
+.keyboard-nameplate{position:relative;padding:.8rem .65rem;border:1px solid #7d5c2d;border-radius:9px;background:linear-gradient(115deg,#caa76a,#f9e7bf 27%,#ead09c 64%,#bc914c);box-shadow:0 2px 4px #07142288,inset 0 0 0 2px #fff1cb88;color:#172b43}
+.instrument .keyboard-case-label h3{margin:0 0 .5rem;padding-bottom:.5rem;border-bottom:1px solid #a68c60;text-transform:uppercase;font:700 .78rem/1.3 Georgia,serif;letter-spacing:.14em;color:#1b2d43;overflow-wrap:anywhere}
+.keyboard-case-label .field{margin:0}.keyboard-case-label .field label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.keyboard-case-label select{font:700 1rem Georgia,serif;letter-spacing:.03em;background-color:#fff5d9;border:1px solid #9d804b;box-shadow:inset 0 1px 3px #7a5d3433;width:100%;padding:.65rem .5rem;color:#172b43}
+.keyboard-case-detail{display:block;color:#e1eaf3;font-size:.75rem;line-height:1.5;margin-top:.8rem}
+.keyboard-board{--key-size:clamp(44px,4vw,60px);width:max-content;min-width:680px;margin:auto;padding:8px 10px 14px;border:2px solid #a78c5c;border-radius:17px;background:linear-gradient(#081b2c,#102b43);box-shadow:inset 0 4px 9px #000a,0 0 0 2px #071522,inset 0 -1px 0 #b7cbd822}
+.keyboard-row{display:flex;gap:5px;margin:6px 0}
+.keycap{width:var(--key-size);min-width:var(--key-size);height:52px;padding:.3rem;border-radius:9px;background:linear-gradient(130deg,#fffdf4 4%,#f8efd9 42%,#e3d2ae 100%);box-shadow:inset 0 0 0 2px #fff8e8,inset 0 -4px 5px #a88e5e55,0 5px 0 #9c8662,0 7px 3px #0009,0 0 0 1px #4b4032;border:1px solid #d6c6a4;color:#14283f;transform:translateY(-2px)}
+.keycap span,.book-source-grid button span{display:grid;gap:3px}.keycap strong{font:700 1.4rem/1 Georgia,serif}
+.keycap:hover{background:linear-gradient(130deg,#fffef8,#f2dfb8)}
+.instrument .keycap[aria-pressed=true]{color:#fff8e5;background:linear-gradient(130deg,#1779d2,#0754a4 70%,#083f7b);border:1px solid #b5deff;box-shadow:inset 0 0 0 2px #70b6f9,inset 0 -3px 5px #06306099,0 3px 0 #0a355c,0 0 0 2px #82caff,0 0 15px #218cffbb;transform:translateY(0)}
+.keycap:focus-visible{outline:3px solid #fff;outline-offset:4px}
+.keyboard-correspondence{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:.5rem 1rem;padding:.2rem .75rem;color:#fff3db;font-size:.8rem;text-shadow:0 1px 2px #180b06}
+.keyboard-correspondence:before,.keyboard-correspondence:after{content:'';flex:1 1 2rem;max-width:12rem;height:2px;background:linear-gradient(90deg,transparent,#e8c382,#fff0b7,#94703d);box-shadow:0 1px #1a110b}
+.keyboard-correspondence:after{transform:rotate(180deg)}
+.keyboard-correspondence-glyphs{display:flex;align-items:center;justify-content:center;gap:.6rem;min-width:0;width:9rem;max-width:100%;padding:.35rem .65rem;background:linear-gradient(#19354c,#081e34);border:3px solid #d5b579;border-radius:50px;box-shadow:inset 0 0 0 2px #405e78,0 2px 4px #140b05; color:#f4fbff}
+.keyboard-correspondence-glyphs strong{font:700 1.8rem Georgia,serif;text-shadow:0 0 8px #62b8ff}.keyboard-correspondence-glyphs>span{font-size:1.5rem}
+.keyboard-correspondence>span{font-size:.75rem}
+.keyboard-text-inspection{margin-top:1rem;display:flex;align-items:center;flex-wrap:wrap;gap:.5rem 1rem}.instrument .keyboard-text-inspection h3{margin:0;font-size:.8rem}.keyboard-text-inspection>p{flex-basis:100%;order:3;margin:0;font-size:.75rem}.keyboard-text-strip{display:flex;gap:4px;flex-wrap:wrap}.keyboard-text-strip button{min-width:44px;padding:.4rem}.keyboard-text-strip button.inspected{outline:2px solid var(--blue);outline-offset:1px}
 
-/* A coordinate instrument with visible axes and a separate selection readout. */
-.polybius-instrument { display: grid; grid-template-columns: minmax(0, 1fr) minmax(13rem, .38fr); gap: 2rem; align-items: center; }
-.polybius-stage { min-width: 0; }
-.polybius-board { background-color: #fcfaf5; background-image: linear-gradient(#d7d1c62b 1px, transparent 1px), linear-gradient(90deg, #d7d1c62b 1px, transparent 1px); background-size: 22px 22px; padding: 1rem; border-radius: 10px; }
-.polybius-square { border-collapse: separate; border-spacing: 0; font-family: ui-monospace, monospace; width: max-content; margin: 0 auto; background: #182d47; border: 3px solid #182d47; border-radius: 10px; box-shadow: 0 5px 12px #1b2d411a; }
-.polybius-square caption { background: #fcfaf5; caption-side: bottom; font-family: Inter, system-ui; font-size: .8rem; color: var(--muted); padding-top: 1rem; }
-.polybius-square th { padding: .4rem; min-width: 48px; height: 48px; color: #fff; background: #182d47; font-size: 1.25rem; border: 1px solid #182d47; }
-.polybius-square th:first-child { border-radius: 7px 0 0; }
-.polybius-square td { padding: 0; background: #fffcf6; }
-.polybius-square button { width: 80px; min-width: 80px; min-height: 80px; font-size: 2rem; border-radius: 0; background: linear-gradient(#fffefb,#fbf7ef); border: 1px solid #c0c7ce; margin: 0; color: #172b44; }
-.polybius-square .axis-highlight button { background: #e7effc; }
-.polybius-square th.coordinate-highlight { background: #075ecf; color: white; box-shadow: inset 0 0 0 2px #aecfff; }
-.instrument .polybius-square button.inspected { background: #075ecf; border: 2px solid #075ecf; color: white; box-shadow: inset 0 0 0 2px #b3d2ff; }
-.polybius-square button:focus-visible { outline-offset: -5px; outline: 2px solid #142b4d; }
-.polybius-square button.inspected:focus-visible { outline-color: white; }
-.polybius-inspection { min-width: 0; padding: .5rem 0 .5rem 1.75rem; border-left: 1px solid #d9d6ce; }
-.instrument .polybius-inspection h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: #50617b; margin: 0 0 1rem; }
-.polybius-coordinate-readout { display: flex; gap: 1.5rem; align-items: center; }
-#polybius-selected-symbol { font-size: 5rem; line-height: 1.2; font-family: ui-monospace, monospace; color: #172b44; overflow-wrap: anywhere; }
-.polybius-coordinate-readout dl { margin: 0; border-left: 1px solid #d9d6ce; padding-left: 1.25rem; }
-.polybius-coordinate-readout dl > div + div { margin-top: .5rem; }
-.polybius-coordinate-readout dt { text-transform: uppercase; color: #50617b; font-size: .7rem; letter-spacing: .08em; }
-.polybius-coordinate-readout dd { margin: 0; font-size: 1.75rem; font-family: ui-monospace, monospace; font-weight: 750; }
-.polybius-aliases { display: flex; flex-wrap: wrap; gap: .5rem 1rem; padding: .7rem 1rem; background: #eaf2ff; border-radius: 8px; overflow-wrap: anywhere; }
-.polybius-aliases > span { color: #50617b; font-size: .85rem; }
-.polybius-inspection > .field { margin: .75rem 0; }
-.polybius-inspection > .small { font-size: .8rem; }
-.polybius-settings { border-top: 1px solid #d9d6ce; padding-top: 1rem; margin-top: 1rem; }
-.polybius-settings .field { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: .5rem 0; }
-.polybius-settings label { margin: 0; font-size: .85rem; }
-.polybius-settings select { width: auto; max-width: 65%; }
-.polybius-rules { margin-top: 1rem; padding: .75rem 0 0; border: 0; border-top: 1px solid #d9d6ce; }
-.polybius-rules summary { font-size: .85rem; }
-.polybius-custom { margin-top: 1rem; }
-
-@media(max-width:1100px) {
-  .key-layout { grid-template-columns: minmax(7rem, .18fr) minmax(0, 1fr); padding: .75rem; gap: .5rem; }
-  .keyboard-case-label { padding-right: .5rem; }
-  .polybius-instrument { gap: 1rem; grid-template-columns: minmax(0,1fr) minmax(12rem,.42fr); }
-  .polybius-square button { width: 64px; min-width: 64px; min-height: 64px; font-size: 1.75rem; }
-  .polybius-inspection { padding-left: 1rem; }
+/* An enamel square and an ivory coordinate reader, rather than a flat table. */
+.polybius-instrument{display:grid;grid-template-columns:minmax(0,1fr) minmax(14rem,.4fr);gap:2rem;align-items:start}.polybius-stage{min-width:0}
+.polybius-case{position:relative;width:max-content;max-width:100%;margin-inline:auto;padding:1.25rem 2rem 1rem;border:3px solid #53677b;border-radius:30px;background:radial-gradient(ellipse at 30% 0,#29465f,#132a41 60%,#0c1e31);box-shadow:inset 0 0 0 2px #96aac055,inset 0 0 0 6px #081827,inset 0 0 0 7px #d0b57c99,0 7px 0 #0a1b2c,0 14px 23px #1121382b;margin-bottom:.75rem;isolation:isolate}
+.polybius-case:before,.polybius-case:after{content:'';position:absolute;inset:15px auto auto 18px;width:80px;height:80px;background:url('./assets/premium-flourish.svg') center/contain no-repeat;opacity:.75;pointer-events:none;z-index:0}.polybius-case:after{left:auto;right:18px;top:auto;bottom:18px;transform:rotate(180deg)}
+.polybius-case>.polybius-board,.polybius-case>.polybius-case-title,.polybius-case>.polybius-case-foot{position:relative;z-index:1}
+.instrument .polybius-case-title{color:#f8e7bd;margin:.25rem 2rem 1rem;text-align:center;font:600 1rem/1.4 Georgia,serif;text-transform:uppercase;letter-spacing:.16em;overflow-wrap:anywhere}.polybius-case-foot{margin:.85rem 2rem .2rem;text-align:center;color:#f8e7bd;font:600 .7rem/1.5 Georgia,serif;letter-spacing:.15em;text-transform:uppercase}
+.polybius-board{padding:.65rem;border:2px solid #e1bd7a;border-radius:17px;background:linear-gradient(115deg,#d5ad67,#f8e6b6 28%,#c99b4f 70%,#e8c98e);box-shadow:inset 0 0 0 2px #fff2ce88,0 0 0 2px #75532a,0 3px 8px #0008;max-width:100%}
+.polybius-square{border-collapse:separate;border-spacing:4px;font-family:Georgia,serif;width:max-content;margin:0 auto;background:transparent;border:0;border-radius:8px}
+.polybius-square caption{caption-side:bottom;font-family:Inter,system-ui;font-size:.75rem;color:#172b43;background:#efd39a;padding:.55rem .35rem .2rem;border-radius:0 0 5px 5px}
+.polybius-square th{padding:.4rem;min-width:44px;height:44px;color:#172b43;background:#ebc987;font:700 1.5rem Georgia,serif;border:1px solid #a18049;box-shadow:inset 0 1px #fff2ce,inset 0 -1px #b89556;border-radius:5px}
+.polybius-square thead th:first-child{font:600 .75rem Inter,system-ui;min-width:44px}
+.polybius-square td{padding:0;background:#5a4631;border-radius:7px;box-shadow:inset 0 3px 5px #3e2e1c}
+.polybius-square button{width:80px;min-width:80px;min-height:80px;font:600 2.35rem Georgia,serif;border-radius:7px;background:linear-gradient(135deg,#fffdf4,#f3e8d0 65%,#dfc9a3);border:1px solid #d3ba8e;margin:0;color:#14283f;box-shadow:inset 0 0 0 2px #fff8e8,inset 0 -4px 5px #a58b5e44,0 3px 0 #8f7348,0 4px 3px #48372288;transform:translateY(-2px)}
+.polybius-square button:hover{background:linear-gradient(#fffdf8,#f2dfb9)}
+.polybius-square .axis-highlight button{background:linear-gradient(135deg,#f0f7ff,#d6e9fb);border-color:#90b3d4;box-shadow:inset 0 0 0 2px #eef7ff,0 3px 0 #617b91,0 4px 3px #273a5288}
+.polybius-square th.coordinate-highlight{background:linear-gradient(#126dc1,#074f98);color:#fff;box-shadow:inset 0 0 0 2px #8dc9ff,0 0 9px #2c8def88;border-color:#a9d8ff}
+.instrument .polybius-square button.inspected{background:linear-gradient(135deg,#197bd1,#07529c);border:1px solid #b6ddff;color:#fff;box-shadow:inset 0 0 0 2px #7cbcf2,inset 0 -3px 6px #00326399,0 1px 0 #052a49,0 0 0 2px #83caff,0 0 13px #4faaff88;transform:translateY(0)}
+.polybius-square button:focus-visible{outline-offset:-6px;outline:3px solid #142b4d}.polybius-square button.inspected:focus-visible{outline-color:#fff}
+.polybius-inspection{min-width:0;padding:.2rem 0}.polybius-reading{position:relative;padding:1.35rem 1rem 1rem;border:1px solid #b29567;border-radius:13px;background:linear-gradient(125deg,#fffdf4,#f2e8d4);box-shadow:inset 0 0 0 3px #fff8e9,inset 0 0 0 4px #cab58d,0 5px 0 #bba889,0 10px 18px #392e1b22;color:#172b43;margin:0 0 1.25rem}
+.polybius-reading .instrument-fastener{width:11px;height:11px}.polybius-reading .instrument-fastener:after{inset:4px 2px}.polybius-reading .instrument-fastener.top-left,.polybius-reading .instrument-fastener.bottom-left{left:10px}.polybius-reading .instrument-fastener.top-right,.polybius-reading .instrument-fastener.bottom-right{right:10px}
+.instrument .polybius-reading h3{font:700 .75rem Georgia,serif;text-transform:uppercase;letter-spacing:.14em;text-align:center;color:#24354b;margin:.15rem 1rem .8rem}
+.polybius-coordinate-readout{text-align:center}#polybius-selected-symbol{display:block;font:600 5rem/1.1 Georgia,serif;color:#14283f;overflow-wrap:anywhere;margin:.2rem 0 1rem;text-shadow:0 2px #fff}
+.polybius-coordinate-readout dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;margin:0;padding-top:.8rem;border-top:1px solid #c5b18a}.polybius-coordinate-readout dt{text-transform:uppercase;color:#26374d;font:700 .7rem Georgia,serif;letter-spacing:.09em}
+.polybius-coordinate-readout dd{margin:.2rem auto 0;border:2px solid #b6955b;border-radius:5px;background:#fff9ea;box-shadow:inset 0 2px 3px #6b573533,0 1px #fff6dd;font:700 1.6rem/1.4 Georgia,serif;width:min(100%,4rem);color:#14283f}
+.polybius-dial{width:100%;max-width:115px;height:auto;display:block;margin:.2rem auto;filter:drop-shadow(0 2px 2px #6a523922)}.dial-rim{fill:#d2af6c;stroke:#967035;stroke-width:.8}.dial-face{fill:#fff5dc;stroke:#8d723f;stroke-width:.7}.dial-tick{stroke:#6e562e;stroke-width:1}.dial-number{fill:#25374b;font:700 9px Georgia,serif}.dial-needle{fill:#075ba9;stroke:#073f74;stroke-width:.7}.dial-hub{fill:#d5ae62;stroke:#8f682f;stroke-width:.8}
+.polybius-aliases{display:flex;flex-wrap:wrap;gap:.5rem 1rem;padding:.7rem .8rem;background:#eaf2ff;border-radius:8px;overflow-wrap:anywhere}.polybius-aliases>span{color:#50617b;font-size:.85rem}.polybius-inspection>.field{margin:.75rem 0}.polybius-inspection>.small{font-size:.8rem}
+.polybius-settings{border-top:1px solid #d9d6ce;padding-top:.8rem;margin-top:1rem}.polybius-settings .field{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.5rem 0}.polybius-settings label{margin:0;font-size:.85rem}.polybius-settings select{width:auto;max-width:65%}.polybius-rules{margin-top:1rem;padding:.75rem 0 0;border:0;border-top:1px solid #d9d6ce}.polybius-rules summary{font-size:.85rem}.polybius-custom{margin-top:1rem}
+@media(max-width:1100px){
+  .keyboard-pair{padding:17px}.key-layout{grid-template-columns:minmax(7rem,.18fr) minmax(0,1fr);padding:1.35rem 1.25rem;gap:.8rem}.keyboard-nameplate{padding:.7rem .4rem}.keyboard-case-label select{font-size:.9rem}
+  .polybius-instrument{gap:1.25rem;grid-template-columns:minmax(0,1fr) minmax(13rem,.38fr)}.polybius-case{padding:1.15rem 1.25rem .9rem}.polybius-square button{width:64px;min-width:64px;min-height:64px;font-size:2rem}.polybius-square th{min-width:40px;font-size:1.25rem}.polybius-square thead th:first-child{min-width:40px}.polybius-reading{padding:1.2rem .65rem .8rem}
 }
-@media(max-width:700px) {
-  .instrument .toolbar { align-items: stretch; }
-  .instrument .toolbar > .field { flex: 1 1 130px; min-width: 0; }
-  .instrument .toolbar > .field select,.instrument .toolbar > .field input { width: 100%; }
-  .key-layout { display: block; border-width: 2px; padding: .65rem; }
-  .keyboard-case-label { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .4rem 1rem; padding: 0 0 .6rem; margin-bottom: .5rem; border: 0; border-bottom: 1px solid #d6d1c7; }
-  .instrument .keyboard-case-label h3 { margin: 0; }
-  .keyboard-case-label .field { display: flex; gap: .5rem; align-items: center; flex: 0 1 auto; }
-  .keyboard-case-label select { max-width: 10rem; }
-  .keyboard-case-label .field label,.keyboard-case-detail { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  .instrument .keyboard-touch-controls > .field { display: block; }
-  .keyboard-touch-controls label { margin-bottom: .3rem; }
-  .keyboard-correspondence { gap: .4rem; }
-  .keyboard-correspondence > span { flex-basis: 100%; text-align: center; }
-  .polybius-instrument { grid-template-columns: minmax(0,1fr); }
-  .polybius-board { padding: .7rem 0; }
-  .polybius-square button { width: 44px; min-width: 44px; min-height: 44px; font-size: 1.25rem; }
-  .polybius-square th { min-width: 30px; height: 36px; padding: .2rem; font-size: .9rem; }
-  .polybius-inspection { padding: 1rem 0 0; border-left: 0; border-top: 1px solid #d9d6ce; }
-  .polybius-coordinate-readout { gap: 1.5rem; }
-  #polybius-selected-symbol { font-size: 3.5rem; }
-  .polybius-coordinate-readout dl { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-  .polybius-coordinate-readout dl > div + div { margin-top: 0; }
-  .polybius-coordinate-readout dd { font-size: 1.5rem; }
-  .book-reference { padding: 1rem; }
-  .book-source-preview { font-size: 1.25rem; }
-  .visual-instrument-links { grid-template-columns: repeat(2,minmax(0,1fr)); }
+@media(max-width:834px){.polybius-instrument{grid-template-columns:minmax(0,1fr)}.polybius-inspection{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.4rem 1.25rem}.polybius-reading{grid-row:1/5}.polybius-inspection>.field,.polybius-inspection>.small,.polybius-inspection>.polybius-aliases{margin:.35rem 0}.polybius-settings{grid-column:2;margin-top:0}.polybius-rules{grid-column:1/-1}}
+@media(max-width:700px){
+  .instrument .toolbar{align-items:stretch}.instrument .toolbar>.field{flex:1 1 130px;min-width:0}.instrument .toolbar>.field select,.instrument .toolbar>.field input{width:100%}
+  .keyboard-pair{padding:12px;border-radius:23px;box-shadow:inset 0 0 0 3px #e9c17e55,inset 0 0 0 6px #27180d99,0 5px 0 #3b2515,0 10px 18px #1a23362b}.key-layout{display:block;border-width:2px;padding:1.1rem .6rem .7rem;border-radius:15px}.key-layout>.instrument-fastener{width:10px;height:10px}.key-layout>.instrument-fastener:after{inset:4px 2px}.key-layout>.instrument-fastener.top-left,.key-layout>.instrument-fastener.bottom-left{left:6px}.key-layout>.instrument-fastener.top-right,.key-layout>.instrument-fastener.bottom-right{right:6px}.key-layout>.instrument-fastener.top-left,.key-layout>.instrument-fastener.top-right{top:5px}.key-layout>.instrument-fastener.bottom-left,.key-layout>.instrument-fastener.bottom-right{bottom:5px}
+  .keyboard-case-label{text-align:left;margin:0 0 .65rem}.keyboard-nameplate{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.35rem .7rem;padding:.4rem .6rem}.instrument .keyboard-case-label h3{margin:0;border:0;padding:0;font-size:.7rem;letter-spacing:.08em}.keyboard-case-label .field{flex:0 1 auto;max-width:100%}.keyboard-case-label select{max-width:10rem;min-height:44px}.keyboard-case-detail{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .instrument .keyboard-touch-controls>.field{display:block}.keyboard-touch-controls label{margin-bottom:.3rem}.keyboard-correspondence{gap:.4rem;padding:.35rem 0}.keyboard-correspondence:before,.keyboard-correspondence:after{max-width:2rem}.keyboard-correspondence>span{flex-basis:100%;text-align:center;order:3}.keyboard-correspondence-glyphs{width:8rem}.keyboard-correspondence-glyphs strong{font-size:1.5rem}
+  .polybius-case{padding:1.1rem .65rem .7rem;border-radius:20px}.instrument .polybius-case-title{font-size:.8rem;margin:.2rem 18px .9rem;letter-spacing:.1em}.polybius-case-foot{font-size:.6rem;letter-spacing:.08em;margin:.75rem 18px .1rem}.polybius-case:before,.polybius-case:after{width:50px;height:50px;opacity:.55}.polybius-board{padding:.35rem;border-radius:11px}.polybius-square{border-spacing:3px}.polybius-square button{width:44px;min-width:44px;min-height:44px;font-size:1.5rem;border-radius:5px}.polybius-square th{min-width:30px;height:36px;padding:.15rem;font-size:1rem}.polybius-square thead th:first-child{min-width:30px;font-size:.7rem}.polybius-square caption{font-size:.7rem}
+  .polybius-inspection{display:block}.polybius-reading{padding:1.25rem 1rem 1rem}.polybius-coordinate-readout{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1rem}#polybius-selected-symbol{font-size:4rem;margin:0;flex:0 1 4rem;max-width:100%}.polybius-coordinate-readout dl{flex:1 1 11rem;min-width:0;grid-template-columns:repeat(auto-fit,minmax(min(100%,4.5rem),1fr));border:0;padding:0;gap:.4rem}.polybius-coordinate-readout dt{font-size:.65rem;letter-spacing:.03em}.polybius-coordinate-readout dd{font-size:1.3rem}.polybius-inspection>.field,.polybius-inspection>.small,.polybius-inspection>.polybius-aliases{margin:.75rem 0}.polybius-settings{margin-top:1rem}
+  .book-reference{padding:1rem}.book-source-preview{font-size:1.25rem}.visual-instrument-links{grid-template-columns:repeat(2,minmax(0,1fr))}
 }

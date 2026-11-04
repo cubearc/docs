@@ -341,28 +341,56 @@ function ringGlyphs(alphabet, radius, shift, cls) {
     return svg('text', { x: 220 + radius * Math.cos(angle), y: 220 + radius * Math.sin(angle), class: cls, 'text-anchor': 'middle', 'dominant-baseline': 'central' }, [letter]);
   });
 }
-function ringGraduations() {
-  return Array.from({length: 24}, (_, index) => {
-    const angle = (index + .5) * Math.PI / 12 - Math.PI / 2;
-    return svg('line', {x1: 220 + 157 * Math.cos(angle), y1: 220 + 157 * Math.sin(angle), x2: 220 + 202 * Math.cos(angle), y2: 220 + 202 * Math.sin(angle), class: 'alberti-graduation'});
+function ringPoint(radius, angle) {
+  return [220 + radius * Math.cos(angle), 220 + radius * Math.sin(angle)];
+}
+function ringSegments(inner, outer, cls) {
+  return Array.from({length:24}, (_, index) => {
+    const start = (index - .5) * Math.PI / 12 - Math.PI / 2;
+    const end = start + Math.PI / 12;
+    const a = ringPoint(outer, start); const b = ringPoint(outer, end);
+    const c = ringPoint(inner, end); const d = ringPoint(inner, start);
+    return svg('path', {d:`M${a} A${outer} ${outer} 0 0 1 ${b} L${c} A${inner} ${inner} 0 0 0 ${d} Z`, class:cls});
   });
+}
+function ringGraduations() {
+  // Four tiny machining marks per canonical sector are decoration, not states.
+  return svg('g', {'aria-hidden':'true'}, Array.from({length:96}, (_, index) => {
+    const angle = index * Math.PI / 48;
+    const a = ringPoint(index % 4 === 0 ? 204 : 206, angle); const b = ringPoint(210, angle);
+    return svg('line', {x1:a[0],y1:a[1],x2:b[0],y2:b[1],class:'alberti-graduation'});
+  }));
 }
 function albertiDisk(api, index, editable = true) {
   const alignment = Math.max(0, index);
-  const ring = svg('g', {}, ringGlyphs(ALBERTI_RINGS.inner, 126, alignment, 'alberti-inner-letter'));
+  const ring = svg('g', {}, [
+    svg('circle', {cx:220,cy:220,r:150,class:'alberti-inner'}),
+    ...ringSegments(101,149,'alberti-inner-sector'),
+    ...ringGlyphs(ALBERTI_RINGS.inner, 126, alignment, 'alberti-inner-letter'),
+    svg('circle', {cx:220,cy:220,r:101,class:'alberti-center-rim'}),
+    svg('circle', {cx:220,cy:220,r:95,class:'alberti-medallion-base'}),
+    svg('image', {href:new URL('./assets/premium-compass.png',import.meta.url).href,x:126,y:126,width:188,height:188,preserveAspectRatio:'xMidYMid meet','aria-hidden':'true',class:'alberti-medallion'}),
+    svg('circle', {cx:220,cy:220,r:97,class:'alberti-medallion-edge'}),
+    svg('circle', {cx:220,cy:220,r:10,class:'alberti-hub'})
+  ]);
   const disk = svg('svg', { viewBox: '0 0 440 440', role: 'img', 'aria-label': index < 0 ? 'Alberti 24-position rings. No initial alignment configured.' : `Alberti 24-position rings. Inner ${ALBERTI_RINGS.inner[index]} aligned under outer A.`, class: `alberti-disk${editable ? '' : ' inspecting'}` }, [
     svg('defs', {}, [
-      svg('linearGradient', {id:'alberti-ivory',x1:'0',y1:'0',x2:'1',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#fffdf3'}),svg('stop',{offset:'.5','stop-color':'#f1e5ca'}),svg('stop',{offset:'1','stop-color':'#fff8e8'})]),
-      svg('radialGradient', {id:'alberti-ink'}, [svg('stop',{offset:'0','stop-color':'#29425c'}),svg('stop',{offset:'1','stop-color':'#14283f'})]),
-      svg('linearGradient', {id:'alberti-brass',x1:'0',y1:'0',x2:'1',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#f9e4a7'}),svg('stop',{offset:'.4','stop-color':'#d8b66b'}),svg('stop',{offset:'.7','stop-color':'#a87e35'}),svg('stop',{offset:'1','stop-color':'#f1d58e'})])
+      svg('linearGradient', {id:'alberti-ivory',x1:'0',y1:'0',x2:'1',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#fff0b9'}),svg('stop',{offset:'.24','stop-color':'#c6a15d'}),svg('stop',{offset:'.5','stop-color':'#f9e3a8'}),svg('stop',{offset:'.72','stop-color':'#cda96a'}),svg('stop',{offset:'1','stop-color':'#f3d58c'})]),
+      svg('radialGradient', {id:'alberti-ink',cx:'.35',cy:'.25',r:'.85'}, [svg('stop',{offset:'0','stop-color':'#294d68'}),svg('stop',{offset:'.55','stop-color':'#132d43'}),svg('stop',{offset:'1','stop-color':'#081a2a'})]),
+      svg('linearGradient', {id:'alberti-brass',x1:'0',y1:'0',x2:'.85',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#fff2c3'}),svg('stop',{offset:'.23','stop-color':'#a97d34'}),svg('stop',{offset:'.45','stop-color':'#f6d48a'}),svg('stop',{offset:'.75','stop-color':'#8d6128'}),svg('stop',{offset:'1','stop-color':'#edcc84'})]),
+      svg('pattern',{id:'alberti-machining',width:4,height:4,patternUnits:'userSpaceOnUse'},[svg('path',{d:'M0 0H4 M0 2H4',stroke:'#fff7db','stroke-width':'.3',opacity:'.15'})])
     ]),
-    svg('circle', { cx: 220, cy: 220, r: 209, class: 'alberti-rim' }),
-    svg('circle', { cx: 220, cy: 220, r: 205, class: 'alberti-outer' }), ...ringGraduations(),
-    svg('circle', { cx: 220, cy: 220, r: 153, class: 'alberti-inner-rim' }), svg('circle', { cx: 220, cy: 220, r: 149, class: 'alberti-inner' }),
-    ...ringGlyphs(ALBERTI_RINGS.outer, 180, 0, 'alberti-outer-letter'), ring,
-    svg('path', { d: 'M211 4 L229 4 L220 22 Z', class: 'alberti-marker' }),
-    svg('circle', { cx: 220, cy: 220, r: 23, class: 'alberti-hub-shadow' }), svg('circle', { cx: 220, cy: 218, r: 20, class: 'alberti-hub' }),
-    svg('circle', { cx: 220, cy: 218, r: 14, class: 'alberti-hub-detail' })]);
+    svg('circle', { cx:220,cy:224,r:214,class:'alberti-backing' }),
+    svg('circle', { cx:220,cy:220,r:214,class:'alberti-rim' }),
+    svg('circle', { cx:220,cy:220,r:210,class:'alberti-rim-highlight' }), ringGraduations(),
+    svg('circle', { cx:220,cy:220,r:202,class:'alberti-outer' }),
+    ...ringSegments(155,201,'alberti-outer-sector'),
+    svg('circle', {cx:220,cy:220,r:201,fill:'url(#alberti-machining)','aria-hidden':'true'}),
+    ...ringGlyphs(ALBERTI_RINGS.outer, 179, 0, 'alberti-outer-letter'),
+    svg('circle', { cx:220,cy:220,r:155,class:'alberti-inner-rim' }), ring,
+    svg('path', {d:'M208 3 Q220 -1 232 3 L220 25 Z',class:'alberti-marker-rim'}),
+    svg('path', {d:'M212 6 L228 6 L220 20 Z',class:'alberti-marker'})
+  ]);
   if (!editable) return disk;
   let start;
   const angle = event => { const bounds = disk.getBoundingClientRect(); return Math.atan2(event.clientY - bounds.top - bounds.height / 2, event.clientX - bounds.left - bounds.width / 2); };
@@ -390,7 +418,9 @@ function alberti(host, api) {
     api.refresh({fallbackFocusId:'alberti-initial'});
   };
   replace(host, h('div', { class: 'mechanism alberti-instrument' },
-    h('div', {class: 'alberti-stage'}, albertiDisk(api, displayed, !selected),
+    h('div', {class: 'alberti-stage'},
+      h('div', {class:'alberti-engraving'}, h('span',{},'Alberti'), h('span',{},'24-position cipher disk')),
+      albertiDisk(api, displayed, !selected),
       h('div', {class: 'alberti-stand'},
         button('‹', () => rotate(-1), {id:'alberti-rotate-left', 'aria-label':'Rotate initial index left'}),
         field('Initial · inner symbol under A', 'alberti-initial', select('alberti-initial', p.initial_index, [...ALBERTI_RINGS.inner], value => change(api, () => { api.ui.traceCursor = -1; api.ui.playing = false; patchSettings(api, { profile: p.profile ?? 'alberti_di_palma_2009_v1', initial_index: value }); }))),

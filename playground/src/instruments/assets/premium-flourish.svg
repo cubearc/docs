@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0bd"/><stop offset=".5" stop-color="#bf934c"/><stop offset="1" stop-color="#f3d993"/></linearGradient></defs>
+  <g stroke="url(#gold)" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 110C7 72 6 39 23 23S72 7 110 7M14 105C15 66 14 42 29 29S66 15 105 14"/>
+    <path d="M9 74C35 72 47 50 34 40C27 35 20 41 24 47C27 51 33 48 31 44M9 56C3 42 5 28 16 23M12 42C21 51 37 52 43 40M43 12C51 20 53 36 40 43M57 9C42 3 29 5 23 16M74 9C72 35 50 47 40 34C35 27 41 20 47 24C51 27 48 33 44 31"/>
+    <path d="M12 95C22 84 29 83 26 73C20 76 15 81 12 95ZM10 66C20 58 23 54 19 48C13 52 10 59 10 66ZM95 12C84 22 83 29 73 26C76 20 81 15 95 12ZM66 10C58 20 54 23 48 19C52 13 59 10 66 10Z" fill="url(#gold)" fill-opacity=".4"/>
+    <path d="M32 31C43 28 54 27 57 17C47 16 39 22 32 31ZM31 32C28 43 27 54 17 57C16 47 22 39 31 32Z" fill="url(#gold)" fill-opacity=".35"/>
+    <path d="M30 30L44 44M41 41C51 36 57 42 54 48C51 53 45 48 48 45M41 41C36 51 42 57 48 54C53 51 48 45 45 48"/>
+    <path d="M6 14L10 10L14 6L10 2L6 6L2 10Z" fill="url(#gold)"/>
+    <circle cx="7" cy="112" r="1.8" fill="url(#gold)"/><circle cx="112" cy="7" r="1.8" fill="url(#gold)"/>
+  </g>
+</svg>

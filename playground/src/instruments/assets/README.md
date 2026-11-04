@@ -17,3 +17,20 @@ flower; crowned, bearded King with sword; two jesters with distinct poses and
 small/large stars. Five equal columns on transparency; no card rectangles,
 typography, rank numbers or suit marks. Exact prompt and original generation
 path are recorded in workspace `.validation/solitaire-card-faces/`.
+
+# Crafted instrument materials
+
+`premium-walnut.png` and `premium-compass.png` are original decorative ImageGen
+assets generated on 2026-11-03. Walnut is a local CSS material for the keyboard
+and Alberti cases. The transparent compass medallion decorates the center of
+Alberti's disk; it does not indicate direction, algorithm state or a trace.
+Letters, sectors, controls and readouts remain DOM/SVG drawn from actual data.
+
+`premium-flourish.svg` is an original vector corner engraving. Two generated
+ornament candidates were rejected because they retained an opaque halo. The
+vector ornament provides clean transparent edges without modifying those images.
+All decorative elements are excluded from accessible control names.
+
+Exact concept and material prompts, rejected candidates and validation history
+are recorded in workspace `.validation/premium-instruments/`. These assets are
+loaded when their instrument is rendered; no external asset service is used.

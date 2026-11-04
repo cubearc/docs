@@ -65,6 +65,13 @@ diamonds 14–26, hearts 27–39 and spades 40–52, with Ace through King in ea
 suit. Core identifies Joker A as 53 and Joker B as 54. The portraits are
 decorative; importing or moving cards preserves these exact IDs.
 
+The keyboard's two key beds share one physical-position selection. Polybius
+shows the selected row and column in both its grid and coordinate readouts;
+these inspect the exact square, including custom alphabets and index origins.
+Alberti's engraved rings use the canonical 24-position alphabets. Its central
+medallion and the instrument case materials are decorative, separate from the
+initial alignment, inspected trace state and final index.
+
 PNG structural inspection is separate from image decoding. A valid CRC is not a
 security assessment. Color matching is exact, Braille represents byte masks,
 and flag/Pigpen/Morse composition does not recognize photographs or microphone
