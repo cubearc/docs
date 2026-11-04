@@ -1,7 +1,7 @@
 /* Shared compact input and full-width instrument composition. */
 .heading.instrument-study-heading {display:flex;align-items:center;gap:.5rem 1.5rem;flex-wrap:wrap;max-width:none;margin-bottom:.5rem}
 .instrument-study-heading h1 {margin:0}
-.instrument-study-heading p {font-size:.85rem;max-width:80ch}
+.heading.instrument-study-heading p {font-size:.85rem;line-height:1.4;max-width:80ch;flex:1 1 20rem;margin:0;min-width:0}
 .play-grid.visual-workspace.instrument-study-workspace {
   grid-template-columns:minmax(0,1fr);
   grid-template-rows:auto;
@@ -12,15 +12,19 @@
 .instrument-study-workspace .instrument-action {flex-basis:28rem}
 .instrument-study-workspace .input-panel {
   display:grid;grid-template-columns:minmax(0,1fr) minmax(16rem,23rem);gap:1.5rem;
-  padding:.5rem 1.25rem;background:#fffdf7;border:1px solid #d3cfc3;border-radius:10px;
-  box-shadow:0 2px 0 #e3e0d8;
+  padding:.5rem 1.25rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;
 }
 .instrument-study-workspace .input-text {
   min-height:2.75rem;height:2.75rem;max-height:16rem;padding:.35rem .75rem;
-  font:600 1.2rem/1.4 ui-monospace,monospace;letter-spacing:.12em;
-  border-color:#b5afa0;background:#fffefb;
+  font:600 1.1rem/1.4 ui-monospace,monospace;
+  border-color:var(--line);background:var(--surface);
 }
 .instrument-study-workspace .input-main>label {font-size:.75rem;margin-bottom:.2rem}
+.instrument-study-workspace .byte-input {display:flex;align-items:center;flex-wrap:wrap;gap:.4rem 1rem;padding:.25rem .5rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.instrument-study-workspace .byte-input strong {overflow-wrap:anywhere;font-size:.85rem}
+.instrument-study-workspace .byte-input p {margin:0;font-size:.8rem}
+.instrument-study-workspace .byte-input button {margin-left:auto;font-size:.85rem}
+.instrument-study-workspace .byte-input pre {flex-basis:100%;max-height:4rem;overflow:auto;font-size:.85rem}
 .study-input-actions {font-size:.8rem;margin-top:0}
 .study-input-actions summary {width:fit-content;min-height:24px;padding:.15rem 0}
 .study-input-actions .toolbar {margin-top:.3rem}
@@ -32,7 +36,7 @@
 .instrument-study-workspace #load-core-example {width:auto;justify-self:start;min-height:28px;font-size:.75rem;padding:.2rem .5rem;border-color:transparent;text-decoration:underline;text-underline-offset:3px}
 .instrument-study-workspace .instrument-surface {padding:0;border:0;background:transparent}
 .instrument-study-workspace #results-section {max-width:70rem;width:100%;margin:1rem auto 0}
-.instrument-study-workspace .result-card {display:grid;grid-template-columns:minmax(0,1fr) minmax(12rem,1fr);gap:.4rem 1.5rem}
+.instrument-study-workspace .result-card {display:grid;grid-template-columns:minmax(0,1fr) minmax(12rem,1fr);gap:.4rem 1.5rem;align-items:start}
 .instrument-study-workspace .result-card>.row,.instrument-study-workspace .result-card>.field,.instrument-study-workspace .result-card>.viewer {grid-column:1/-1}
 .instrument-study-workspace .result-card .toolbar button {flex:1 1 6rem}
 
@@ -45,10 +49,10 @@
   .instrument-study-workspace .instrument-action {flex-basis:100%}
   .instrument-study-workspace .result-card {display:block}
 }
-.study-output-strip {display:flex;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:1.25rem;padding:1rem 1.25rem;border:1px solid #c9c4b8;border-radius:8px;background:linear-gradient(#fffef9,#f4efe4);box-shadow:0 2px 0 #e3e0d8;color:#18263c}
+.study-output-strip {display:flex;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:1.25rem;padding:1rem 1.25rem;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 .study-output-label {flex:0 1 12rem;min-width:0;font-size:.85rem;overflow-wrap:anywhere}
 .study-output-label small {display:block;margin-top:.3rem;color:#586070;font-size:.75rem}
 .study-output-strip pre {flex:1 1 8rem;min-width:0;max-height:8rem;overflow:auto;font:600 1.3rem/1.5 ui-monospace,monospace}
-.study-output-strip button {flex:none;background:#fffef9;border-color:#9b9fa6}
+.study-output-strip button {flex:none;background:var(--surface);border-color:var(--line)}
 .study-output-limit {flex-basis:100%;margin:0;font-size:.8rem;color:#586070}
 @media(max-width:550px) {.study-output-strip {padding:.75rem;gap:.75rem}.study-output-label {flex-basis:100%}.study-output-strip pre {font-size:1.1rem}}

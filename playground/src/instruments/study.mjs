@@ -1,7 +1,7 @@
 import {h, button, copyText} from '../dom.mjs';
-import {primaryOutputName} from './registry.mjs';
+import {instrumentSeries, primaryOutputName} from './registry.mjs';
 
-const studies = new Set(['enigma', 'keyboard', 'polybius', 'alberti', 'solitaire']);
+const studies = new Set(instrumentSeries.map(({kind}) => kind));
 export const isInstrumentStudy = descriptor => studies.has(descriptor?.kind);
 
 /** Uses the already-produced, exact representation; never interprets outputs. */

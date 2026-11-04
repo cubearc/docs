@@ -107,7 +107,7 @@ test('an instrument immediately shows its main output without losing named outpu
   await book.close();
 });
 
-test('visual instruments keep the working surface beside input and results', {timeout:240000}, async t => {
+test('visual instruments keep compact input above the working surface and evidence', {timeout:240000}, async t => {
   const {context, base} = await instrumentBrowser(t);
   const folder = process.env.PLAYGROUND_EVIDENCE;
   if (folder) await mkdir(folder, {recursive:true});
@@ -134,7 +134,6 @@ test('visual instruments keep the working surface beside input and results', {ti
         if (kind === 'polybius') await page.locator('#polybius-cell-7').click();
         await page.evaluate(() => window.scrollTo(0, 0));
         const {surface, input, result} = await geometry(page);
-        if (['enigma','keyboard','polybius','alberti','solitaire'].includes(kind)) {
           if (kind === 'enigma') {
             const console = await page.locator('.enigma-console').boundingBox();
             assert.ok(console.width > surface.width * .7, 'The Enigma console dominates the full-width stage.');
@@ -142,19 +141,19 @@ test('visual instruments keep the working surface beside input and results', {ti
           assert.ok(input.height < 180, 'The input is a compact strip above the machine.');
           assert.ok(input.y + input.height <= surface.y, 'Input precedes the machine.');
           assert.ok(result.y >= surface.y + surface.height, 'Full evidence follows the machine.');
-        } else {
-          assert.ok(surface.width > input.width * 2, 'The instrument is the dominant work area.');
-          assert.ok(surface.x + surface.width <= input.x, 'Input sits beside the instrument.');
-          assert.ok(Math.abs(surface.y - input.y) < 2, 'Input and instrument start together.');
-          assert.ok(Math.abs(result.x - input.x) < 2, 'Result follows its input in the same rail.');
-        }
         assert.ok(surface.y < 360, 'The instrument starts within the first viewport.');
+        await page.mouse.move(0,0);
+        const runStyle = await page.locator('#run-tools').evaluate(node => {
+          const style = getComputedStyle(node);
+          return {background:style.backgroundColor,image:style.backgroundImage,border:style.borderRadius,shadow:style.boxShadow};
+        });
+        assert.deepEqual(runStyle,{background:'rgb(0, 95, 204)',image:'none',border:'8px',shadow:'none'},'Illustrated instruments retain the shared primary-button design.');
         const calls = await page.evaluate(() => window.instrumentCalls);
         await page.locator('#instrument-tab-parameters').click();
         assert.ok(await page.locator('#instrument-parameter-panel').isVisible());
         await page.locator('#instrument-tab-visual').click();
         assert.equal(await page.evaluate(() => window.instrumentCalls), calls);
-        for (const width of [1440, 390, 320]) {
+        for (const width of [1440, 1100, 834, 700, 390, 320]) {
           await page.setViewportSize({width, height:1000});
           await page.evaluate(() => document.fonts.ready);
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${kind} reflows at ${width}`);
@@ -163,7 +162,7 @@ test('visual instruments keep the working surface beside input and results', {ti
             assert.ok(top.y + top.height <= visual.y, 'Mobile input precedes the instrument.');
             assert.ok(visual.y + visual.height <= bottom.y, 'Mobile results follow the instrument.');
           }
-          if (folder && width !== 320) await page.screenshot({path:`${folder}/${kind}-${width}.png`, fullPage:true});
+          if (folder && [1440,390].includes(width)) await page.screenshot({path:`${folder}/${kind}-${width}.png`, fullPage:true});
         }
       } finally { await page.close(); }
     });
