@@ -136,7 +136,7 @@ test('five mechanical instruments edit canonical config and inspect real worker/
     await page.locator('#instrument-tab-parameters').click();
     assert.deepEqual(JSON.parse(await page.locator('#playground-options-deck').inputValue()).slice(0,2),[2,1],'Dragging changes the actual initial permutation.');
     await page.locator('#instrument-tab-visual').click();await page.getByRole('button',{name:'Use ordered deck 1–54',exact:true}).click();
-    await page.getByRole('button',{name:'#53 A JOKER. Position 53: Joker A. Select to move.',exact:true}).focus();await page.keyboard.press('Enter');
+    await page.getByRole('button',{name:'JOKER A #53. Position 53: Joker A. ID 53. Select to move.',exact:true}).focus();await page.keyboard.press('Enter');
     await page.getByRole('button',{name:'Move earlier',exact:true}).click();
     await page.locator('#instrument-tab-parameters').click();
     const order=JSON.parse(await page.locator('#playground-options-deck').inputValue());assert.equal(order[51],53);assert.equal(new Set(order).size,54);

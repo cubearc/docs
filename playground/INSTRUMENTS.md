@@ -38,7 +38,7 @@ use Core outputs, independently of canvas drawing or browser playback.
 | --- | --- | --- |
 | Digital keyboard | Inspect/insert keys, compare physical positions across layouts, choose layers and displacement | Exact text, coordinate/position reports when supplied |
 | Enigma | Initial rotors, windows, rings, reflector and disjoint plugs | Text, final windows, optional post-step windows |
-| Solitaire | Import/reorder all 54 cards with drag or movement buttons | Text; no invented deck trace |
+| Solitaire | Inspect illustrated cards, then reorder all 54 cards with drag or movement buttons | Text; no invented deck trace |
 | Scytale | Discrete columns and character inspection in strip/grid views | Text; no inferred source-to-destination mapping |
 | Cardan | Toggle fixed mask holes, extract or overlay | Exact exposed/replaced characters and named outputs |
 | Flag semaphore | Adjust anatomical arms, interpret pair and compose symbols | Canonical sender-facing arm pairs |
@@ -56,6 +56,14 @@ use Core outputs, independently of canvas drawing or browser playback.
 | Hex comparison | Inspect aligned rows, select ranges, navigate differences | Positional byte comparison, complete counts/listing status |
 | Exact colors | Select exact original samples/palette entries, build mask/layer | Core histogram, selection counts and exported image bytes |
 | PNG structure | Select chunks/signature/trailing bytes, inspect/export payload | Original byte offsets, payload/total lengths, CRC and boundary report |
+
+Solitaire shows ranks, suit pips, illustrated courts and two distinct jokers.
+Select a card to enlarge its face and inspect its position and numeric ID.
+Faces follow the bridge-order convention in the
+[Solitaire reference](https://www.schneier.com/academic/solitaire/): clubs 1–13,
+diamonds 14–26, hearts 27–39 and spades 40–52, with Ace through King in each
+suit. Core identifies Joker A as 53 and Joker B as 54. The portraits are
+decorative; importing or moving cards preserves these exact IDs.
 
 PNG structural inspection is separate from image decoding. A valid CRC is not a
 security assessment. Color matching is exact, Braille represents byte masks,

@@ -1,4 +1,5 @@
 import { h, button, replace, copyText } from '../dom.mjs';
+import { solitaireCard, solitaireFace } from './solitaire-cards.mjs';
 
 // Exact display alphabets from Cube ciphers/mechanical/alberti.rs at the locked revision.
 // These arrange the instrument; all enciphering and advancement remain in Core.
@@ -288,9 +289,9 @@ function enigma(host, api) {
 function solitaire(host, api) {
   const deck = list(api.param('deck')); const selected = Math.max(0, Math.min(deck.length - 1, api.ui.card ?? 0));
   const move = to => change(api, () => { jsonParam(api, 'deck', moveCard(deck, selected, to)); api.ui.card = to; });
-  const cardName = card => card === 53 ? 'Joker A' : card === 54 ? 'Joker B' : `Card ${card}`;
-  const card = (value, index) => button(h('span', {}, h('small', {}, `#${index + 1}`), ' ', h('strong', {}, value > 52 ? value === 53 ? 'A' : 'B' : value), ' ', h('span', {}, value > 52 ? 'JOKER' : 'CARD')), () => change(api, () => { api.ui.card = index; }), {
-    id: `solitaire-card-${index}`, class: `solitaire-card${index === selected ? ' selected' : ''}${value > 52 ? ' joker' : ''}`, draggable: deckStatus(deck).length ? 'false' : 'true', 'aria-label': `#${index + 1} ${value > 52 ? value === 53 ? 'A JOKER' : 'B JOKER' : `${value} CARD`}. Position ${index + 1}: ${cardName(value)}. Select to move.`, 'aria-pressed': String(index === selected),
+  const cardName = card => solitaireCard(card).name;
+  const card = (value, index) => button([solitaireFace(value, `deck-${index}`), h('small', {class: 'solitaire-position', 'aria-hidden': 'true'}, `#${index + 1}`)], () => change(api, () => { api.ui.card = index; }), {
+    id: `solitaire-card-${index}`, class: `solitaire-card${index === selected ? ' selected' : ''}`, draggable: deckStatus(deck).length ? 'false' : 'true', 'aria-label': `${solitaireCard(value).joker ? 'JOKER ' : ''}${solitaireCard(value).rank} #${index + 1}. Position ${index + 1}: ${cardName(value)}. ID ${value}. Select to move.`, 'aria-pressed': String(index === selected),
     onDragstart: event => {
       if (deckStatus(deck).length || !event.dataTransfer) { event.preventDefault(); return; }
       const token = crypto.randomUUID();
@@ -306,19 +307,23 @@ function solitaire(host, api) {
       change(api, () => { jsonParam(api, 'deck', moveCard(deck, drag.index, index)); api.ui.card = index; });
     } });
   const selectedValue = deck[selected];
-  const selectedCard = selectedValue > 52 ? selectedValue === 53 ? 'A' : 'B' : selectedValue;
+  const selectedCard = solitaireCard(selectedValue).joker ? solitaireCard(selectedValue).rank : selectedValue;
   replace(host, h('div', { class: 'mechanism solitaire-table' },
     h('div', {class: 'solitaire-mat'},
       h('div', { class: 'row between solitaire-header' }, h('div', {}, h('h3', {}, 'Initial deck · 54 cards'), note('Select a card, then move it. Or drag it onto a new position.')), button('Use ordered deck 1–54', () => change(api, () => jsonParam(api, 'deck', Array.from({ length: 54 }, (_, i) => i + 1))))),
       warning(deckStatus(deck)),
       h('div', { class: 'solitaire-deck', 'data-instrument-scroll': 'initial-deck', 'aria-label': 'Initial deck in position order' }, deck.slice(0, 54).map(card)),
       deck.length ? h('div', {class: 'solitaire-selection'},
-        h('div', {class: 'solitaire-selected'}, h('div', {}, h('span', {class: 'solitaire-selection-label'}, 'Selected card'), h('p', {id: 'solitaire-selected-position'}, `Position ${selected + 1} · ${cardName(selectedValue)}`)),
-          h('div', {class: `solitaire-selected-card${selectedValue > 52 ? ' joker' : ''}`, 'aria-hidden': 'true'}, h('small', {}, `#${selected + 1}`), h('strong', {id: 'solitaire-selected-value'}, selectedCard), selectedValue > 52 ? h('span', {}, 'JOKER') : null)),
+        h('div', {class: 'solitaire-selected'},
+          h('div', {class: 'solitaire-selected-card'}, solitaireFace(selectedValue, 'selected')),
+          h('div', {class: 'solitaire-selection-copy'}, h('span', {class: 'solitaire-selection-label'}, 'Selected card'),
+            h('p', {id: 'solitaire-selected-position'}, `Position ${selected + 1} · ${cardName(selectedValue)}`),
+            h('p', {}, 'Card ID ', h('span', {id: 'solitaire-selected-value'}, selectedCard), solitaireCard(selectedValue).joker ? ` · ${selectedValue}` : ''))),
         h('div', { class: 'toolbar' }, button('Move earlier', () => move(selected - 1), { id: 'solitaire-move-earlier', disabled: selected <= 0 || Boolean(deckStatus(deck).length) }), button('Move later', () => move(selected + 1), { id: 'solitaire-move-later', disabled: selected >= deck.length - 1 || Boolean(deckStatus(deck).length) })),
         field('Move selected card to position (1–54)', 'solitaire-move-position', h('input', { id: 'solitaire-move-position', type: 'number', min: 1, max: 54, disabled: Boolean(deckStatus(deck).length), value: selected + 1, onChange: event => { const to = int(event.target.value) - 1; if (to >= 0 && to < deck.length) move(to); } }))) : null),
     note('This is the initial configuration. The result is text; intermediate shuffle states are not returned.'),
     disclosure(api, 'deck-list', 'Accessible deck list and import',
+      note('Faces use bridge order: clubs 1–13, diamonds 14–26, hearts 27–39, spades 40–52; Ace through King. Joker A is 53; Joker B is 54. Positions change when you move a card; its ID stays the same.'),
       h('div', {class: 'mechanism-settings solitaire-options'}, field('Passphrase (ASCII letters; ordered deck required)', 'solitaire-passphrase', h('input', { id: 'solitaire-passphrase', type: 'password', autocomplete: 'off', value: api.param('passphrase') ?? '', maxlength: 65536, onChange: event => change(api, () => api.setParam('passphrase', event.target.value)) })),
         field('Deck-round budget', 'solitaire-max-steps', h('input', { id: 'solitaire-max-steps', type: 'number', min: 0, max: 1048576, value: api.param('max_steps') ?? 1048576, onChange: event => change(api, () => api.setParam('max_steps', event.target.value)) }))),
       field('Card order JSON', 'solitaire-deck-json', h('textarea', { id: 'solitaire-deck-json', rows: 4, value: typeof api.param('deck') === 'string' ? api.param('deck') : JSON.stringify(deck), onChange: event => change(api, () => api.setParam('deck', event.target.value)) })), h('ol', { class: 'deck-list' }, deck.map((value, index) => h('li', {}, `Position ${index + 1}: ${cardName(value)}`))))));
