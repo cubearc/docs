@@ -5,10 +5,11 @@ tool from its normal catalog entry. **Load Core example** loads a labeled,
 synthetic conformance example. It does not run it. Review the input and press
 **Run tools** to execute the installed local SDK in its dedicated worker.
 
-Keyboard, Enigma, Polybius, Alberti and Solitaire use a full-width instrument
-below a compact input strip. Expand **Input actions** for file loading, paste
-and clear. Other workbenches place input and results beside the instrument on
-wide screens. Narrow screens follow the order input, instrument, results.
+Every workbench uses a full-width instrument below a compact input strip.
+Expand **Input actions** for file loading, paste and clear. Results follow the
+instrument on wide and narrow screens. Illustrated surfaces distinguish keys,
+rotors, masks, signals and file structures; ordinary buttons, fields and tabs
+retain the shared Playground styling.
 The action selector and **Visual / Parameters** controls stay above the work area.
 
 **Visual** and **Parameters** share one configuration. Selecting a cell, card,
@@ -68,9 +69,15 @@ decorative; importing or moving cards preserves these exact IDs.
 The keyboard's two key beds share one physical-position selection. Polybius
 shows the selected row and column in both its grid and coordinate readouts;
 these inspect the exact square, including custom alphabets and index origins.
-Alberti's engraved rings use the canonical 24-position alphabets. Its central
-medallion and the instrument case materials are decorative, separate from the
+Alberti's illustrated rings use the canonical 24-position alphabets. Its central
+hub and the instrument case details are decorative, separate from the
 initial alignment, inspected trace state and final index.
+
+Book cipher places the indexed source characters on two visual pages. Expand
+**Edit reference text** to change the exact source, then **Index reference text**
+to validate its coordinates again. Page layout does not change source lines or
+coordinate rules. The graph's selected-node inspector shows up to 96 incident
+edges with their total count; the paged edge list retains access to every entry.
 
 PNG structural inspection is separate from image decoding. A valid CRC is not a
 security assessment. Color matching is exact, Braille represents byte masks,

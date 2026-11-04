@@ -1,3 +1,14 @@
+# Semaphore character
+
+`semaphore-body.png`, `semaphore-left-arm.png` and `semaphore-right-arm.png`
+are original transparent character sprites generated with built-in ImageGen on
+2026-11-04 from the approved cartoon semaphore design study. The body and each
+arm are separate so the renderer can position both arms using actual selected
+directions. Clothing, facial details and fabric folds are illustrative artwork;
+direction labels, symbol correspondence, selections and results remain data.
+The sprite contains no authoritative text or execution state. Prompts and source
+provenance are recorded in workspace `.validation/cartoon-instruments/`.
+
 # Solitaire portraits
 
 `solitaire-court-portraits.png` is original decorative artwork generated with
@@ -18,18 +29,19 @@ small/large stars. Five equal columns on transparency; no card rectangles,
 typography, rank numbers or suit marks. Exact prompt and original generation
 path are recorded in workspace `.validation/solitaire-card-faces/`.
 
-# Crafted instrument materials
+# Earlier design materials
 
 `premium-walnut.png` and `premium-compass.png` are original decorative ImageGen
-assets generated on 2026-11-03. Walnut is a local CSS material for the keyboard
-and Alberti cases. The transparent compass medallion decorates the center of
-Alberti's disk; it does not indicate direction, algorithm state or a trace.
-Letters, sectors, controls and readouts remain DOM/SVG drawn from actual data.
+assets generated on 2026-11-03 for the earlier keyboard and Alberti design.
+They are retained as design sources; the illustrated instruments use code-drawn
+surfaces and a static gear hub. Letters, sectors, controls and readouts remain
+DOM/SVG drawn from actual data.
 
 `premium-flourish.svg` is an original vector corner engraving. Two generated
 ornament candidates were rejected because they retained an opaque halo. The
-vector ornament provides clean transparent edges without modifying those images.
-All decorative elements are excluded from accessible control names.
+vector ornament provided clean transparent edges without modifying those images.
+It is retained as an earlier design source. Decorative artwork is excluded from
+accessible control names.
 
 Exact concept and material prompts, rejected candidates and validation history
 are recorded in workspace `.validation/premium-instruments/`. These assets are

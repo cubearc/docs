@@ -10,6 +10,26 @@ async function holdBookResponses(context) {
 }
 const sourceFiles=process.env.INSTRUMENT_SOURCE==='1'?['app.mjs','playground-view.mjs','instruments/shell.mjs','instruments/workbench.mjs']:[];
 
+test('book pages keep the exact source editable and inspect the Core index without executing',{timeout:60000},async t=>{
+ const {open}=await instrumentBrowser(t,{sourceFiles});
+ const page=await open('cipher.book.decode','book');
+ const editor=page.locator('.book-source-editor');
+ assert.equal(await editor.getAttribute('open'),null,'Source editing is initially a disclosure, leaving the book dominant.');
+ await editor.locator('summary').click();
+ const source='HIDDEN ECHO LIGHT LANTERN ORBIT';
+ await page.locator('#book-source').fill(source);
+ await editor.locator('summary').click();
+ await page.locator('#book-index').click();await page.locator('#book-cell-0').waitFor();
+ assert.equal(await page.locator('.book-open-spread .book-page').count(),2);
+ assert.equal(await page.locator('.book-open-spread #book-cell-0').count(),1,'Validated characters are on the book pages.');
+ const calls=await page.evaluate(()=>window.instrumentCalls);
+ await page.locator('#book-cell-6').click();
+ assert.equal(await page.evaluate(()=>window.instrumentCalls),calls);
+ await editor.locator('summary').click();
+ assert.equal(await page.locator('#book-source').inputValue(),source);
+ await page.close();
+});
+
 test('graph redraw, removal and paged reference inspection retain usable keyboard focus',{timeout:120000},async t=>{
  const {open}=await instrumentBrowser(t,{sourceFiles});
  const graph=await open('graph.shortest_path','graph');
@@ -24,6 +44,7 @@ test('graph redraw, removal and paged reference inspection retain usable keyboar
  await graph.close();
 
  const book=await open('cipher.book.decode','book');
+ await book.locator('.book-source-editor summary').click();
  await book.locator('#book-source').fill(Array(400).fill('A').join(' '));
  await book.locator('#book-index').click();await book.locator('#book-cell-0').waitFor();
  const indexed=await book.evaluate(()=>window.instrumentCalls);
@@ -80,7 +101,7 @@ test('leaving an indexing request does not write an old error into the next book
  await page.locator('#book-index').click();await page.waitForFunction(()=>typeof window.releaseBookReply==='function');
  await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'All tools',exact:true}).click();await page.locator('#tool-search').waitFor();
  await page.evaluate(()=>window.releaseBookReply());
- await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'Playground',exact:true}).click();await page.locator('#book-source').waitFor();
+ await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'Playground',exact:true}).click();await page.locator('.book-open-spread').waitFor();
  assert.equal(await page.locator('.instrument .error').count(),0,'A disposed index request must not leave an error on the replacement view.');
  assert.equal(await page.locator('#book-source').inputValue(),input);
  await page.locator('#book-index').click();await page.locator('#book-cell-0').waitFor();

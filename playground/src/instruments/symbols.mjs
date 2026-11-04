@@ -1,4 +1,5 @@
-import { h, button as domButton, replace } from '../dom.mjs';
+import { h, button as domButton, replace, copyText } from '../dom.mjs';
+import { flagFigure } from './semaphore-figure.mjs';
 
 // Stable control identities let the shared shell restore focus after a redraw.
 function button(content, action, attributes = {}) {
@@ -114,7 +115,7 @@ function gridWindow(api, chars, columns, { rows, holes, onToggle, output } = {})
       'aria-label': `${visibleLabel}. ${onToggle ? open ? 'Close hole' : 'Open hole' : 'Inspect'} row ${row}, column ${col}, position ${index}, ${ch ?? 'empty'}${open ? ', open' : ''}`, 'aria-pressed': String(onToggle ? Boolean(open) : selected), disabled: ch === undefined && !onToggle });
   });
   return h('div', { class: 'symbol-grid-view' },
-    h('div', { class: 'symbol-grid-scroll', role: 'region', tabindex: 0, 'aria-label': 'Character grid' }, h('div', { class: 'symbol-grid', style: `grid-template-columns:repeat(${Math.max(1, visibleCols)},minmax(3.5rem,4.6rem))` }, cells)),
+    h('div', { class: 'symbol-grid-scroll', role: 'region', tabindex: 0, 'aria-label': 'Character grid' }, h('div', { class: 'symbol-grid', style: `grid-template-columns:repeat(${Math.max(1, visibleCols)},minmax(3.5rem,var(--symbol-cell-size,4.6rem)))` }, cells)),
     h('div', { class: 'symbol-grid-caption' }, h('span', {}, `${totalRows} rows × ${columns} columns`), h('span', {}, 'Row / column · zero-based')),
     h('details', { class: 'symbol-grid-navigation', open: api.ui.gridNavigation ?? (totalRows > 10 || columns > 16), onToggle: event => { if (event.currentTarget.isConnected) api.ui.gridNavigation = event.currentTarget.open; } }, h('summary', { onClick: event => { if (event.currentTarget.isConnected && !event.defaultPrevented) api.ui.gridNavigation = !event.currentTarget.parentElement.open; } }, 'Grid navigation'),
       h('div', { class: 'toolbar' },
@@ -177,33 +178,6 @@ function cardan(host, api) {
       note('This is a fixed row-major mask. Space or Enter toggles a focused cell. The inspection position does not edit the mask. Extract and overlay keep their own named outputs; no rotation is applied.')));
 }
 
-function directionPoint(direction, radius = 84) {
-  const angle = DIRECTIONS.indexOf(direction) * Math.PI / 4 - Math.PI / 2;
-  return [150 + Math.cos(angle) * radius, 120 + Math.sin(angle) * radius];
-}
-function flagFigure(api, left, right) {
-  const drawArm = (direction, side) => {
-    const [x, y] = directionPoint(direction);
-    const setDirection = event => {
-      const rect = event.currentTarget.ownerSVGElement.getBoundingClientRect();
-      const dx = (event.clientX - rect.left) * 300 / rect.width - 150;
-      const dy = (event.clientY - rect.top) * 260 / rect.height - 120;
-      const sector = (Math.round((Math.atan2(dy, dx) + Math.PI / 2) / (Math.PI / 4)) + 8) % 8;
-      api.ui[side] = DIRECTIONS[sector]; api.ui.pairResult = null; api.ui.pairError = ''; api.refresh();
-    };
-    return svg('g', {}, svg('line', { x1: 150, y1: 120, x2: x, y2: y, stroke: side === 'left' ? '#005fcc' : '#142033', 'stroke-width': 9, 'stroke-linecap': 'round' }),
-      svg('rect', { x: x - 13, y: y - 13, width: 26, height: 26, fill: side === 'left' ? '#005fcc' : '#fff', stroke: '#142033', 'stroke-width': 2 }),
-      svg('path', { d: `M${x - 13},${y - 13} L${x + 13},${y + 13} L${x - 13},${y + 13} Z`, fill: '#c43b36' }),
-      svg('circle', { cx: x, cy: y, r: 22, fill: 'transparent', class: 'semaphore-handle', 'aria-hidden': 'true',
-        onPointerdown: event => event.currentTarget.setPointerCapture(event.pointerId), onPointerup: setDirection }));
-  };
-  return svg('svg', { viewBox: '0 0 300 260', class: 'semaphore-figure', role: 'img', 'aria-label': `Facing sender. Anatomical left arm ${left}, right arm ${right}. Adjust with the direction selectors.` },
-    svg('circle', { cx: 150, cy: 120, r: 102, fill: '#f6f8fc', stroke: '#d8e0ea', 'stroke-width': 1 }),
-    ...DIRECTIONS.map(direction => { const [x1, y1] = directionPoint(direction, 96); const [x2, y2] = directionPoint(direction, 102); return svg('line', { x1, y1, x2, y2, stroke: '#aab8ca', 'stroke-width': 2 }); }),
-    ...DIRECTIONS.map(d => { const [x, y] = directionPoint(d, 113); const el = svg('text', { x, y: y + 4, 'text-anchor': 'middle', fill: '#59677b', 'font-size': 13 }); el.textContent = d; return el; }),
-    svg('circle', { cx: 150, cy: 77, r: 18, fill: '#d9e0e9', stroke: '#142033', 'stroke-width': 2 }),
-    svg('path', { d: 'M150 100 L150 190 M150 190 L125 240 M150 190 L175 240', stroke: '#142033', 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }), drawArm(left, 'left'), drawArm(right, 'right'));
-}
 function semaphore(host, api) {
   const left = api.ui.left ?? 'S'; const right = api.ui.right ?? 'SW'; const pair = `${left},${right}`;
   const alphabet = Array.isArray(api.data?.semaphore) ? api.data.semaphore : [];
@@ -222,26 +196,38 @@ function semaphore(host, api) {
       api.ui.pairResult = { pair, unit: result.output }; api.ui.pairError = ''; api.refresh();
     } catch (error) { if (!api.revision || api.revision() === revision) { api.ui.pairError = error.message; api.refresh(); } }
   }
+  const retained = api.result();
+  const resultText = typeof retained?.output === 'string' ? retained.output : typeof retained?.text === 'string' ? retained.text : undefined;
+  const sequenceItems = visible.items.map((token, n) => {
+    const canonicalPair = isDecode(api) ? token : alphabet.find(entry => entry.unit === token.toUpperCase())?.token;
+    return button(h('span', {}, h('strong', {}, token === ' ' ? 'Space' : token), canonicalPair?.includes(',') ? h('small', {}, ' ' + canonicalPair) : null), () => {
+      const index = visible.start + n; api.ui.selection = index;
+      if (canonicalPair?.includes(',')) [api.ui.left, api.ui.right] = canonicalPair.split(',');
+      api.ui.pairResult = null; api.ui.pairError = ''; api.refresh();
+    }, { 'aria-pressed': String(selected === visible.start + n), 'aria-label': `${token === ' ' ? 'Space' : token}${canonicalPair?.includes(',') ? ' ' + canonicalPair : ''}. Inspect position ${visible.start + n}: ${token}` });
+  });
   replace(host,
     h('div', { class: 'semaphore-workbench' },
-      h('div', { class: 'semaphore-stage' }, sectionTitle('Sender’s signal', 'Receiver-facing view'), flagFigure(api, left, right),
+      h('section', { class: 'semaphore-stage' }, flagFigure(api, left, right),
         h('div', { class: 'semaphore-arm-legend' }, h('span', {}, h('i', { class: 'left', 'aria-hidden': 'true' }), 'LH · sender left'), h('span', {}, h('i', { class: 'right', 'aria-hidden': 'true' }), 'RH · sender right'))),
-      h('div', { class: 'semaphore-controls' },
-        h('div', { class: 'semaphore-directions' }, selector('left', left, 'Sender left hand (LH)'), selector('right', right, 'Sender right hand (RH)')),
-        h('div', { class: 'semaphore-reading' }, h('span', { class: 'small muted' }, 'Selected pair'), h('p', { class: 'symbol-pair' }, h('code', {}, pair), h('strong', {}, unit ?? '—'))),
-        h('div', { class: 'toolbar semaphore-compose-actions' }, button('Add symbol', () => add(isDecode(api) ? pair : unit), { disabled: !unit, class: 'primary' }), button('Add space', () => add(isDecode(api) ? '/' : ' '))),
-        button('Interpret pair', interpret, { class: 'quiet semaphore-interpret' }),
-        api.ui.pairError ? warn(api.ui.pairError) : null,
-        note('Drag a flag or choose directions. Add symbol edits the input.'))),
-    sectionTitle('Input sequence', selected === undefined ? 'Select a symbol to inspect its arms' : `Position ${selected} selected`),
-    h('div', { class: 'symbol-sequence semaphore-sequence', role: 'group', 'aria-label': 'Semaphore input sequence' }, visible.items.map((token, n) => button(token === ' ' ? 'Space' : token, () => {
-      const index = visible.start + n; api.ui.selection = index;
-      const actual = isDecode(api) ? token : alphabet.find(entry => entry.unit === token.toUpperCase())?.token;
-      if (actual?.includes(',')) [api.ui.left, api.ui.right] = actual.split(',');
-      api.ui.pairResult = null; api.ui.pairError = ''; api.refresh();
-    }, { 'aria-pressed': String(selected === visible.start + n), 'aria-label': `${token === ' ' ? 'Space' : token}. Inspect position ${visible.start + n}: ${token}` }))),
-    windowControls(api, 'sequenceStart', sequence.length),
-    details(api, 'Viewpoint and direction convention', note('Directions are viewed facing the sender. LH and RH refer to the sender’s anatomical left and right arms, not screen order. The blue flag marks LH; the outlined flag marks RH.'),
+      h('div', { class: 'semaphore-side' },
+        h('section', { class: 'semaphore-controls' }, sectionTitle('Selected symbol'),
+          h('div', { class: 'semaphore-selection' },
+            h('p', { class: 'symbol-pair' }, h('strong', {}, unit ?? '—'), h('code', {}, pair)),
+            h('div', { class: 'semaphore-directions' }, selector('left', left, 'Sender left hand (LH)'), selector('right', right, 'Sender right hand (RH)'))),
+          h('div', { class: 'semaphore-viewpoint' }, h('strong', {}, 'Facing the sender'), note('Sender’s left is on your right.')),
+          h('div', { class: 'toolbar semaphore-compose-actions' }, button('Add symbol', () => add(isDecode(api) ? pair : unit), { disabled: !unit, class: 'primary' }), button('Add space', () => add(isDecode(api) ? '/' : ' ')), button('Interpret pair', interpret)),
+          api.ui.pairError ? warn(api.ui.pairError) : null,
+          note('Drag a flag or choose directions. Add symbol edits the input.')),
+        h('section', { class: 'semaphore-composition' },
+          sectionTitle('Sequence', selected === undefined ? 'Select to inspect' : `Position ${selected} selected`),
+          h('div', { class: 'symbol-sequence semaphore-sequence', role: 'group', 'aria-label': 'Semaphore input sequence' }, sequenceItems.length ? sequenceItems : note('Add a symbol to start the sequence.')),
+          sequence.length > 96 ? windowControls(api, 'sequenceStart', sequence.length) : null,
+          h('div', { class: 'semaphore-output' }, h('div', {class:'row between'}, h('strong', {}, 'Output'), h('small', {class:'muted'}, api.stale() ? 'Previous configuration' : resultText === undefined ? 'Run to produce a result' : 'Text')),
+            h('pre', {tabindex:0, 'aria-label':'Semaphore output preview'}, resultText?.slice(0,4096) ?? '—'),
+            h('div', {class:'toolbar'}, button('Copy', () => copyText(resultText), {disabled:resultText === undefined, 'aria-label':'Copy semaphore output'}), button('Use as input', () => api.useOutput?.(Object.hasOwn(retained ?? {}, 'output') ? 'output' : 'text'), {disabled:resultText === undefined || !api.useOutput})),
+            resultText?.length > 4096 ? note('Preview: 4,096 characters. Copy retains the complete output.') : null)))),
+    details(api, 'Viewpoint and direction convention', note('Directions are viewed facing the sender. LH and RH refer to the sender’s anatomical left and right arms, not screen order. The red/yellow flag marks LH; the blue/white flag marks RH.'),
       note('Interpret pair validates the selected directions. Selecting a sequence position inspects without editing or executing. Spaces and exact separators remain in the input.')));
 
 }

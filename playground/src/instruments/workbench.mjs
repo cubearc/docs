@@ -47,7 +47,7 @@ function keyLayout(api,layout,title,selectedKey,target=false,layoutControl=null)
   const layer=api.ui.layer ?? 'base';
   const visible=entries.filter(e=>e.layer===layer);
   const rows=[...new Set(visible.map(e=>e.row ?? 0))];
-  return h('section',{class:'key-layout','aria-label':title},instrumentFasteners(),header,h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
+  return h('section',{class:'key-layout','aria-label':title},header,h('div',{class:'instrument-scroll','data-instrument-scroll':target?'keyboard-destination':'keyboard-source'},h('div',{class:'keyboard-board'},rows.map(row=>h('div',{class:'keyboard-row',style:`padding-left:${row*10}px`},visible.filter(e=>(e.row??0)===row).map(entry=>button(h('span',{},h('strong',{},entry.symbol)),()=>{
     api.ui.key=entry.key;api.ui.layer=entry.layer;
     const offset=api.text().indexOf(entry.symbol);
     api.ui.textPosition=offset<0?null:Array.from(api.text().slice(0,offset)).length;
@@ -128,24 +128,17 @@ function polybiusRules(api) {
     if(event.currentTarget.isConnected&&!event.defaultPrevented)api.ui.polybiusRules=!event.currentTarget.parentElement.open;
   }},'Matching and spaces'),note('Presets fold ASCII case. Each literal space is retained as / (a null token). Custom squares match exact scalars.'));
 }
-// Decorative fasteners and coordinate dials are presentation only. They never
-// change configuration or infer an operation result.
-function instrumentFasteners() {
-  return ['top-left','top-right','bottom-left','bottom-right'].map(corner=>h('span',{class:`instrument-fastener ${corner}`,'aria-hidden':'true'}));
-}
+// Coordinate rulers show only the selected row/column; all labels derive from
+// the current square. This is inspection, never a computed cipher result.
 function coordinateDial(side,base,index) {
   if (!side || base===null) return null;
-  const angle=value=>(side===1?0:-140+value*280/(side-1))*Math.PI/180;
-  const point=(value,radius)=>[50+Math.sin(angle(value))*radius,50-Math.cos(angle(value))*radius];
-  const marks=Array.from({length:side},(_,value)=>{
-    const [x1,y1]=point(value,36),[x2,y2]=point(value,40),[x,y]=point(value,28);
-    const labeled=side<=8 || value%Math.ceil(side/8)===0 || value===side-1;
-    return [svg('line',{x1,y1,x2,y2,class:'dial-tick'}),labeled?svg('text',{x,y:y+3,'text-anchor':'middle',class:'dial-number'},value+base):null];
+  const shown=Array.from({length:Math.min(side,8)},(_,i)=>{
+    const value=side<=8?i:Math.round(i*(side-1)/7);
+    return {value,x:8+i*16};
   });
-  return svg('svg',{viewBox:'0 0 100 100',class:'polybius-dial','aria-hidden':'true',focusable:'false'},
-    svg('circle',{cx:50,cy:50,r:47,class:'dial-rim'}),svg('circle',{cx:50,cy:50,r:43,class:'dial-face'}),marks,
-    index===undefined?null:svg('g',{transform:`rotate(${side===1?0:-140+index*280/(side-1)} 50 50)`},svg('path',{d:'M47 54 L50 30 L53 54 Z',class:'dial-needle'})),
-    svg('circle',{cx:50,cy:50,r:5,class:'dial-hub'}));
+  return svg('svg',{viewBox:`0 0 ${Math.max(32,shown.length*16)} 32`,class:'polybius-dial','aria-hidden':'true',focusable:'false'},
+    svg('rect',{x:1,y:1,width:Math.max(30,shown.length*16-2),height:29,rx:7,class:'coordinate-rail'}),
+    shown.map(({value,x})=>[svg('rect',{x:x-6,y:6,width:13,height:18,rx:4,class:`coordinate-mark${index===value?' active':''}`}),svg('text',{x,y:19,'text-anchor':'middle',class:`coordinate-rail-number${index===value?' active':''}`},value+base)]));
 }
 function polybius(host,api) {
   const custom=api.param('alphabet');
@@ -163,7 +156,7 @@ function polybius(host,api) {
     api.ui.rowPage=0;api.refresh();})),
     field('polybius-base','Index origin',choice('polybius-base',base,[0,1],v=>patch(api,'index_base',v))));
   const grid=valid?h('div',{class:'instrument-scroll polybius-board','data-instrument-scroll':'polybius-square'},h('table',{class:'polybius-square'},h('caption',{},'Row, column — exact square'),h('thead',{},h('tr',{},h('th',{scope:'col'},'r/c'),Array.from({length:side},(_,c)=>h('th',{scope:'col',class:selected!==undefined&&selected%side===c?'coordinate-highlight':''},c+base)))),h('tbody',{},Array.from({length:Math.min(8,side-start)},(_,r)=>h('tr',{},h('th',{scope:'row',class:selected!==undefined&&Math.floor(selected/side)===r+start?'coordinate-highlight':''},r+start+base),Array.from({length:side},(_,c)=>polybiusCell(api,alphabet,(r+start)*side+c,side,base,selected))))))):h('p',{class:'warning'},'A custom square requires side² unique scalars and valid aliases. Review Parameters.');
-  const reading=h('div',{class:'polybius-reading'},instrumentFasteners(),h('h3',{},'Selected cell'),
+  const reading=h('div',{class:'polybius-reading'},h('h3',{},'Selected cell'),
     h('div',{class:'polybius-coordinate-readout'},h('strong',{id:'polybius-selected-symbol'},selected===undefined?'—':alphabet[selected]),
       h('dl',{},h('div',{},h('dt',{},'Row'),coordinateDial(side,base,selected===undefined?undefined:Math.floor(selected/side)),h('dd',{id:'polybius-selected-row'},selected===undefined?'—':Math.floor(selected/side)+base)),h('div',{},h('dt',{},'Column'),coordinateDial(side,base,selected===undefined?undefined:selected%side),h('dd',{id:'polybius-selected-column'},selected===undefined?'—':selected%side+base)))));
   const inspection=h('aside',{class:'polybius-inspection','aria-label':'Selected cell coordinates'},reading,
@@ -171,7 +164,7 @@ function polybius(host,api) {
     field('polybius-action','Cell action',choice('polybius-action',api.ui.cellAction??'inspect',['inspect','insert'],v=>{api.ui.cellAction=v;api.refresh();})),
     note('Arrow keys inspect adjacent cells. Choose Insert, then activate a cell to compose.'),controls,
     polybiusRules(api));
-  replace(host,h('div',{class:'polybius-instrument'},h('div',{class:'polybius-stage'},h('div',{class:'polybius-case'},instrumentFasteners(),h('h3',{class:'polybius-case-title'},custom?'Custom square':api.param('preset')==='tap'?'Tap square':'Polybius square'),grid,h('p',{class:'polybius-case-foot'},'Coordinate instrument')),side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null),inspection),
+  replace(host,h('div',{class:'polybius-instrument'},h('div',{class:'polybius-stage'},h('div',{class:'polybius-case'},h('h3',{class:'polybius-case-title'},custom?'Custom square':api.param('preset')==='tap'?'Tap square':'Polybius square'),grid,h('p',{class:'polybius-case-foot'},'Coordinate instrument')),side>8?h('div',{class:'toolbar'},button('Previous rows',()=>{api.ui.rowPage=Math.max(0,start-8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-previous-rows',disabled:start===0}),button('Next rows',()=>{api.ui.rowPage=Math.min(side-1,start+8);api.refresh({fallbackFocusId:`polybius-cell-${api.ui.rowPage*side}`});},{id:'polybius-next-rows',disabled:start+8>=side}),note(`Rows ${start+1}–${Math.min(start+8,side)} of ${side}. All ${side*side} cells remain in the configuration.`)):null),inspection),
     custom?h('div',{class:'toolbar polybius-custom'},field('polybius-alphabet','Custom alphabet',h('textarea',{id:'polybius-alphabet',rows:2,value:custom,onChange:e=>patch(api,'alphabet',e.target.value)})),field('polybius-side','Side',h('input',{id:'polybius-side',type:'number',min:1,max:64,value:api.param('side'),onChange:e=>patch(api,'side',e.target.value)}))):null,
     h('p',{class:'selection-caption'},selected!==undefined?`Selected ${alphabet[selected]} ↔ ${Math.floor(selected/side)+base},${selected%side+base}. Inspection does not edit or run.`:'Select a cell to inspect its coordinates.'));
 }
@@ -182,6 +175,13 @@ function svg(tag,attributes={},...children) {
   for(const child of children.flat(Infinity))if(child!==null&&child!==undefined)node.append(child instanceof Node?child:document.createTextNode(String(child)));
   return node;
 }
+// A bounded projection of supplied edges, not a graph computation. Count the
+// complete source while retaining only the rows this inspector can display.
+function incidentEdgeWindow(edges,selected) {
+  const visible=[];let total=0;
+  if(selected!==undefined)for(const edge of edges)if(edge.from===selected||edge.to===selected){total++;if(visible.length<96)visible.push(edge);}
+  return {visible,total};
+}
 function graph(host,api) {
   const data=graphDraft(api.text());
   const controls=h('div',{class:'toolbar'});
@@ -189,6 +189,7 @@ function graph(host,api) {
   const save=(next,focusId)=>{api.setText(JSON.stringify(next,null,2));api.refresh({focusId});};
   const vertices=data.vertices;
   const selected=api.ui.node;
+  const incident=incidentEdgeWindow(data.edges,selected);
   if (!api.ui.positions || Object.getPrototypeOf(api.ui.positions)!==null) api.ui.positions=Object.assign(Object.create(null),api.ui.positions ?? {});
   const positions=api.ui.positions;
   const currentNodes=new Set(vertices);
@@ -214,7 +215,7 @@ function graph(host,api) {
   for(const name of vertices.slice(0,100)) {
     const pos=positions[name];
     const node=svg('g',{transform:`translate(${pos.x} ${pos.y})`,class:'graph-node'});
-    node.append(svg('circle',{r:25,fill:result?.vertices?.includes(name)?'#d9eaff':'#fff',stroke:name===selected?'#005fcc':'#59677b','stroke-width':name===selected?4:2}),svg('text',{'text-anchor':'middle',y:6},name));
+    node.append(svg('circle',{r:26,cy:5,class:'graph-node-shadow'}),svg('circle',{r:25,class:`graph-node-ring${result?.vertices?.includes(name)?' on-path':''}${name===selected?' is-selected':''}`}),svg('path',{d:'M-18 -6 Q-14 -18 -3 -19',class:'graph-node-shine'}),svg('text',{'text-anchor':'middle',y:6},name));
     node.addEventListener('pointerdown',event=>{
       event.preventDefault();node.setPointerCapture(event.pointerId);let moved=false;
       const move=e=>{const r=canvas.getBoundingClientRect();positions[name]={x:Math.min(665,Math.max(35,(e.clientX-r.left)/r.width*700)),y:Math.min(425,Math.max(35,(e.clientY-r.top)/r.height*460))};moved=true;node.setAttribute('transform',`translate(${positions[name].x} ${positions[name].y})`);};
@@ -232,6 +233,7 @@ function graph(host,api) {
   replace(host,h('div',{class:'toolbar'},field('graph-directed','Graph direction',choice('graph-directed',data.directed?'directed':'undirected',['undirected','directed'],v=>save({...data,directed:v==='directed'}))),
     field('graph-source','Source',choice('graph-source',api.param('source'),vertices,v=>patch(api,'source',v))),field('graph-target','Target',choice('graph-target',api.param('target'),vertices,v=>patch(api,'target',v)))),
     h('div',{class:'instrument-scroll','data-instrument-scroll':'graph-layout',tabindex:0,role:'region','aria-label':'Graph layout viewport'},canvas),note(`Drag nodes to change layout only. ${Math.min(vertices.length,100)} nodes and ${Math.min(data.edges.length,200)} edges drawn; the lists retain all graph entries.`),
+    h('section',{class:'graph-node-inspector','aria-label':'Selected node inspection'},h('div',{},h('h3',{},'Selected node'),h('strong',{id:'graph-selected-node'},selected??'—')),selected?h('div',{},note(selected===api.param('source')?'Source node':selected===api.param('target')?'Target node':'Graph node'),h('ul',{class:'compact-list'},incident.visible.map(edge=>h('li',{},`${edge.id}: ${edge.from} ${data.directed?'→':'—'} ${edge.to}`))),note(`Showing ${incident.visible.length} of ${incident.total} incident edges. The Edges list below retains access to every supplied edge.`),note('These are the supplied edges. Selecting a node inspects it; dragging or the layout buttons move it.')):note('Select a node in the map or the node list to inspect its supplied edges.')),
     result?h('p',{class:'selection-caption'},`${result.vertices.join(' → ')} · ${result.edges.length} edges${api.stale()?' · earlier input':''}`):note('Run to find a path. The graph has no weights or search trace.'),
     h('div',{class:'toolbar'},field('graph-new-node','New node ID',vertexInput),button('Add node',()=>attempt(()=>{const name=vertexInput.value;if(!name||vertices.includes(name))throw new Error('Use a nonempty distinct node ID.');save({...data,vertices:[...vertices,name]});}),{id:'graph-add-node'})),
     h('div',{class:'toolbar'},endpoint('graph-edge-from','from'),endpoint('graph-edge-to','to'),field('graph-edge-id','New edge ID',edgeId),button('Add edge',()=>attempt(()=>save(editGraphEdge(data,api.ui.from??vertices[0],api.ui.to??vertices[0],edgeId.value))),{id:'graph-add-edge'})),
@@ -257,6 +259,16 @@ export function sourceCells(source,words,scheme,base) {
     return scalars.slice(word.scalar_index,word.scalar_index+word.scalar_length).map((symbol,index)=>({symbol,scalar:word.scalar_index+index,coordinate:scheme==='word_character'?`${word.word_index+base}:${index+base}`:`${row+base}:${wordInLine+base}:${index+base}`}));
   });
 }
+function bookSpread(api,index,start,source) {
+  const visible=index?.cells.slice(start,start+160)??[];
+  const middle=Math.ceil(visible.length/2);
+  const cell=(value,offset)=>button(h('span',{},h('strong',{},value.symbol===' '?'␠':value.symbol),h('small',{},value.coordinate)),()=>{api.ui.bookCell=start+offset;api.refresh();},{id:`book-cell-${start+offset}`,'aria-pressed':String(api.ui.bookCell===start+offset),'aria-label':`${value.symbol===' '?'␠':value.symbol}${value.coordinate}: coordinate ${value.coordinate}`});
+  const page=(side,values,offset)=>h('section',{class:`book-page book-page-${side}`,'aria-label':`${side==='left'?'Left':'Right'} reference page`},
+    h('div',{class:'book-page-heading'},h('h3',{},side==='left'?'Reference text':'Reference text · continued'),h('span',{},index?`${values.length} characters`:'Not indexed')),
+    index?h('div',{class:'book-source-grid book-page-grid'},values.map((value,i)=>cell(value,offset+i))):side==='left'?h('pre',{class:'book-source-preview'},source||'No reference text yet.'):h('div',{class:'book-index-empty'},h('p',{},'Index this source'),note('Core validates the coordinates before the characters can be selected.')),
+    h('div',{class:'book-page-foot'},index&&values.length?`Positions ${start+offset}–${start+offset+values.length-1}`:'Exact source · visual pages only'));
+  return h('div',{class:'book-open-spread'},h('span',{class:'book-binding','aria-hidden':'true'}),page('left',visible.slice(0,middle),0),page('right',visible.slice(middle),middle));
+}
 function book(host,api) {
   const encode=api.action.id.endsWith('.encode');
   const source=encode?api.text():String(api.param('source')??'');
@@ -269,7 +281,7 @@ function book(host,api) {
     field('book-source','Reference text (exact)',h('textarea',{id:'book-source',rows:4,value:source,onInput:e=>{api.setParam('source',e.target.value);api.refresh();}}));
   const indexSource=async()=>{
     if (api.ui.bookRequest) return;
-    api.ui.bookError='';const revision=api.revision();
+    api.ui.bookEditorOpen=false;api.ui.bookError='';const revision=api.revision();
     const request=api.ui.bookRequest={revision};
     api.refresh();
     try{
@@ -297,16 +309,16 @@ function book(host,api) {
   }}, 'Source identity and inspection limits'),
     index ? note(`Source SHA-256 ${index.hash}. Visual inspection retains at most 4,096 scalars; the complete source and results remain exact.`) : null,
     api.result().source_sha256 ? note(`Execution source SHA-256: ${api.result().source_sha256}`) : null) : null;
-  replace(host,h('div',{class:'toolbar'},field('book-scheme','Coordinate scheme',choice('book-scheme',scheme,api.choices('scheme'),v=>patch(api,'scheme',v))),field('book-base','Index origin',choice('book-base',base,[0,1],v=>patch(api,'index_base',v))), encode ? field('book-matching','Matching policy',choice('book-matching',api.param('matching'),api.choices('matching'),v=>patch(api,'matching',v))) : null),textField,
-    h('section',{class:'book-reference'},h('h3',{},'Reference text'),h('pre',{class:'book-source-preview'},source||'No reference text yet.')),
+  replace(host,h('div',{class:'toolbar'},field('book-scheme','Coordinate scheme',choice('book-scheme',scheme,api.choices('scheme'),v=>patch(api,'scheme',v))),field('book-base','Index origin',choice('book-base',base,[0,1],v=>patch(api,'index_base',v))), encode ? field('book-matching','Matching policy',choice('book-matching',api.param('matching'),api.choices('matching'),v=>patch(api,'matching',v))) : null),encode?textField:h('details',{class:'book-source-editor',open:Boolean(api.ui.bookEditorOpen),onToggle:event=>{if(event.currentTarget.isConnected)api.ui.bookEditorOpen=event.currentTarget.open;}},h('summary',{onClick:event=>{if(event.currentTarget.isConnected&&!event.defaultPrevented)api.ui.bookEditorOpen=!event.currentTarget.parentElement.open;}},'Edit reference text'),textField),
     h('div',{class:'toolbar'},button('Index reference text',indexSource,{id:'book-index','aria-disabled':String(Boolean(api.ui.bookRequest)),'aria-busy':String(Boolean(api.ui.bookRequest))}),button('Insert selected coordinate',()=>{const cell=index?.cells[api.ui.bookCell];if(!cell||stale)return;if(encode){api.setExtra('text',api.extra('text')+cell.symbol);api.refresh();}else addText(api,cell.coordinate,',');},{id:'book-insert-coordinate',disabled:!index||stale||api.ui.bookCell===undefined})),
     api.ui.bookRequest?h('p',{class:'small muted',role:'status'},'Indexing reference text in Core…'):null,
     api.ui.bookError?h('p',{class:'error',role:'alert'},api.ui.bookError):null,
     stale?h('p',{class:'warning'},'The indexed source or coordinates changed. Index the reference text again; the previous source is retained below.'):null,
+    bookSpread(api,index,start,source),
     index?h('section',{},note(`${index.cells.length} of ${index.total} indexed scalars · select a character to inspect its coordinate.`),
-      h('div',{class:'book-source-grid'},index.cells.slice(start,start+160).map((cell,i)=>button(h('span',{},h('strong',{},cell.symbol===' '?'␠':cell.symbol),h('small',{},cell.coordinate)),()=>{api.ui.bookCell=start+i;api.refresh();},{id:`book-cell-${start+i}`,'aria-pressed':String(api.ui.bookCell===start+i),'aria-label':`${cell.symbol===' '?'␠':cell.symbol}${cell.coordinate}: coordinate ${cell.coordinate}`}))),
       h('div',{class:'toolbar'},button('Previous source cells',()=>{api.ui.bookPage=Math.max(0,start-160);api.refresh({fallbackFocusId:`book-cell-${api.ui.bookPage}`});},{id:'book-previous-source',disabled:!start}),note(`${start+1}–${Math.min(start+160,index.cells.length)}`),button('Next source cells',()=>{api.ui.bookPage=start+160;api.refresh({fallbackFocusId:`book-cell-${api.ui.bookPage}`});},{id:'book-next-source',disabled:start+160>=index.cells.length})),
       api.ui.bookCell!==undefined? h('p',{class:'selection-caption'},`Selected ${index.cells[api.ui.bookCell]?.coordinate}: ${index.cells[api.ui.bookCell]?.symbol}. Source selection inspects; Insert explicitly composes the message/coordinates.`):null):note('Index the reference text to inspect Core-validated coordinates. Visual wrapping never changes source lines.'),
+    h('details',{class:'book-exact-source'},h('summary',{},'Exact source text'),h('pre',{},index?.source??source)),
     identity);
 }
 

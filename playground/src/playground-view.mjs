@@ -268,7 +268,7 @@ export function mountPlayground(container, context) {
     instrument = instrumentShell({page,action:selected,descriptor,runtime,changed,
       setInput(value, options = {}) { const previous=session.input.type; changed({input:value,...options}); if (previous !== value.type) render(); },
       parameters:()=>page.parameters[selected.id], extra:()=>page.extraInputs[selected.id],
-      redrawForm:()=>page.redrawParameters?.(),selectAction,loadExample,convertInput:id=>run({ids:[id],continueAfter:true,keepTool:true})});
+      redrawForm:()=>page.redrawParameters?.(),selectAction,loadExample,convertInput:id=>run({ids:[id],continueAfter:true,keepTool:true}),continueOutput:chooseContinue});
     page.dispose = instrument.dispose;
   }
   append(inputOptions, hasInput && (!descriptor || selected.direct.inputs[selected.contract.inputs[0].name] === 'bytes' && value.type === 'text') ? h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.utf8, onChange: event => { page.utf8 = event.target.checked; changed(); } }), 'Use UTF-8 for text sent to byte tools') : null,

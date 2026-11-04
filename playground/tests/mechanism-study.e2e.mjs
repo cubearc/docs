@@ -73,3 +73,23 @@ test('Solitaire selected card readout follows actual moves and advanced options 
   assert.equal(await page.locator('.result-card .viewer pre').first().textContent(),'EXKYIZSGEH');
   await capture(page,'solitaire');
 });
+
+test('Brainfuck keeps memory ahead of report settings and source inspection tied to recorded dispatches', {timeout:120000}, async t=>{
+  const {open}=await instrumentBrowser(t,{sourceFiles});
+  const page=await open('esolang.brainfuck.report','brainfuck',2);
+  await page.locator('#playground-input').fill('++++++++[>++++++++<-]>+.');
+  await page.locator('#bf-stdin').fill('');await page.locator('#bf-stdin').press('Tab');
+  assert.equal(await page.locator('.bf-source-inspection').count(),0,'The input editor is the source until a recorded instruction is inspected.');
+  const memory=page.locator('.bf-evidence-grid');
+  assert.ok(await memory.evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('.bf-report-settings')) & Node.DOCUMENT_POSITION_FOLLOWING)),'The memory instrument precedes advanced report settings in reading order.');
+  await page.getByRole('button',{name:'Request tape cells 0–31 and recorded dispatches',exact:true}).click();
+  await page.locator('#run-tools').click();
+  await page.locator('[data-result-operation="esolang.brainfuck.report"]').waitFor();
+  assert.ok((await page.locator('.bf-tape').textContent()).includes('65'));
+  const calls=await page.evaluate(()=>window.instrumentCalls);
+  await page.locator('#mechanism-trace-next').click();
+  assert.equal(await page.locator('.bf-source-inspection mark').textContent(),'+');
+  assert.equal(await page.evaluate(()=>window.instrumentCalls),calls,'Inspecting an instruction never executes again.');
+  await page.locator('#bf-width').selectOption('8');
+  await capture(page,'brainfuck');
+});

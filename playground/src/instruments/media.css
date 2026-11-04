@@ -3,11 +3,11 @@
 .instrument .media-workspace>*{min-width:0;max-width:100%}
 .instrument .media-workspace p{margin:.35rem 0;line-height:1.55}
 .instrument .media-workspace h3{font-size:.95rem;margin:0 0 .6rem;font-weight:650}
-.instrument .media-workspace button{max-width:100%;overflow-wrap:anywhere;font-size:.875rem;min-height:40px;border-radius:6px}
+.instrument .media-workspace button{max-width:100%;overflow-wrap:anywhere;font-size:.875rem;min-height:44px;border-radius:8px}
 .instrument .media-workspace .toolbar{gap:.5rem;min-width:0;max-width:100%}
 .instrument .media-field{display:flex;flex-direction:column;gap:.4rem;min-width:0;max-width:100%;margin:0;font-size:.8rem;font-weight:600}
 .instrument .media-field>label{margin:0;font-size:inherit}
-.instrument .media-field input,.instrument .media-field select{width:100%;min-width:0;max-width:19rem;min-height:40px;padding:.55rem .65rem;border-radius:5px;background-color:var(--surface);font-size:.9rem;font-weight:450}
+.instrument .media-field input,.instrument .media-field select{width:100%;min-width:0;max-width:19rem;min-height:44px;padding:.55rem .65rem;border-radius:8px;background-color:var(--surface);font-size:.9rem;font-weight:450}
 .instrument .media-control-label{font-size:.8rem;font-weight:600;line-height:1.35}
 .instrument .media-settings-bar{display:flex;gap:.8rem;align-items:end;flex-wrap:wrap;padding:.85rem;background:#f3f6fa;border-bottom:1px solid var(--line);border-radius:7px}
 .instrument .media-settings-bar .media-field{flex:0 1 175px}
@@ -178,3 +178,30 @@
  .instrument .media-source-info{display:block}
  .instrument .media-source-info p+p{margin-top:.25rem}
 }
+
+/* Drawn instrument enclosures. Input/actions outside these surfaces retain the
+   flat product controls; outlines never alter pixel data or analytical arrays. */
+.instrument .media-image-panel{padding:.85rem;border:2px solid #263d5b;border-radius:18px;background:#e7f2ff;box-shadow:inset 0 4px #f8fcff,0 5px #b4cfe9;margin-bottom:.35rem}
+.instrument .media-image-panel h3{font-weight:700;color:#263d5b}.instrument .media-image-panel h3:before{width:9px;height:9px;background:#5b95cb;border:1px solid #263d5b;border-radius:50%}.instrument .media-image-panel:first-child h3:before{background:#005fcc}
+.instrument .media-image-scroll,.instrument .media-image-placeholder{border:2px solid #263d5b;border-radius:10px;box-shadow:inset 0 3px #b9cee2}
+.instrument .media-image-placeholder{box-shadow:none;background:#f6faff}.instrument .media-image-panel>p{color:#405873}
+.instrument .media-palette{gap:.7rem}.instrument .media-palette button{background:#fff;border-color:#a9bfd5;box-shadow:none}
+.instrument .media-swatch{width:32px;height:32px;border:2px solid #263d5b;border-radius:50% 45% 48% 38%;box-shadow:0 2px #bdd1e5}
+.instrument .media-thumbnails{padding:.75rem;background:#e7f2ff;border:2px solid #263d5b;border-radius:14px;gap:.7rem}.instrument .media-thumbnails>button{border-color:#8daac7;background:white}.instrument .media-mini-bits{border:2px solid #263d5b}
+/* PNG chunks resemble linked file sections; lengths/offsets stay exact DOM. */
+.instrument .media-png-map{gap:8px;padding:.7rem 0 1rem;align-items:stretch}
+.instrument .media-png-map button{position:relative;min-height:132px;min-width:92px;flex-basis:92px;padding:1.5rem .8rem .8rem;border:2px solid #263d5b;border-radius:7px 20px 7px 7px;background:#deedff;box-shadow:inset 0 -6px #b7d3ef,0 4px #263d5b;color:#142033}
+.instrument .media-png-map button:before{content:'';position:absolute;right:5px;top:5px;width:14px;height:14px;border-left:2px solid #263d5b;border-bottom:2px solid #263d5b;border-radius:0 0 0 4px;background:#f7fbff}
+.instrument .media-png-map button[data-chunk=Signature]{background:#e7eaf3;box-shadow:inset 0 -6px #c9d0e2,0 4px #263d5b;min-width:112px;flex-basis:112px}
+.instrument .media-png-map button[data-chunk=IDAT]{background:#d9eee9;box-shadow:inset 0 -6px #a9cec2,0 4px #263d5b}.instrument .media-png-map button[data-chunk=IEND]{background:#ffe6db;box-shadow:inset 0 -6px #eac1ae,0 4px #263d5b}
+.instrument .media-png-map button[aria-pressed=true]{border:2px solid #005fcc;background:#edf4ff;box-shadow:inset 0 -6px #adcff6,0 4px #005fcc;outline:2px solid #005fcc;outline-offset:2px;color:#142033}
+.instrument .media-png-map strong{font-size:1.15rem}.instrument .media-png-map button>span{gap:.7rem;font-size:.78rem}
+/* Hex remains aligned tabular evidence, with two distinct file rails. */
+.instrument .media-hex-table{border:2px solid #263d5b;border-radius:14px;box-shadow:0 4px #c6d9ec}.instrument .media-hex-table .media-table th{background:#deedff;color:#263d5b}
+.instrument .media-hex-left .media-source-offset{border-left:4px solid #5c9bd7;padding-left:.5rem}.instrument .media-hex-right .media-source-offset{border-left:4px solid #d9937e;padding-left:.5rem}
+.instrument .media-hex-cells button{background:white;border:1px solid #dae3ed;box-shadow:none}.instrument .media-hex-cells .media-byte-changed{background:#ffedca;border-bottom:3px solid #a66a0c;color:#583b00}.instrument .media-hex-cells .media-byte-selected{background:#dcecff;outline:2px solid #005fcc;outline-offset:-2px}
+/* A contemporary illustrated scope shell surrounds the exact Core plots. */
+.instrument .media-audio-panel{padding:1rem;border:2px solid #263d5b;border-radius:18px;background:#dfedfb;box-shadow:inset 0 4px #f8fcff,0 5px #a9c8e6;margin-bottom:.4rem}
+.instrument .media-audio-panel h3{display:flex;align-items:center;gap:.6rem;font-weight:700;color:#263d5b}.instrument .media-audio-panel h3:before{content:'';width:10px;height:10px;flex:none;border:2px solid #263d5b;background:#5c9bd7;border-radius:50%}
+.instrument .media-plot{border:2px solid #263d5b;border-radius:10px;background:#f7f9fc}.instrument .media-axis-scale{color:#263d5b}.instrument .media-audio-panel>p{color:#405873}.instrument .media-audio-panel details{border-color:#b4cbe2}
+@media(max-width:700px){.instrument .media-image-panel,.instrument .media-audio-panel{padding:.7rem;border-radius:14px}.instrument .media-png-map button{min-height:112px;padding:1.5rem .55rem .65rem}.instrument .media-png-map{gap:7px}.instrument .media-thumbnails{padding:.5rem}}

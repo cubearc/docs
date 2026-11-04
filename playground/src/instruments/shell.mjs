@@ -5,7 +5,7 @@ import { PresentationState } from './state.mjs';
 import { isInstrumentStudy, studyOutput } from './study.mjs';
 
 /** Adapts existing Playground/session ownership to lazy, disposable renderers. */
-export function instrumentShell({ page, action, descriptor, runtime, changed, setInput, parameters, extra, redrawForm, selectAction, loadExample, convertInput }) {
+export function instrumentShell({ page, action, descriptor, runtime, changed, setInput, parameters, extra, redrawForm, selectAction, loadExample, convertInput, continueOutput }) {
   page.presentation ??= new PresentationState();
   const state = page.presentation;
   const ui = state.ui(descriptor.kind);
@@ -42,7 +42,7 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     evidence=page.session.latest(action.id);
     redrawForm?.();
     warning.textContent = record()?.earlierInput ? 'This result belongs to earlier input or settings. The instrument retains its producing evidence.' : '';
-    if (isInstrumentStudy(descriptor) && descriptor.kind !== 'enigma') {
+    if (isInstrumentStudy(descriptor) && !['enigma','semaphore'].includes(descriptor.kind)) {
       output?.remove();
       output = studyOutput(descriptor, evidence);
       surface.append(output);
@@ -84,6 +84,9 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     selectAction,
     loadExample,
     convertInput,
+    useOutput(name) {
+      if (!disposed && evidence?.outputs[name]) continueOutput?.(evidence, name);
+    },
     inputReadCurrent: token => !disposed && page.tool === action.id && page.secondaryReading?.token === token,
     pendingInputRead(token, completedToken) {
       if (disposed || page.tool !== action.id) return;

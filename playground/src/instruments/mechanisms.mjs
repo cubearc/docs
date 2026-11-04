@@ -361,6 +361,23 @@ function ringGraduations() {
     return svg('line', {x1:a[0],y1:a[1],x2:b[0],y2:b[1],class:'alberti-graduation'});
   }));
 }
+// Static illustrated hub. These gears carry no algorithm or trace state.
+function albertiHubArtwork() {
+  const gear = (cx, cy, radius, teeth, className) => {
+    const points = Array.from({length: teeth * 4}, (_, i) => {
+      const angle = i * Math.PI * 2 / (teeth * 4);
+      const r = i % 4 < 2 ? radius : radius * .83;
+      return `${cx + Math.cos(angle) * r},${cy + Math.sin(angle) * r}`;
+    }).join(' ');
+    return [svg('polygon', {points, class: className}), svg('circle', {cx, cy, r: radius * .42, class: 'gear-core'}),
+      svg('circle', {cx, cy, r: radius * .15, fill: '#243e5d', stroke: 'none'})];
+  };
+  return svg('g', {class: 'alberti-center-art', 'aria-hidden': 'true'}, [
+    ...gear(196, 202, 43, 12, 'gear-a'), ...gear(250, 253, 34, 10, 'gear-b'),
+    svg('path', {d: 'M181 177 Q195 169 209 177 M240 234 Q249 230 259 235', class: 'ink-detail'}),
+    svg('circle', {cx: 258, cy: 173, r: 5, fill: '#78b3ee'}),
+    svg('path', {d: 'M164 254h17 M172 246v16 M263 207h12'})]);
+}
 function albertiDisk(api, index, editable = true) {
   const alignment = Math.max(0, index);
   const ring = svg('g', {}, [
@@ -369,23 +386,16 @@ function albertiDisk(api, index, editable = true) {
     ...ringGlyphs(ALBERTI_RINGS.inner, 126, alignment, 'alberti-inner-letter'),
     svg('circle', {cx:220,cy:220,r:101,class:'alberti-center-rim'}),
     svg('circle', {cx:220,cy:220,r:95,class:'alberti-medallion-base'}),
-    svg('image', {href:new URL('./assets/premium-compass.png',import.meta.url).href,x:126,y:126,width:188,height:188,preserveAspectRatio:'xMidYMid meet','aria-hidden':'true',class:'alberti-medallion'}),
+    albertiHubArtwork(),
     svg('circle', {cx:220,cy:220,r:97,class:'alberti-medallion-edge'}),
     svg('circle', {cx:220,cy:220,r:10,class:'alberti-hub'})
   ]);
   const disk = svg('svg', { viewBox: '0 0 440 440', role: 'img', 'aria-label': index < 0 ? 'Alberti 24-position rings. No initial alignment configured.' : `Alberti 24-position rings. Inner ${ALBERTI_RINGS.inner[index]} aligned under outer A.`, class: `alberti-disk${editable ? '' : ' inspecting'}` }, [
-    svg('defs', {}, [
-      svg('linearGradient', {id:'alberti-ivory',x1:'0',y1:'0',x2:'1',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#fff0b9'}),svg('stop',{offset:'.24','stop-color':'#c6a15d'}),svg('stop',{offset:'.5','stop-color':'#f9e3a8'}),svg('stop',{offset:'.72','stop-color':'#cda96a'}),svg('stop',{offset:'1','stop-color':'#f3d58c'})]),
-      svg('radialGradient', {id:'alberti-ink',cx:'.35',cy:'.25',r:'.85'}, [svg('stop',{offset:'0','stop-color':'#294d68'}),svg('stop',{offset:'.55','stop-color':'#132d43'}),svg('stop',{offset:'1','stop-color':'#081a2a'})]),
-      svg('linearGradient', {id:'alberti-brass',x1:'0',y1:'0',x2:'.85',y2:'1'}, [svg('stop',{offset:'0','stop-color':'#fff2c3'}),svg('stop',{offset:'.23','stop-color':'#a97d34'}),svg('stop',{offset:'.45','stop-color':'#f6d48a'}),svg('stop',{offset:'.75','stop-color':'#8d6128'}),svg('stop',{offset:'1','stop-color':'#edcc84'})]),
-      svg('pattern',{id:'alberti-machining',width:4,height:4,patternUnits:'userSpaceOnUse'},[svg('path',{d:'M0 0H4 M0 2H4',stroke:'#fff7db','stroke-width':'.3',opacity:'.15'})])
-    ]),
     svg('circle', { cx:220,cy:224,r:214,class:'alberti-backing' }),
     svg('circle', { cx:220,cy:220,r:214,class:'alberti-rim' }),
     svg('circle', { cx:220,cy:220,r:210,class:'alberti-rim-highlight' }), ringGraduations(),
     svg('circle', { cx:220,cy:220,r:202,class:'alberti-outer' }),
     ...ringSegments(155,201,'alberti-outer-sector'),
-    svg('circle', {cx:220,cy:220,r:201,fill:'url(#alberti-machining)','aria-hidden':'true'}),
     ...ringGlyphs(ALBERTI_RINGS.outer, 179, 0, 'alberti-outer-letter'),
     svg('circle', { cx:220,cy:220,r:155,class:'alberti-inner-rim' }), ring,
     svg('path', {d:'M208 3 Q220 -1 232 3 L220 25 Z',class:'alberti-marker-rim'}),
@@ -505,7 +515,7 @@ function reportOf(api) {
 }
 function brainfuckOptions(api) {
   return h('div', { class: 'mechanism-settings' },
-    field('Cell width (unsigned wrapping)', 'bf-width', select('bf-width', Number(api.param('cell_bits') ?? 8), [8, 16, 32], value => change(api, () => api.setParam('cell_bits', value)))),
+    field('Cell width (bits)', 'bf-width', select('bf-width', Number(api.param('cell_bits') ?? 8), [8, 16, 32], value => change(api, () => api.setParam('cell_bits', value)))),
     field('Instruction budget', 'bf-budget', h('input', { id: 'bf-budget', type: 'number', min: 0, max: 1000000, value: api.param('max_instructions') ?? 1000000, onChange: event => change(api, () => api.setParam('max_instructions', event.target.value)) })),
     field('EOF policy', 'bf-eof', select('bf-eof', api.param('eof') ?? 'error', ['error', 'zero', 'unchanged'], value => change(api, () => api.setParam('eof', value)))));
 }
@@ -520,12 +530,27 @@ function brainfuckTape(report, api) {
 function sourceSelection(api, selected) {
   const source = selected ? snapshotText(api) : api.text();
   if (typeof source !== 'string') return note('Choose a text source.');
-  if (!selected) return source ? h('div', {}, h('pre', {class: 'bf-source-inspection', 'aria-label': 'Program source preview'}, source.slice(0, 2048)), note(source.length > 2048 ? 'Source preview: first 2,048 characters. The complete program is retained in the input editor.' : 'Edit the program in the input editor. A recorded dispatch selects its actual UTF-8 source offset.')) : note('Empty program. Add instructions in the input editor.');
+  if (!selected) return source ? null : note('Empty program. Add instructions in the input editor.');
   const bytes = new TextEncoder().encode(source); const offset = selected.source_offset;
   const before = new TextDecoder().decode(bytes.slice(Math.max(0, offset - 120), offset));
   const command = new TextDecoder().decode(bytes.slice(offset, offset + 1));
   const after = new TextDecoder().decode(bytes.slice(offset + 1, offset + 121));
   return h('pre', { class: 'bf-source-inspection', 'aria-label': `Recorded instruction ${selected.instruction} at source byte ${offset}` }, before, h('mark', {}, command), after);
+}
+function brainfuckReportSettings(api, isReport) {
+  if (!isReport) return note('Select the report action to request tape ranges and recorded dispatches. Execute returns exact output bytes; compare retains one report per width.');
+  return h('section', {class: 'bf-report-settings', 'aria-label': 'Report settings'}, h('h3', {}, 'Report settings'),
+    h('div', { class: 'mechanism-settings' },
+      field('Final tape start (zero-based)', 'bf-tape-start', h('input', { id: 'bf-tape-start', type: 'number', min: 0, max: 30000, value: api.param('tape_start') ?? 0, onChange: event => change(api, () => api.setParam('tape_start', event.target.value)) })),
+      field('Final tape length', 'bf-tape-length', h('input', { id: 'bf-tape-length', type: 'number', min: 0, max: 30000, value: api.param('tape_len') ?? 0, onChange: event => change(api, () => api.setParam('tape_len', event.target.value)) }))),
+    button('Request tape cells 0–31 and recorded dispatches', () => change(api, () => { api.setParam('tape_start', '0'); api.setParam('tape_len', '32'); api.setParam('max_trace_records', '4096'); api.setParam('max_trace_bytes', '1048576'); })),
+    note('Trace budget: at most 4,096 records / 1 MiB. Reaching it truncates the trace, not the execution. Run explicitly after changing options.'));
+}
+function brainfuckOutput(result, byteOutput) {
+  return h('section', { class: 'bf-output' }, h('h3', {}, 'Output bytes'),
+    h('p', { class: 'small muted' }, result === undefined ? 'No execution output retained. Run the selected action.' : `${byteOutput.length} bytes · full output is retained by the result export`),
+    h('div', {class: 'bf-output-preview'}, h('h4', {}, 'Hex'), h('pre', { 'aria-label': 'Output byte preview in hexadecimal' }, Array.from(byteOutput.slice(0, 1024), byte => byte.toString(16).padStart(2, '0').toUpperCase()).join(' '))),
+    h('div', {class: 'bf-output-preview'}, h('h4', {}, 'UTF-8 preview'), h('pre', { 'aria-label': 'Output text preview decoded as UTF-8' }, new TextDecoder().decode(Uint8Array.from(byteOutput.slice(0, 1024))))));
 }
 function brainfuck(host, api) {
   const result = output(api).output; const report = reportOf(api); const trace = report?.trace ?? [];
@@ -536,18 +561,13 @@ function brainfuck(host, api) {
     h('div', { class: 'row between' }, h('h3', {}, 'Program and recorded machine state'), h('span', { class: 'tag' }, '30,000-cell tape · wrapping arithmetic')),
     h('div', {class: 'bf-configuration'}, !isCompare ? brainfuckOptions(api) : field('Compare cell widths (JSON)', 'bf-widths', h('input', { id: 'bf-widths', value: typeof api.param('widths') === 'string' ? api.param('widths') : JSON.stringify(api.param('widths') ?? []), onChange: event => change(api, () => api.setParam('widths', event.target.value)) })),
       field('stdin · exact bytes as Base64', 'bf-stdin', h('input', { id: 'bf-stdin', value: api.extra('input'), spellcheck: false, onChange: event => change(api, () => api.setExtra('input', event.target.value)) }))),
-    isReport ? h('div', {class: 'bf-report-settings'}, h('div', { class: 'mechanism-settings' }, field('Final tape start (zero-based)', 'bf-tape-start', h('input', { id: 'bf-tape-start', type: 'number', min: 0, max: 30000, value: api.param('tape_start') ?? 0, onChange: event => change(api, () => api.setParam('tape_start', event.target.value)) })),
-      field('Final tape length', 'bf-tape-length', h('input', { id: 'bf-tape-length', type: 'number', min: 0, max: 30000, value: api.param('tape_len') ?? 0, onChange: event => change(api, () => api.setParam('tape_len', event.target.value)) }))),
-      button('Request tape cells 0–31 and recorded dispatches', () => change(api, () => { api.setParam('tape_start', '0'); api.setParam('tape_len', '32'); api.setParam('max_trace_records', '4096'); api.setParam('max_trace_bytes', '1048576'); })), note('Trace budget: at most 4,096 records / 1 MiB. Reaching it truncates the trace, not the execution. Run explicitly after changing options.')) : note('Select the report action to request tape ranges and recorded dispatches. Execute returns exact output bytes; compare retains one report per width.'),
     result?.runs ? field('Inspect completed comparison run', 'bf-run', select('bf-run', api.ui.runIndex ?? 0, result.runs.map((_, i) => i), value => change(api, () => { api.ui.runIndex = Number(value); api.ui.traceCursor = -1; }), 'Comparison run index')) : null,
     report ? h('p', { class: report.completed ? 'mechanism-reading' : 'warning', role: 'status' }, `${report.completed ? 'Program completed' : `Execution stopped · ${report.stop_reason}`} · ${report.instructions} dispatched instructions · ${report.options.cell_bits}-bit cells`, report.trace_complete === false ? h('strong', {}, ' · Trace truncated; execution status is separate.') : null) : null,
+    h('div', {class: `bf-evidence-grid${isReport || report ? '' : ' output-only'}`}, isReport || report ? brainfuckTape(report, api) : null, brainfuckOutput(result, byteOutput)),
     h('section', {class: 'bf-recorded', 'aria-label': 'Program and recorded dispatch'}, sourceSelection(api, selected),
       selected ? h('div', { class: 'bf-dispatch' }, h('h3', {}, `Recorded dispatch ${selected.instruction} · ${selected.command}`), h('p', {}, `Source byte ${selected.source_offset}; pointer ${selected.pointer_before} → ${selected.pointer_after}; cell at pointer before ${selected.cell_before}; cell at pointer after ${selected.cell_after}.`), note('Only these observed cells belong to this dispatch; the final tape is a separate state.')) : null,
       isReport || report ? traceControls(api, trace, row => `instruction ${row.instruction} · source byte ${row.source_offset} · ${row.command}`, 'No recorded dispatch selected. The tape shown is the final recorded range.') : null),
-    h('div', {class: `bf-evidence-grid${isReport || report ? '' : ' output-only'}`}, isReport || report ? brainfuckTape(report, api) : null,
-    h('section', { class: 'bf-output' }, h('h3', {}, 'Output bytes'), h('p', { class: 'small muted' }, result === undefined ? 'No execution output retained. Run the selected action.' : `${byteOutput.length} bytes · full output is retained by the result export`),
-      h('div', {class: 'bf-output-preview'}, h('h4', {}, 'Hex'), h('pre', { 'aria-label': 'Output byte preview in hexadecimal' }, Array.from(byteOutput.slice(0, 1024), byte => byte.toString(16).padStart(2, '0').toUpperCase()).join(' '))),
-      h('div', {class: 'bf-output-preview'}, h('h4', {}, 'UTF-8 preview'), h('pre', { 'aria-label': 'Output text preview decoded as UTF-8' }, new TextDecoder().decode(Uint8Array.from(byteOutput.slice(0, 1024)))))))));
+    brainfuckReportSettings(api, isReport)));
   return playback(host, api, trace);
 }
 

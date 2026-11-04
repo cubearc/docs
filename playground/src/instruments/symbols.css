@@ -223,3 +223,90 @@
   .symbol-morse .morse-navigation{grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr))}
 }
 @media(prefers-reduced-motion:reduce){.symbol-scytale .scytale-ribbon{transform:none}}
+
+/* Illustrated instruments keep their character inside the working surface.
+   Application buttons, selects, tabs and navigation retain the site styles. */
+.symbol-instrument{--symbol-paper:#edf4fc;--symbol-rule:#d9e0e9;--symbol-cell-size:5.5rem}
+.symbol-instrument .symbol-grid-scroll{background:#edf4fc;border:1px solid #d7e2ef;border-radius:16px}
+.symbol-instrument .symbol-grid{gap:6px}
+.symbol-instrument .symbol-cell{border-radius:9px;border:1.5px solid #839bb8;min-height:5.6rem;box-shadow:0 3px 0 #c7d7e8;background:#fffdf4}
+.symbol-instrument .symbol-cell-value{font-size:2rem;color:#1a3554;font-weight:650}
+.symbol-instrument .symbol-cell small{color:#435976}
+.symbol-instrument .symbol-cell.is-inspected{outline:3px solid #005fcc;outline-offset:2px}
+.symbol-instrument .symbol-cell.is-empty{background:#edf4fc;box-shadow:none}
+.symbol-scytale .scytale-cylinder{min-height:300px;border:2px solid #284b73;border-radius:48px;background:linear-gradient(90deg,#3c80bb,#8dc6ef 14%,#b9e0f9 35%,#87c1ed 68%,#3d80ba);box-shadow:inset 0 -14px 0 #244d7620,0 7px 0 #c5d6e8;overflow:auto;padding:3rem 2rem}
+.symbol-scytale .scytale-cylinder::before,.symbol-scytale .scytale-cylinder::after{top:12px;bottom:12px;width:36px;border:2px solid #294e76;opacity:.65;background:#437daf33}
+.symbol-scytale .scytale-cylinder::before{left:8px}.symbol-scytale .scytale-cylinder::after{right:8px}
+.symbol-scytale .scytale-ribbon{padding:.7rem;background:#fffdf1;border:2px solid #3f5a77;border-radius:5px;box-shadow:0 7px 0 #25456625;transform:rotate(-6deg)}
+.symbol-scytale .scytale-ribbon button{color:#193550;font-weight:650;border-color:#c8d4df;background:#fffdf1}
+.symbol-scytale .scytale-flat-stage .symbol-grid-scroll{background:#edf4fc;min-height:300px}
+.symbol-cardan{--symbol-cell-size:6.25rem}
+.symbol-cardan .symbol-grid-scroll{padding:1.5rem;background:#edf4fc;border-color:#d7e2ef}
+.symbol-cardan .symbol-grid{padding:1rem;gap:8px;border:2px solid #244969;border-radius:20px;background:linear-gradient(145deg,#70b2e9,#3986c8);box-shadow:inset 0 3px 0 #b1d7f3,0 7px 0 #b7ccdf}
+.symbol-cardan .symbol-cell{min-height:6.2rem;background:#246caa;border:2px solid #245278;box-shadow:inset 0 3px 0 #7db2db,0 2px 0 #8fc2e7}
+.symbol-cardan .symbol-cell-value{color:#eef6ff;font-size:2.4rem}
+.symbol-cardan .symbol-cell small{color:#e1edfa}
+.symbol-cardan .symbol-cell:hover{background:#1e5f98}
+.symbol-cardan .symbol-cell.is-hole,.symbol-cardan .symbol-cell.is-hole:hover{background:#fff4d8;border-color:#284b70;box-shadow:inset 0 3px 0 #d5bd8c,0 2px 0 #9dcced}
+.symbol-cardan .symbol-cell.is-hole .symbol-cell-value{color:#192d46}
+.symbol-cardan .symbol-cell.is-hole small{color:#405775}
+.symbol-cardan .symbol-cell.is-inspected{outline-color:#142033;outline-width:3px;outline-offset:3px}
+.symbol-cardan .symbol-overlay-value{color:#0055b8}
+.symbol-cardan .cardan-swatch{background:#246caa;border-color:#284b70}
+.symbol-cardan .cardan-swatch.open{background:#fff4d8;border-color:#284b70}
+.symbol-semaphore .semaphore-stage{background:#f5f8fc;border:1px solid #d9e0e9;border-radius:12px;padding:1rem}
+.symbol-semaphore .semaphore-figure{max-width:450px;aspect-ratio:360/440}
+.symbol-semaphore .semaphore-arm-legend .left{background:linear-gradient(45deg,#de615c 50%,#f5ca56 50%);border-color:#233650}
+.symbol-semaphore .semaphore-arm-legend .right{background:linear-gradient(45deg,#fff 50%,#68a8df 50%);border-color:#233650}
+.symbol-semaphore .semaphore-controls>.small{max-width:40ch}
+.symbol-pigpen .pigpen-grid-bank,.symbol-pigpen .pigpen-cross-bank{padding:.7rem;max-width:360px;border:2px solid #3a5d7f;border-radius:16px;background:#dbeaf8;box-shadow:0 5px 0 #c5d7e8}
+.symbol-pigpen .pigpen-letter-pair{border:1px solid #8ba9c5;border-radius:6px;padding:.2rem;background:#fffdf4;box-shadow:0 2px 0 #b6cce0}
+.symbol-pigpen .pigpen-key{background:#fffdf4;border-radius:4px}
+.symbol-pigpen .pigpen-key:hover{background:#edf4ff}
+.symbol-pigpen .pigpen-glyph{filter:drop-shadow(0 2px 0 #b7cee5)}
+.symbol-pigpen .symbol-selected>.pigpen-glyph{width:124px;height:124px;padding:12px;border:2px solid #395a7c;border-radius:16px;background:#fff4d8;box-shadow:0 5px 0 #d1dce8}
+.symbol-braille .braille-cell{padding:1.6rem 1.1rem;gap:.7rem 1.3rem;border:2px solid #355b7d;border-radius:26px;background:#d7eafa;box-shadow:inset 0 5px 0 #f2f8ff,0 7px 0 #b9cede}
+.symbol-braille .braille-dot{width:40px;height:40px;background:#fbfdff;border:2px solid #496e93;box-shadow:inset 0 -4px 0 #cfdfec}
+.symbol-braille .braille-cell button[aria-pressed=true] .braille-dot{background:#236ba8;border-color:#244f73;box-shadow:inset 0 4px 0 #6ba4d2,0 3px 0 #afc9df}
+.symbol-braille .braille-cell small{color:#314d6e}
+.symbol-braille .braille-unicode-sample{border-bottom:1px solid #d9e0e9;padding-bottom:.6rem}
+.symbol-braille .braille-unicode{color:#1b4e7e}
+.symbol-morse .morse-sequence{border:2px solid #36597d;border-radius:16px;background:#e8f2fb;box-shadow:inset 0 4px 0 #fff,0 5px 0 #cedce9;padding:1rem}
+.symbol-morse .morse-sequence button{background:#fffdf4;border:1px solid #9eb3c9;box-shadow:0 3px 0 #bdcfe0;border-radius:8px}
+.symbol-morse .morse-sequence button:hover{background:#edf4ff}
+.symbol-morse .morse-dot-shape{width:17px;height:17px;background:#255f93;border:2px solid #24496d;box-shadow:inset 0 2px 0 #80add3,0 2px 0 #bdd2e6}
+.symbol-morse .morse-dash-shape{width:39px;height:14px;background:#255f93;border:2px solid #24496d;border-radius:5px;box-shadow:inset 0 2px 0 #80add3,0 2px 0 #bdd2e6}
+.symbol-morse .morse-key-pair button{background:white;border:1px solid var(--line);border-radius:8px;box-shadow:none}
+.symbol-morse .morse-key-pair button:hover{background:#f1f5fa}
+@container(max-width:620px){.symbol-semaphore .semaphore-figure{max-width:340px}.symbol-scytale .scytale-cylinder{min-height:230px}.symbol-scytale .scytale-flat-stage .symbol-grid-scroll{min-height:0}}
+@container(max-width:560px){.symbol-cardan .symbol-grid-scroll{padding:.75rem}.symbol-cardan .symbol-grid{padding:.65rem;gap:7px}.symbol-semaphore .semaphore-stage{padding:.5rem}.symbol-pigpen .pigpen-grid-bank,.symbol-pigpen .pigpen-cross-bank{padding:.45rem}}
+@media(prefers-reduced-motion:reduce){.symbol-scytale .scytale-ribbon{transform:none}}
+
+/* The approved semaphore composition: illustration left, linked inspection and
+   sequence right. Only the illustration is cartoon; controls use product UI. */
+.symbol-semaphore .semaphore-workbench{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:stretch;gap:1.25rem}
+.symbol-semaphore .semaphore-stage{display:flex;flex-direction:column;justify-content:center;padding:.5rem;background:#f8fafd;min-height:0}
+.symbol-semaphore .semaphore-figure{width:100%;max-width:700px;max-height:680px;display:block;margin:auto}
+.symbol-semaphore .semaphore-side{display:grid;grid-template-rows:auto minmax(0,1fr);gap:1rem;min-width:0}
+.symbol-semaphore .semaphore-controls,.symbol-semaphore .semaphore-composition{background:white;border:1px solid var(--line);border-radius:12px;padding:1.25rem;min-width:0}
+.symbol-semaphore .semaphore-selection{display:grid;grid-template-columns:minmax(5rem,.6fr) minmax(0,1fr);gap:1rem;align-items:center}
+.symbol-semaphore .symbol-pair{display:grid;justify-content:start;justify-items:center;gap:.4rem;margin:0}
+.symbol-semaphore .symbol-pair strong{font-size:4.5rem;line-height:1.1}
+.symbol-semaphore .symbol-pair code{font-size:.9rem}
+.symbol-semaphore .semaphore-directions .field{margin:.5rem 0}
+.symbol-semaphore .semaphore-viewpoint{padding:.85rem 0;border-top:1px solid var(--line);margin-top:.8rem}
+.symbol-semaphore .semaphore-viewpoint p{margin:.25rem 0 0}
+.symbol-semaphore .semaphore-compose-actions{gap:.4rem}
+.symbol-semaphore .semaphore-compose-actions button{flex:1 1 6rem;font-size:.85rem;padding:.5rem .6rem}
+.symbol-semaphore .semaphore-controls>.small{margin:.6rem 0 0;max-width:none}
+.symbol-semaphore .semaphore-sequence{border:0;margin:0;padding:.5rem 0 .9rem;min-height:96px}
+.symbol-semaphore .semaphore-sequence button{min-width:64px;min-height:78px;background:white;border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem}
+.symbol-semaphore .semaphore-sequence button>span{display:grid;gap:.4rem;text-align:center}
+.symbol-semaphore .semaphore-sequence strong{font-size:1.8rem}
+.symbol-semaphore .semaphore-sequence small{font-size:.75rem;color:var(--muted)}
+.symbol-semaphore .semaphore-output{padding-top:.8rem;border-top:1px solid var(--line)}
+.symbol-semaphore .semaphore-output pre{margin:.75rem 0;padding:.65rem .8rem;border:1px solid var(--line);border-radius:8px;max-height:8rem;background:#f8fafd}
+.symbol-semaphore .semaphore-output .toolbar{gap:.5rem}
+.symbol-semaphore .semaphore-output .toolbar>*{flex:1 1 7rem;min-width:0;font-size:.9rem}
+@container(max-width:760px){.symbol-semaphore .semaphore-workbench{grid-template-columns:minmax(0,1fr)}.symbol-semaphore .semaphore-figure{max-height:620px;max-width:650px}}
+@container(max-width:620px){.symbol-semaphore .semaphore-controls{display:block}.symbol-semaphore .semaphore-selection{grid-template-columns:minmax(4rem,.45fr) minmax(0,1fr);gap:.6rem}.symbol-semaphore .semaphore-directions{display:block;grid-column:auto}.symbol-semaphore .semaphore-controls,.symbol-semaphore .semaphore-composition{padding:1rem}.symbol-semaphore .semaphore-figure{max-width:100%;max-height:none}.symbol-semaphore .semaphore-stage{padding:.25rem}}
