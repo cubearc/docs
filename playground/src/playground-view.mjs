@@ -241,9 +241,22 @@ export function mountPlayground(container, context) {
   const value = session.input;
   let inputControl;
   if (!hasInput) inputControl = null;
-  else if (value.type === 'text') inputControl = h('textarea', { id: 'playground-input', class: 'input-text', value: value.data, spellcheck: false, 'aria-label': inputLabel, onInput: event => { try { changed({ input: { type: 'text', data: event.target.value }, preservePresentation: descriptor?.kind === 'keyboard' || descriptor?.kind === 'graph' }); instrument?.refresh(); } catch (error) { event.target.value=session.input.type==='text'?session.input.data:'';rejectedInput(error); } } });
+  else if (value.type === 'text') {
+    // Keep the native editor across workspace changes. Reassigning its value
+    // can normalize accepted line endings and discard the editing context.
+    inputControl = page.inputEditor ??= h('textarea', {id:'playground-input',class:'input-text',spellcheck:false});
+    if(inputControl.value!==value.data)inputControl.value=value.data;
+    inputControl.setAttribute('aria-label',inputLabel);
+    inputControl.addEventListener('input',editInput);
+  }
   else inputControl = h('div', { class: 'byte-input' }, h('strong', {}, page.sourceName ?? `${labelFor(value.type)} input`), h('p', { class: 'muted' }, `${bytesOf(value).toLocaleString()} bytes · ${value.type}`),
     value.type === 'bytes' ? button('Use as UTF-8 text', () => run({ ids: ['text.utf8.decode'], continueAfter: true })) : h('pre', {}, JSON.stringify(value.data, null, 2).slice(0, 2048)));
+  if(value.type!=='text')page.inputEditor=null;
+  function editInput(event) {
+    if(!isCurrentView())return;
+    try {changed({input:{type:'text',data:event.target.value},preservePresentation:descriptor?.kind==='keyboard'||descriptor?.kind==='graph'});instrument?.refresh();}
+    catch(error){event.target.value=session.input.type==='text'?session.input.data:'';rejectedInput(error);}
+  }
   const fileInput = h('input', { type: 'file', id: 'playground-file', hidden: true, onChange: event => setFile(event.target.files[0]) });
   const inputMain = !hasInput ? h('div', { class: 'input-main' }, h('p', { class: 'muted' }, 'This tool uses the options below. No starting input is required.')) : h('div', { class: 'input-main' }, h('label', { for: 'playground-input' }, inputLabel), inputControl,
     h('div', { class: 'toolbar spacer' }, button('Paste',pasteInput,{id:'input-paste'}),
@@ -264,7 +277,7 @@ export function mountPlayground(container, context) {
     parameterRegion.prepend(namedFields);
     page.redrawParameters = () => {
       if (!parameterRegion.contains(document.activeElement)) { replace(parameterRegion, namedFields, form() ?? h('p',{class:'muted'},'No additional parameters.')); }
-      if (inputControl?.tagName === 'TEXTAREA' && document.activeElement !== inputControl && session.input.type === 'text') inputControl.value = session.input.data;
+      if (inputControl?.tagName === 'TEXTAREA' && document.activeElement !== inputControl && session.input.type === 'text' && inputControl.value !== session.input.data) inputControl.value = session.input.data;
       for (const port of selected.contract.inputs.slice(1)) { const field=document.getElementById(`extra-${port.name}`); if(field && field!==document.activeElement) field.value=page.extraInputs[selected.id]?.[port.name] ?? ''; }
     };
     append(inputOptions, descriptor ? null : parameterRegion);
@@ -370,7 +383,7 @@ export function mountPlayground(container, context) {
     if (visual) instrument.refresh({captureScroll:!wasHidden});
   }
   updateTab();
-  page.dispose = instrument?.dispose;
+  page.dispose = () => {instrument?.dispose();inputControl?.removeEventListener('input',editInput);};
   page.redraw = () => { const eligibility=policy();runButton.hidden=page.auto&&eligibility.eligible&&!routeError;stopButton.hidden=!page.running&&!page.auxiliaryRunning&&!page.readingFile&&!page.secondaryReading&&page.phase!=='updating';runButton.disabled=page.running||Boolean(page.readingFile)||Boolean(page.secondaryReading)||Boolean(routeError)||Boolean(selected&&!selected.available);status.textContent=routeError?'Choose the current operation version.':page.status;policyStatus.textContent=eligibility.eligible?'':eligibility.reason;renderResults(); };
   page.schedulePreview=schedulePreview;
   page.redraw();

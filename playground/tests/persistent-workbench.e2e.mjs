@@ -27,6 +27,7 @@ test('persistent navigation, first-use automatic results, pins, configuration an
  const {context,base}=await instrumentBrowser(t);const page=await context.newPage();
  await page.goto(base);await page.getByRole('heading',{name:'Multidecoder',exact:true}).waitFor({timeout:45000});
  const sidebar=await page.locator('#tool-sidebar').elementHandle();
+ const editor=await page.locator('#playground-input').elementHandle();
  await select(page,'encoding.base64','Base64');
  assert.match(page.url(),/#\/tools\/encoding.base64.decode\/1$/);
  assert.equal(await page.getByRole('button',{name:'Use tool',exact:true}).count(),0);
@@ -61,9 +62,14 @@ test('persistent navigation, first-use automatic results, pins, configuration an
  await page.locator('#result-filter-all').click();
  await page.locator('#tool-action').selectOption('encoding.base64.encode');
  await page.locator('#playground-input').fill('雪\r\n');
- // DOM text controls normalize CRLF to LF, while file bytes below remain exact.
- await current(page,'encoding.base64.encode',Buffer.from('雪\n').toString('base64'));
+ // Text editing can preserve CRLF (WebKit) or expose normalized LF. The
+ // exact accepted DOM value must reach Core and survive internal navigation.
+ const entered=await page.locator('#playground-input').inputValue();
+ assert.ok(['雪\n','雪\r\n'].includes(entered),'Unicode and the accepted line ending remain intact');
+ await current(page,'encoding.base64.encode',Buffer.from(entered).toString('base64'));
  await select(page,'cipher.caesar','Caesar cipher');
+ assert.equal(await page.locator('#playground-input').inputValue(),entered,'navigation preserves the accepted text exactly');
+ assert.equal(await page.evaluate(editor=>editor===document.querySelector('#playground-input'),editor),true,'tool changes keep the native input editor mounted');
  await page.locator('#tool-action').selectOption('cipher.caesar.encode');
  await page.locator('#playground-input').fill('ABC');await page.locator('#playground-options-shift').fill('2');
  await current(page,'cipher.caesar.encode','CDE');
@@ -133,6 +139,7 @@ test('routes, exact file bytes, sidebar context and narrow keyboard drawer',{tim
  await page.locator('#tool-search').fill('Base64');await page.locator('#playground-input').fill('A');
  await current(page,'encoding.base64.encode','QQ==');
  await page.setViewportSize({width:360,height:800});
+ await page.locator('#toggle-tools').waitFor({state:'visible'});
  await page.locator('#toggle-tools').focus();await page.keyboard.press('Enter');
  await page.getByRole('dialog',{name:'Tools',exact:true}).waitFor();
  assert.equal(await page.locator('#tool-search').inputValue(),'Base64');

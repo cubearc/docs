@@ -52,8 +52,9 @@ state and sidebar search/category/scroll context survive internal navigation.
 Desktop text tools put input and result side by side. Narrow layouts use a
 keyboard-accessible Tools drawer and stacked work areas. Opening/closing the
 drawer preserves the active workspace. Input/Result jumps preserve a selected
-tool's canonical route. The shell stays mounted while operation views change;
-result updates preserve input focus and stable result controls/disclosures.
+tool's canonical route. The shell and native text editor stay mounted while
+operation views change, preserving accepted text and editing context. Result
+updates preserve input focus and stable result controls/disclosures.
 
 ## Automatic results and retained evidence
 

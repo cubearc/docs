@@ -173,10 +173,8 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
   await t.test('Pigpen Haverhill glyph composition, dots, exact tokens and invalid input recovery', async () => {
     await open('symbol.alphabet.encode');
     await page.locator('#playground-options-profile').selectOption('pigpen_haverhill_pairs_v1');
-    // Selecting a supported profile is a configuration edit; remount the selected action to resolve its presentation.
-    const openVisual = page.getByRole('button', { name: /Open visual|Use visual|Visual instrument/ }).first();
-    if (await openVisual.count()) await openVisual.click();
-    else { await page.getByRole('link', { name: 'All tools', exact: true }).click(); await page.goto(toolUrl('symbol.alphabet.encode')); await manualExecution(page); }
+    // A compatible profile opens its instrument immediately in this workspace.
+    assert.equal(await page.locator('#playground-options-profile').inputValue(),'pigpen_haverhill_pairs_v1');
     await page.locator('[data-instrument="pigpen"] .pigpen-palette').waitFor();
     await page.locator('#playground-input').fill('[]');
     await page.getByRole('button', { name: 'A: grid:ES', exact: true }).click();
