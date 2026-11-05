@@ -5,7 +5,11 @@ import {createRequire} from 'node:module';
 import {instrumentBrowser} from './support/instrument-browser.mjs';
 const require=createRequire(import.meta.url);
 const output=(page,id)=>page.locator(`[data-result-operation="${id}"] .viewer pre`).first();
-async function current(page,id,text){await page.waitForFunction(({id,text})=>document.querySelector('#results-section')?.dataset.state==='current'&&document.querySelector(`[data-result-operation="${id}"][data-result-current="true"] .viewer pre`)?.textContent===text,{id,text});await page.waitForFunction(()=>document.querySelector('#run-tools')&&!document.querySelector('#run-tools').disabled);}
+async function current(page,id,text){
+ try {await page.waitForFunction(({id,text})=>document.querySelector('#results-section')?.dataset.state==='current'&&document.querySelector(`[data-result-operation="${id}"][data-result-current="true"] .viewer pre`)?.textContent===text,{id,text});}
+ catch(error){throw new Error(`${error.message}\nWorkspace state: ${await page.locator('#input-section').innerText()}\nResult state: ${await page.locator('#results-section').getAttribute('data-state')}`,{cause:error});}
+ await page.waitForFunction(()=>document.querySelector('#run-tools')&&!document.querySelector('#run-tools').disabled);
+}
 async function select(page,key,query){
  if(await page.locator('#toggle-tools').isVisible())await page.locator('#toggle-tools').click();
  await page.locator('#tool-search').fill(query);

@@ -4,7 +4,7 @@ import { snapshot } from './data.mjs';
 import { presentationFor, primaryOutputName } from './instruments/registry.mjs';
 import { instrumentShell } from './instruments/shell.mjs';
 import { isInstrumentStudy } from './instruments/study.mjs';
-import { automaticPolicy, comparisonCandidates, manualComparisons, inputBytes as bytesOf } from './execution-policy.mjs';
+import { automaticPolicy, comparisonCandidates, manualComparisons, updateExecutionPolicy, inputBytes as bytesOf } from './execution-policy.mjs';
 import { toolHelp } from './tools-view.mjs';
 import { pipelineCompatibility } from './pipeline.mjs';
 
@@ -144,14 +144,13 @@ export function mountPlayground(container, context) {
           if(!accepted)break;
           acceptedCount++;
           const elapsed = performance.now() - started;
-          if(automatic&&elapsed>750)page.slow.add(id);
-          if(!automatic&&elapsed<250)page.slow.delete(id);
+          updateExecutionPolicy(page.slow,id,{automatic,elapsedMs:elapsed});
           if(!automatic){page.redraw?.(); instrument?.refresh();}
           if (continueAfter) { const record = session.current.results.at(-1); continueWith(record, 'output', undefined, keepTool); break; }
         } catch (error) {
           if (controller.signal.aborted || page.revision !== revision) break;
           page.errors.push({ title: action.title, message: error.message, code: error.code, parameter: error.parameter });
-          if(automatic&&error.code==='resource_limit')page.slow.add(id);
+          updateExecutionPolicy(page.slow,id,{automatic,error});
           page.redraw?.();
         }
       }

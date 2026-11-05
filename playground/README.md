@@ -64,9 +64,10 @@ installed availability/version with a small reviewed operation set, at most 4 Ki
 of primary input and 8 KiB of options/secondary inputs. It does not authorize the
 whole catalog. Searches, programs, media work, generation, unknown operations,
 large inputs and operations exceeding the live time budget keep an explicit
-**Run** action and explanation. Runtime timings can suspend live updates; a fast
-successful manual run can qualify that operation again. Automatic requests have
-a two-second worker deadline. Deadline/Stop requests do not establish Core
+**Run** action and explanation. Actual worker-deadline or Core resource-budget
+failures suspend live updates; a successful manual retry within two seconds can
+qualify that operation again. Startup and transport latency alone do not suspend
+a successful preview. Automatic requests have a two-second worker deadline. Deadline/Stop requests do not establish Core
 completion or cooperative cancellation.
 
 A live computation replaces one bounded **Live preview**. Typing consumes no

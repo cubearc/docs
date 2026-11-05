@@ -21,8 +21,15 @@ export function automaticPolicy(action,input,{parameters={},extraInputs={},slow=
   if(inputBytes(input)>4096)return {eligible:false,reason:'Input exceeds the 4-KiB automatic budget. Run explicitly with the original input.'};
   if(new TextEncoder().encode(JSON.stringify({parameters,extraInputs},(_,v)=>typeof v==='bigint'?v.toString():v)).byteLength>8192)
     return {eligible:false,reason:'Settings and secondary inputs exceed the 8-KiB automatic budget. Run explicitly.'};
-  if(slow)return {eligible:false,reason:'This operation exceeded the live-update time budget. Run explicitly.'};
+  if(slow)return {eligible:false,reason:'Live-update budget exceeded. Run explicitly.'};
   return {eligible:true,reason:'Automatic updates · input up to 4 KiB'};
+}
+/** Wall-clock delivery includes startup, transport and representation work.
+ * Keep reviewed successful operations eligible; suspend on an actual worker or
+ * Core budget failure. Explicit bounded retries can restore eligibility. */
+export function updateExecutionPolicy(slow,id,{automatic,elapsedMs,error}={}) {
+  if(automatic&&['resource_limit','worker_timeout'].includes(error?.code))slow.add(id);
+  else if(!automatic&&!error&&elapsedMs<2000)slow.delete(id);
 }
 export function comparisonCandidates(runtime,mode,input,{slow=new Set()}={}) {
   const ids=input.type==='bytes'&&mode==='Decode'?['text.utf8.decode']:presets[mode]??presets.Decode;

@@ -37,3 +37,18 @@ test('leaving a workspace or stopping revokes the scheduled preview',async()=>{
  scheduler.schedule(async()=>{called=true;},5);scheduler.cancel();
  await new Promise(resolve=>setTimeout(resolve,15));assert.equal(called,false);
 });
+
+test('successful previews remain automatic despite worker transport latency; only real budget failures suspend them',async()=>{
+ const {updateExecutionPolicy}=await import('../src/execution-policy.mjs');
+ const slow=new Set();
+ updateExecutionPolicy(slow,'encoding.base64.decode',{automatic:true,elapsedMs:1400});
+ assert.equal(slow.has('encoding.base64.decode'),false,'wall-clock latency alone does not redefine a reviewed lightweight operation');
+ updateExecutionPolicy(slow,'encoding.base64.decode',{automatic:true,error:{code:'worker_timeout'}});
+ assert.equal(slow.has('encoding.base64.decode'),true);
+ updateExecutionPolicy(slow,'encoding.base64.decode',{automatic:false,elapsedMs:300});
+ assert.equal(slow.has('encoding.base64.decode'),false,'an explicit successful bounded retry can re-enable live updates');
+ updateExecutionPolicy(slow,'cipher.enigma',{automatic:true,error:{code:'resource_limit'}});
+ assert.equal(slow.has('cipher.enigma'),true);
+ updateExecutionPolicy(slow,'cipher.enigma',{automatic:false,elapsedMs:3000});
+ assert.equal(slow.has('cipher.enigma'),true);
+});
