@@ -1,9 +1,11 @@
 # Inspect operations visually
 
-Open **All tools → Visual instruments** to choose a workbench, or use a supported
-tool from its normal catalog entry. **Load Core example** loads a labeled,
-synthetic conformance example. It does not run it. Review the input and press
-**Run tools** to execute the installed local SDK in its dedicated worker.
+Select a tool from its normal sidebar category or search result. Its registered
+instrument opens directly; profile-specific interfaces appear when that canonical
+profile is configured. **About this tool → Load Core example** explicitly replaces
+input/settings with a synthetic conformance example. Eligible tools then update
+automatically; heavy tools keep **Run**. Pause **Automatic updates** for explicit
+manual execution while reviewing a configuration.
 
 Every workbench uses a full-width instrument below a compact input strip.
 Expand **Input actions** for file loading, paste and clear. Results follow the
@@ -19,8 +21,10 @@ Dragging graph nodes changes only their drawing positions. Recorded traces are
 not live debuggers. Enigma shows post-step windows; Solitaire and M-138-A show
 initial configuration because their contracts return no movement trace.
 
-Edits retain the previous result and label it as earlier evidence. Failed attempts
-retain the last accepted result. Stop revokes pending reads/results and requests
+Edits mark producing evidence as earlier input/settings. A live preview is
+replaceable; **Pin**, **Keep result** or an explicit manual run retains a snapshot
+within the session budgets. Failed attempts preserve pinned/retained results and
+identify earlier evidence. Live edits consume no retained-history slots. Stop revokes pending reads/results and requests
 the actual SDK worker termination; it does not establish Core completion or
 cooperative cancellation. Secondary file/settings reads also disable Run and
 reject completions after a newer read, an edit, Stop or leaving the instrument.
@@ -98,8 +102,8 @@ renderers. Canonical input/options stay in the Playground. Presentation selectio
 zoom, layout and trace cursors stay separate. Named scroll surfaces retain pan
 across inspection, parameter edits and tab changes; primary source replacements
 reset their viewport scope. Focus is restored to stable controls, with an explicit
-fallback when a control disappears or becomes unavailable. Each accepted run retains its
-input/settings snapshot. The Session bounds accepted evidence to four MiB;
+fallback when a control disappears or becomes unavailable. Each accepted preview/run carries its
+input/settings snapshot; only explicit retention consumes history. The Session bounds accepted evidence to four MiB;
 auxiliary media caches have their own four-MiB retention ceiling, clear obsolete
 source buffers and dispose resources when leaving the instrument. Each auxiliary
 view retains its producing selection/settings; a later pixel read or export cannot
@@ -152,7 +156,7 @@ responsive layouts and automated accessibility rules. Inspect the screenshots an
 retained incomplete accessibility checks. The focused `workbench-focus.e2e.mjs`, `mechanism-regressions.e2e.mjs`,
 `media-continuation.e2e.mjs` and Chromium-only `symbol-accessibility.e2e.mjs`
 cover keyboard focus/pan, exact invalid drafts, disposal and per-view provenance.
-`instrument-targets.e2e.mjs` also loads examples through all twenty launchers and
+`instrument-targets.e2e.mjs` also loads examples through normal catalog navigation for all twenty instruments and
 measures enabled HTML targets (including the [SC2.5.8 spacing exception](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html)) and application
 containment at 390/320 CSS pixels,
 without executing an operation on viewport changes. This is browser geometry

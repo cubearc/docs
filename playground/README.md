@@ -1,7 +1,7 @@
 # Cube Playground
 
-Static browser application owned by `cubearc/docs`. The approved R2 direction
-covers Playground, Pipelines and All tools. Algorithms, canonical contracts and
+Static browser application owned by `cubearc/docs`. A persistent workbench
+contains Multidecoder, individual tools and Pipelines. Algorithms, canonical contracts and
 JavaScript/Wasm bindings belong to `cubearc/cube`.
 
 ## Build a local preview
@@ -31,22 +31,89 @@ options and expected output; these reference values neither execute nor establis
 browser support. Precise contract JSON remains text so large schema integers
 survive JavaScript parsing. Its common-tool presets are selection policy over discovered IDs.
 
-The first local limits are 128 KiB input, eight retained rounds, 24 results per
-round, 16 pins and four MiB retained result/provenance data. Runtime limits are
-separate and may be lower for a particular operation or transport. Errors and
-unavailable operations remain discoverable. No readability score claims a solve;
-encoding alternatives are equally relevant. Selecting another tool, stopping or
-starting an explicit run revokes queued automatic comparisons; it does not
-relabel earlier results as work from the new selection.
+## Work in the Playground
+
+Use the persistent sidebar to search the complete catalog, open a category or
+select a favorite. Selecting a grouped tool immediately opens its working input,
+action selector, parameters and result. Base64 remains one tool with Encode and
+Decode actions. **About this tool** contains descriptions, reference examples,
+documentation and exact contract details. Loading an example explicitly replaces
+input/settings; normal tool selection never does.
+
+**Multidecoder** is the default for a fresh session. Its bounded set contains up
+to six independently applied lightweight alternatives, all starting from the same
+input snapshot. **Pipelines** is separate, explicit composition. Selecting tools
+never adds steps. **Add to pipeline** appears only for a real linear adapter and
+checks the receiving type/version and current options. Type changes require
+explicit conversion steps; advanced imported definitions remain preserved.
+
+Input, per-operation parameters/secondary inputs, action selection, presentation
+state and sidebar search/category/scroll context survive internal navigation.
+Desktop text tools put input and result side by side. Narrow layouts use a
+keyboard-accessible Tools drawer and stacked work areas. Opening/closing the
+drawer preserves the active workspace. Input/Result jumps preserve a selected
+tool's canonical route. The shell stays mounted while operation views change;
+result updates preserve input focus and stable result controls/disclosures.
+
+## Automatic results and retained evidence
+
+Automatic updates start enabled. Reviewed lightweight deterministic operations
+can run from their first use, without a previous timing run. Text/settings edits
+use a 250-ms debounce. The explicit policy in `src/execution-policy.mjs` combines
+installed availability/version with a small reviewed operation set, at most 4 KiB
+of primary input and 8 KiB of options/secondary inputs. It does not authorize the
+whole catalog. Searches, programs, media work, generation, unknown operations,
+large inputs and operations exceeding the live time budget keep an explicit
+**Run** action and explanation. Runtime timings can suspend live updates; a fast
+successful manual run can qualify that operation again. Automatic requests have
+a two-second worker deadline. Deadline/Stop requests do not establish Core
+completion or cooperative cancellation.
+
+A live computation replaces one bounded **Live preview**. Typing consumes no
+retained-round slots. **Keep result**, **Pin** and **Use as input** retain producing
+evidence; explicit manual runs create retained rounds. Pins preserve values,
+named-output choice, representations and their producing input/options. Earlier
+input/configuration is labeled rather than presented as current. Empty output is
+a valid result, distinct from absent evidence, updating, invalid input or a
+failed execution. Only the newest accepted input/tool/run can receive a response.
+The scheduler permits one active preview and one replaceable pending edit.
+The visible earlier result stays inspectable while its replacement is computed.
+Accepted alternatives commit together; a failed or revoked replacement leaves
+the earlier evidence labeled as such. Staged results count toward the same
+memory budget.
+
+**Use as input** is explicit. Byte results offer exact bytes and, when valid,
+an explicit UTF-8 conversion. **Restore previous input** reverses the last such
+continuation, including exact bytes and its provenance path. **Used settings**
+exposes the producing operation/options and retained secondary inputs; its run
+export explicitly includes input/settings and uses the existing SDK's exact
+serialization and transport limits. Output copying/downloading always uses the
+complete selected named output, independently of preview truncation.
+
+Local limits remain 128 KiB primary input, eight retained rounds, 24 results per
+round, 16 pins and four MiB total retained input/result/provenance data, including
+the visible preview, its staged replacement and reversible input. Runtime limits are separate and may be
+lower for a particular operation/transport. No readability score claims a solve.
+Original file bytes remain bytes across tool selection. Text-to-byte conversion
+is controlled by the visible UTF-8 option; bytes are never silently reinterpreted
+as text. Input/options stay in memory: reload restores route selection, not user
+content or secrets. Saved pipelines still require explicit inclusion of input
+and sensitive options; favorites alone persist as tool identities.
 
 ## Use visual instruments
 
-Open All tools → Visual instruments to choose one of the 20 workbenches. Visual
-and Parameters share input/options; selection and recorded trace playback do not
-execute tools. Load Core example fills a labeled synthetic fixture, then Run
-tools executes it locally. Edits preserve earlier evidence. See
-[visual instruments](INSTRUMENTS.md) for controls, boundaries, architecture and
-the additional real-SDK/browser review commands.
+Find instruments through their normal catalog categories: Enigma under Ciphers,
+keyboard tools under Text and Unicode, symbolic tools under their catalog
+category, media under Images/Audio, and byte/file tools under Files/Binary. The
+existing registry chooses the appropriate lazy interface, version and profile;
+there is no separate instrument launcher or algorithm catalog.
+
+**Visual** and **Parameters** edit the same operation state. Data/parameter edits
+can trigger an eligible preview; selection, zoom, layout, layer inspection and
+recorded trace playback do not. Stateful previews start from the configured
+initial state each time. They never accumulate rotor movement. Heavy instrument
+analyses keep explicit controls. See [visual instruments](INSTRUMENTS.md) for
+controls, boundaries and real-SDK/browser checks.
 
 ## Edit tool names and summaries
 
@@ -95,9 +162,20 @@ unit tests or ImageGen boards does not establish those properties. The automated
 suite also checks 200% CSS text enlargement at 1440/834/320 pixels and a short
 844×390 landscape viewport. CSS text enlargement is distinct from native browser
 zoom, screen-reader review and physical-device qualification.
-Run `node --test playground/tests/pipeline-import.integration.mjs playground/tests/runtime.integration.mjs` after building
-to check editable saved recipes, exact parameters and preserved advanced
-definitions against the installed actual SDK. `BROWSER_ENGINE` may select
+After building, provide the matching Core conformance file to verify saved
+recipes, exact parameters, advanced definitions and the visual instruments
+against the installed SDK:
+
+```sh
+CUBE_CONFORMANCE_FIXTURES=/absolute/path/to/cube/crates/cube-core/src/operations/contracts/conformance.json \
+  node --test playground/tests/pipeline-import.integration.mjs \
+    playground/tests/runtime.integration.mjs playground/tests/instruments.integration.mjs
+```
+
+`persistent-workbench.e2e.mjs` covers first-use automatic output, live replacement
+without history growth, pins, per-tool configuration, reversible continuation,
+file ownership, delayed worker responses, pipeline compatibility and narrow
+keyboard navigation. It is included in the complete runner below. `BROWSER_ENGINE` may select
 `chromium`, `firefox` or `webkit` for the end-to-end suite. Clipboard readback is
 automated in Chromium; the other engines check success or the visible download
 fallback when clipboard permission is unavailable.
@@ -114,13 +192,14 @@ native zoom, screen-reader and physical-device review. The audit library is not
 included in the application output. Keyboard assertions additionally verify
 focus after result filtering and moving, removing or restoring pipeline steps.
 
-Exact catalog links use `#/tools/<operation-id>/<operation-version>`. Old
-unversioned family links remain aliases. Opening a different operation version
-shows an explanation and disables execution until the user explicitly chooses
-the current version. Mobile Input/Results and pipeline jump fragments also
-initialize a ready section when opened directly or refreshed; existing in-page
-jumps preserve the active draft. Selection and action changes update the link; refresh keeps
-the chosen grouped action. Unknown/malformed links provide a route back.
+Canonical workspace links use `#/tools/<operation-id>/<operation-version>` and
+open the working tool directly. Old unversioned family links remain aliases;
+`#/playground` opens Multidecoder and `#/pipelines` opens Pipelines. Reload and
+browser back/forward restore selection without embedding input or secrets in
+the route. A mismatched version explains the issue and blocks execution until
+**Open current version** is chosen. Legacy in-page fragments still initialize
+the appropriate activity when loaded directly; normal jumps keep the tool route
+and draft. Unknown/malformed links preserve input and offer recovery.
 
 ## Run the complete browser checks
 
