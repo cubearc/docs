@@ -1,3 +1,5 @@
+import {selectInstrument} from './support/workspace.mjs';
+import { manualExecution, loadCoreExample } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createServer } from 'node:http';
@@ -44,13 +46,13 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
     // Reset through one full navigation; a second reload can abort module startup.
     documentRevision++;
     await page.goto(toolUrl(id));
-    await page.getByRole('button', { name: 'Use tool', exact: true }).waitFor({ timeout: 45000 });
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click();
+    await page.locator('#playground-heading').waitFor({timeout:45000});
+    await manualExecution(page);
     if (kind) await page.locator(`[data-instrument="${kind}"]`).waitFor();
   }
   async function load() {
-    await page.locator('#load-core-example').click();
-    await page.getByText('Synthetic Core example loaded. Run to produce your own result.', { exact: true }).waitFor();
+    await loadCoreExample(page);
+    await page.getByText('Core example loaded.', { exact: true }).waitFor();
   }
   async function run(id, expected) {
     await page.locator('#run-tools').click();
@@ -112,7 +114,7 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
   async function failAndRecover(id, change, repair, expected) {
     await change(); await page.locator('#run-tools').click();
     await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
-    await page.getByText(/Not applicable or needs options/).waitFor();
+    await page.locator('.execution-errors').waitFor();
     await repair(); await run(id, expected);
   }
   await t.test('Scytale columns, ragged row, selection, current versus previous result', async () => {
@@ -174,7 +176,7 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
     // Selecting a supported profile is a configuration edit; remount the selected action to resolve its presentation.
     const openVisual = page.getByRole('button', { name: /Open visual|Use visual|Visual instrument/ }).first();
     if (await openVisual.count()) await openVisual.click();
-    else { await page.getByRole('link', { name: 'All tools', exact: true }).click(); await page.goto(toolUrl('symbol.alphabet.encode')); await page.getByRole('button', {name:'Use tool',exact:true}).click(); }
+    else { await page.getByRole('link', { name: 'All tools', exact: true }).click(); await page.goto(toolUrl('symbol.alphabet.encode')); await manualExecution(page); }
     await page.locator('[data-instrument="pigpen"] .pigpen-palette').waitFor();
     await page.locator('#playground-input').fill('[]');
     await page.getByRole('button', { name: 'A: grid:ES', exact: true }).click();
@@ -215,7 +217,7 @@ test('six symbol instruments edit canonical configuration and execute actual Cor
     await run('symbol.morse.encode', '... --- ...');
     await page.getByRole('button', { name: 'Compose signals', exact: true }).click();
     for (const name of ['Dot','Dot','Dot','Next letter','Dash','Dash','Dash','Next letter','Dot','Dot','Dot']) {
-      const control = page.getByRole('button', {name,exact:name.startsWith('Next')}); await control.focus(); await page.keyboard.press('Enter');
+      const control = page.locator('.instrument').getByRole('button', {name,exact:name.startsWith('Next')}); await control.focus(); await page.keyboard.press('Enter');
     }
     assert.equal(await page.locator('#playground-input').inputValue(), '... --- ...');
     await run('symbol.morse.decode', 'SOS'); await tabsDoNotRun();
@@ -234,14 +236,13 @@ test('Pigpen Core examples preserve the selected profile in both directions', { 
   const {context,base} = await instrumentBrowser(t);
   const page = await context.newPage();
   await page.goto(base+'#/tools');
-  await page.getByText('Visual instruments · 20 workbenches',{exact:true}).click({timeout:45000});
-  await page.locator('[data-open-instrument="pigpen"]').click();
+  await selectInstrument(page,'pigpen');
   const units = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',' '];
   for (const operation of ['symbol.alphabet.encode','symbol.alphabet.decode']) {
     if (operation.endsWith('.decode')) await page.locator('#instrument-action').selectOption(operation);
     const before = await page.evaluate(()=>window.instrumentCalls);
-    await page.locator('#load-core-example').click();
-    await page.getByText('Synthetic Core example loaded. Run to produce your own result.',{exact:true}).waitFor();
+    await loadCoreExample(page);
+    await page.getByText('Core example loaded.',{exact:true}).waitFor();
     assert.equal(await page.locator('#playground-options-profile').inputValue(),'pigpen_haverhill_pairs_v1','Loading an example must retain the visual profile');
     assert.equal(await page.locator('[data-instrument="pigpen"]').count(),1);
     assert.equal(await page.evaluate(()=>window.instrumentCalls),before,'Loading sample data does not execute it');
@@ -259,6 +260,8 @@ test('Pigpen Core examples preserve the selected profile in both directions', { 
     else assert.deepEqual(result,units.map((unit,token_index)=>({token_index,alternatives:[unit]})));
     if(evidence) { await mkdir(evidence,{recursive:true});await page.screenshot({path:`${evidence}/pigpen-example-${operation.endsWith('.encode')?'encode':'decode'}.png`,fullPage:true}); }
   }
+  await page.getByText('About this tool',{exact:true}).click();
+  await page.getByRole('heading',{name:'Example',exact:true}).waitFor();
   let resume, seen;
   const held = new Promise(resolve => { seen = resolve; });
   await page.route('**/tool-details/symbol.alphabet.decode.json', async route => {
@@ -266,7 +269,7 @@ test('Pigpen Core examples preserve the selected profile in both directions', { 
     await route.continue();
   });
   const calls = await page.evaluate(()=>window.instrumentCalls);
-  await page.locator('#load-core-example').click(); await held;
+  await loadCoreExample(page,{wait:false}); await held;
   const edited = '["grid:ES:dot"]';
   await page.locator('#playground-input').fill(edited);
   const response = page.waitForResponse(response => response.url().endsWith('/tool-details/symbol.alphabet.decode.json'));
@@ -282,7 +285,7 @@ test('Pigpen Core examples preserve the selected profile in both directions', { 
     await new Promise(resolve => { rejectRead = resolve; reached(); });
     await route.fulfill({status:503,body:'Metadata unavailable'});
   });
-  await page.locator('#load-core-example').click(); await pendingFailure;
+  await loadCoreExample(page,{wait:false}); await pendingFailure;
   await page.locator('#playground-input').fill('["grid:SW"]');
   const status = await page.locator('.input-options > [role="status"]').textContent();
   const failureResponse = page.waitForResponse(response => response.url().endsWith('/tool-details/symbol.alphabet.decode.json'));
@@ -295,14 +298,15 @@ test('Pigpen Core examples preserve the selected profile in both directions', { 
 
 test('Stop revokes a pending example before it can replace current input',{timeout:45000},async t=>{
  const {context,base}=await instrumentBrowser(t);const page=await context.newPage();
- await page.goto(base+'#/tools');await page.getByText('Visual instruments · 20 workbenches',{exact:true}).click({timeout:30000});
- await page.locator('[data-open-instrument="pigpen"]').click();
+ await page.goto(base+'#/tools');
+ await selectInstrument(page,'pigpen');
  await page.locator('[data-instrument="pigpen"] button').first().waitFor();
  await page.locator('#playground-input').fill('["B"]');
+ await page.getByText('About this tool',{exact:true}).click();await page.getByRole('heading',{name:'Example',exact:true}).waitFor();
  let release,seen;const held=new Promise(resolve=>{seen=resolve;});
  await page.route('**/tool-details/symbol.alphabet.encode.json',async route=>{await new Promise(resolve=>{release=resolve;seen();});await route.continue();});
  const before=await page.evaluate(()=>window.instrumentCalls);
- await page.locator('#load-core-example').click();await held;
+ await loadCoreExample(page,{wait:false});await held;
  assert.equal(await page.locator('#run-tools').isDisabled(),true,'Run waits for the pending input');
  await page.getByRole('button',{name:'Stop',exact:true}).click();
  const status=await page.locator('.input-options > [role="status"]').textContent();
@@ -312,8 +316,8 @@ test('Stop revokes a pending example before it can replace current input',{timeo
  assert.equal(await page.locator('.input-options > [role="status"]').textContent(),status);
  assert.equal(await page.locator('#run-tools').isEnabled(),true);
  await page.unroute('**/tool-details/symbol.alphabet.encode.json');
- await page.locator('#load-core-example').click();
- await page.getByText('Synthetic Core example loaded. Run to produce your own result.',{exact:true}).waitFor();
+ await loadCoreExample(page);
+ await page.getByText('Core example loaded.',{exact:true}).waitFor();
  assert.deepEqual(JSON.parse(await page.locator('#playground-input').inputValue()),[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',' ']);
  assert.equal(await page.evaluate(()=>window.instrumentCalls),before,'Stop/retry does not run the selected operation');
  await page.close();

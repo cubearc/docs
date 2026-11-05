@@ -1,3 +1,4 @@
+import { navigateActivity, manualExecution } from './workspace.mjs';
 import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
@@ -9,24 +10,24 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     await page.locator('#tool-search').waitFor({timeout:45000});
     await page.locator('#tool-search').fill('cipher.book.decode');
     await page.locator('[data-tool="cipher.book"]').click();
-    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await manualExecution(page);
     await page.locator('#playground-input').fill('1:1,2:1');
     await page.locator('#instrument-tab-parameters').click();
     await page.locator('#playground-options-source').fill('another book');
     await page.locator('#playground-options-scheme').selectOption('word_character');
-    await page.getByRole('button',{name:'Run tools',exact:true}).click();
+    await page.getByRole('button',{name:'Run',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
     assert.equal(await page.locator('[data-result-operation="cipher.book.decode"] .viewer pre').first().textContent(),'ab');
-    await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'All tools',exact:true}).click();
+    await navigateActivity(page,'All tools');
     await page.locator('#tool-search').fill('number.constant_digits');
     await page.locator('[data-tool="number.constant_digits"]').click();
-    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await manualExecution(page);
     await page.locator('#playground-options-constant').waitFor();
     assert.equal(await page.locator('#playground-options-constant').count(),1,'Tools with no input ports must open their actual options.');
     await page.locator('#playground-options-constant').selectOption('pi');
     await page.locator('#playground-options-count').fill('3');
     await page.locator('#playground-options-max_digits').fill('16');
-    await page.getByRole('button',{name:'Run tools',exact:true}).click();
+    await page.getByRole('button',{name:'Run',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
     const result=JSON.parse(await page.locator('[data-result-operation="number.constant_digits"] .viewer pre').first().textContent());
     assert.equal(result.digits,'141');
@@ -37,7 +38,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       await page.setViewportSize({width,height:900});
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     }
-    await page.getByRole('button',{name:'Compare common tools',exact:true}).click();
+    await navigateActivity(page,'Playground');
     assert.equal(await page.locator('#playground-input').inputValue(),'1:1,2:1','Navigation through an options-only tool preserves the previous text.');
     await page.goto(`${origin}/docs/playground/#/tools/cipher.vic.encode/1`);
     await page.getByRole('heading',{name:'VIC (English 2010)',exact:true}).waitFor();
@@ -45,10 +46,10 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     assert.equal(response.status(),200);
     const example = (await response.json()).example;
     assert.equal(example.parameters.padding,'');
-    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await manualExecution(page);
     await page.locator('#playground-input').fill(example.inputs.text);
     for (const [name,value] of Object.entries(example.parameters)) await page.locator(`#playground-options-${name}`).fill(String(value));
-    await page.getByRole('button',{name:'Run tools',exact:true}).click();
+    await page.getByRole('button',{name:'Run',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
     assert.equal(await page.locator('[data-result-operation="cipher.vic.encode"]').count(),1,await page.locator('#results-section').textContent());
     const vic = page.locator('[data-result-operation="cipher.vic.encode"] .viewer pre');
@@ -62,7 +63,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       assert.equal(response.status(),200);
       const example=(await response.json()).example;
       await page.waitForFunction(operation=>document.querySelector('#tool-action')?.value===operation,operation);
-      await page.getByRole('button',{name:'Use tool',exact:true}).click();
+      await manualExecution(page);
       const input=Object.values(example.inputs)[0];
       await page.locator('#playground-input').fill(typeof input==='string'?input:JSON.stringify(input));
       for (const [name,value] of Object.entries(example.parameters)) {
@@ -70,7 +71,7 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
         if(await field.evaluate(element=>element.tagName)==='SELECT') await field.selectOption(String(value));
         else await field.fill(typeof value==='object'?JSON.stringify(value):String(value));
       }
-      await page.getByRole('button',{name:'Run tools',exact:true}).click();
+      await page.getByRole('button',{name:'Run',exact:true}).click();
       await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
       const output=operation==='cipher.prime_multiplication.decode'?'groups':operation==='symbol.alphabet.decode'?'readings':'tokens';
       assert.equal(await page.locator(`[data-result-operation="${operation}"]`).count(),1,await page.locator('#main').innerText());
@@ -86,13 +87,13 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
     await page.reload();
     await page.goto(`${origin}/docs/playground/#/tools/symbol.alphabet.decode/1`);
     await page.waitForFunction(()=>document.querySelector('#tool-action')?.value==='symbol.alphabet.decode');
-    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await manualExecution(page);
     await page.locator('#playground-input').fill('["hylian:r3c5"]');
     const profile=page.locator('#playground-options-profile');
     const choices=await profile.locator('option').evaluateAll(options=>options.map(option=>option.value).filter(Boolean));
     assert.equal(new Set(choices).size,23,'Every qualified profile is available through the actual required-profile control.');
     await profile.selectOption('hylian_skyward_dcode_v1');
-    await page.getByRole('button',{name:'Run tools',exact:true}).click();
+    await page.getByRole('button',{name:'Run',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
     const card=page.locator('[data-result-operation="symbol.alphabet.decode"]');
     await card.getByRole('combobox',{name:'Choose an output',exact:true}).selectOption('readings');
@@ -109,10 +110,10 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
       const example=(await response.json()).example;
       const title=operation==='analysis.substitution.solve'?'Solve substitution constraints':'Suggest classical cipher families';
       await page.getByRole('heading',{name:title,exact:true}).waitFor();
-      await page.getByRole('button',{name:'Use tool',exact:true}).click();
+      await manualExecution(page);
       const request=example.inputs.request;
       await page.locator('#playground-input').fill(typeof request==='string'?request:JSON.stringify(request));
-      await page.getByRole('button',{name:'Run tools',exact:true}).click();
+      await page.getByRole('button',{name:'Run',exact:true}).click();
       await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
       const card=page.locator(`[data-result-operation="${operation}"]`);
       assert.equal(await card.count(),1,await page.locator('#main').innerText());
@@ -136,14 +137,14 @@ export async function verifyNewBindings(context,origin,audit = async () => {}) {
         assert.equal(response.status(),200);
         const example=(await response.json()).example;
         await page.getByRole('heading',{name:names.tools[operation].display_name,exact:true}).waitFor();
-        await page.getByRole('button',{name:'Use tool',exact:true}).click();
+        await manualExecution(page);
         const raw=Object.hasOwn(example.inputs,'codes');
         const primary=example.inputs[raw?'codes':'text'];
         await page.locator('#playground-input').fill(typeof primary==='string'?primary:JSON.stringify(primary));
         if (await page.locator('#instrument-tab-parameters').count()) await page.locator('#instrument-tab-parameters').click();
         const settings=example.inputs.settings;
         await page.locator('#extra-settings').fill(typeof settings==='string'?settings:JSON.stringify(settings));
-        await page.getByRole('button',{name:'Run tools',exact:true}).click();
+        await page.getByRole('button',{name:'Run',exact:true}).click();
         await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
         const card=page.locator(`[data-result-operation="${operation}"]`);
         assert.equal(await card.count(),1,operation+': '+await page.locator('#results-section').textContent());

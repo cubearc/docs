@@ -1,3 +1,4 @@
+import { manualExecution, loadCoreExample } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createServer } from 'node:http';
@@ -14,7 +15,7 @@ const mime = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/jav
 async function openColors(context, origin) {
   const page = await context.newPage();
   await page.goto(`${origin}#/tools/image.histogram/1`);
-  await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+  await manualExecution(page);
   await page.locator('[data-instrument="colors"]').waitFor();
   const tuples = { R: [255, 0, 0], G: [0, 255, 0], B: [0, 0, 255] };
   const samples = Array.from('RRGGRBBGRBGGRRBB').flatMap(letter => tuples[letter]);
@@ -56,9 +57,9 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('PNG chunk labels remain horizontal inside the localized byte table', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/image.png.inspect/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
-    await page.locator('#load-core-example').click();
-    await page.getByText('Synthetic Core example loaded. Run to produce your own result.', { exact: true }).waitFor();
+    await manualExecution(page);
+    await loadCoreExample(page);
+    await page.getByText('Core example loaded.', { exact: true }).waitFor();
     await page.locator('#run-tools').click();
     await page.locator('[data-result-operation="image.png.inspect"]').waitFor();
     const records = await page.locator('[data-result-operation]').count();
@@ -146,7 +147,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('a fresh auxiliary mask replaces an earlier primary extract in the visual viewer', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/image.colors.extract/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     const tuples = { R: [255, 0, 0], G: [0, 255, 0], B: [0, 0, 255] };
     const samples = Array.from('RRGGRBBGRBGGRRBB').flatMap(letter => tuples[letter]);
     await page.locator('#playground-input').fill(JSON.stringify({ width: 4, height: 4, color_model: 'rgb', samples: { base64: Buffer.from(samples).toString('base64') }, palette: [], transparency: { base64: '' } }));
@@ -166,7 +167,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('a pending auxiliary rejection after disposal cannot mutate retained presentation state', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/playground`);
-    await page.locator('#run-tools').waitFor({ timeout: 45000 });
+    await page.locator('#run-tools').waitFor({ state:'attached',timeout: 45000 });
     const after = await page.evaluate(async () => {
       const media = await import('./instruments/media.mjs');
       const host = document.createElement('div');
@@ -194,7 +195,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('a delayed pixel read keeps the coordinates actually sent to Core', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/playground`);
-    await page.locator('#run-tools').waitFor({ timeout: 45000 });
+    await page.locator('#run-tools').waitFor({ state:'attached',timeout: 45000 });
     const inspected = await page.evaluate(async () => {
       const media = await import('./instruments/media.mjs');
       const host = document.createElement('div'); document.body.append(host);
@@ -222,10 +223,10 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('reverse Shift-click exports the inclusive bytes between both selected offsets', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/file.hex.inspect/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     const original = Buffer.from(Array.from({ length: 16 }, (_, i) => i));
     await page.locator('#playground-file').setInputFiles({ name: 'offsets.bin', buffer: original });
-    await page.getByText('File ready. Run tools with these exact bytes.', { exact: true }).waitFor();
+    await page.getByText('Exact file bytes loaded.', { exact: true }).waitFor();
     await page.locator('#run-tools').click();
     await page.locator('#media-byte-Left-8').waitFor();
     await page.locator('#media-byte-Left-8').click();
@@ -240,10 +241,10 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('next difference loads its actual byte page without rerunning comparison', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/file.binary.compare/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     const left = Buffer.alloc(640), right = Buffer.alloc(640); right[300] = 0xFF; right[500] = 0x7F;
     await page.locator('#playground-file').setInputFiles({ name: 'left.bin', buffer: left });
-    await page.getByText('File ready. Run tools with these exact bytes.', { exact: true }).waitFor();
+    await page.getByText('Exact file bytes loaded.', { exact: true }).waitFor();
     await page.locator('.instrument input[type=file]').setInputFiles({ name: 'right.bin', buffer: right });
     await page.getByText('Right source: right.bin', { exact: true }).waitFor();
     await page.locator('#run-tools').click();
@@ -263,7 +264,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('image pan survives parameter tabs without executing the operation again', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/image.bit_plane.extract/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     await page.locator('#playground-input').fill(JSON.stringify({ width: 64, height: 64, color_model: 'gray', samples: { base64: Buffer.alloc(4096, 255).toString('base64') }, palette: [], transparency: { base64: '' } }));
     await page.locator('#instrument-tab-parameters').click();
     await page.locator('#playground-options-channel').selectOption('gray');
@@ -285,7 +286,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('required bit-plane channel stays visibly unselected until canonical configuration chooses it', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/image.bit_plane.extract/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     await page.locator('#playground-input').fill(JSON.stringify({ width: 2, height: 1, color_model: 'gray', samples: { base64: 'AP8=' }, palette: [], transparency: { base64: '' } }));
     await page.locator('#instrument-tab-parameters').click();
     assert.equal(await page.locator('#playground-options-channel').inputValue(), '');
@@ -301,7 +302,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('expanded indexed samples offer their actual RGBA bit-plane channels', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/image.bit_plane.extract/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     await page.locator('#playground-input').fill(JSON.stringify({ width: 2, height: 1, color_model: 'indexed', samples: { base64: 'AAE=' }, palette: [[255, 0, 0], [0, 0, 255]], transparency: { base64: '' } }));
     await page.locator('#instrument-tab-parameters').click();
     await page.locator('#playground-options-expand_palette').check();
@@ -319,7 +320,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('supplied PCM keeps exact frame origin and selects the actual returned channel', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/audio.spectrum/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     const samples = Buffer.alloc(32);
     for (let frame = 0; frame < 8; frame++) samples.writeInt16LE(1000, frame * 4 + 2);
     await page.locator('#playground-input').fill(JSON.stringify({ channels: [0, 1], format: { bits_per_sample: 16, block_align: 4, byte_rate: 32000, channels: 2, format_tag: 1, sample_rate: 8000 }, frames: 8, start_frame: '9007199254740993', data: { base64: samples.toString('base64') } }));
@@ -354,7 +355,7 @@ test('media retained evidence and asynchronous lifetime regressions', { timeout:
   await subtest('audio axes expose their accessible names through semantic groups', async () => {
     const page = await context.newPage();
     await page.goto(`${origin}#/tools/audio.wave.inspect/1`);
-    await page.getByRole('button', { name: 'Use tool', exact: true }).click({ timeout: 45000 });
+    await manualExecution(page);
     await page.getByRole('button', { name: 'Load synthetic 1 kHz WAVE example', exact: true }).click();
     await page.getByRole('button', { name: 'Analyze waveform, spectrum and spectrogram', exact: true }).click();
     await page.getByRole('button', { name: 'Export complete spectrum JSON', exact: true }).waitFor();

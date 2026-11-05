@@ -2,21 +2,24 @@ import { h, button, notify } from './dom.mjs';
 import { initializeRuntime } from './runtime.mjs';
 import { migrateFavorites } from './catalog.mjs';
 import { Session } from './session.mjs';
-import { PipelineDraft } from './pipeline.mjs';
+import { PipelineDraft, pipelineCompatibility } from './pipeline.mjs';
+import { parametersFor } from './controls.mjs';
+import { snapshot } from './data.mjs';
+import { PreviewScheduler } from './execution-policy.mjs';
+import { mountSidebar, navigationDrawer } from './sidebar.mjs';
 import { PipelineLibrary } from './library.mjs';
 import { loadPipeline } from './pipeline-document.mjs';
 import { mountPlayground } from './playground-view.mjs';
 import { mountPipelines } from './pipelines-view.mjs';
-import { mountTools } from './tools-view.mjs';
-import { resolveToolLink } from './tool-route.mjs';
+import { resolveWorkspaceRoute, toolLink } from './tool-route.mjs';
 
 const main = document.querySelector('#main');
 const state = {
   playground: { session: new Session(), mode: 'Decode', tool: null, parameters: {}, extraInputs: {}, revision: 0, inputRevision: 0,
     running: false, errors: [], status: 'Ready. Paste text or choose a file.', pendingNext: false, filter: 'all', showRound: null,
-    outputChoices: {}, viewChoices: {}, utf8: true, auto: false, fast: new Map(), sourceName: null },
+    outputChoices: {}, viewChoices: {}, utf8: true, auto: true, slow: new Set(), sourceName: null, scheduler: new PreviewScheduler(), lastActions: {}, inputTouched: false },
   catalog: { query: '', category: '', favoritesOnly: false, shown: 50, tool: null, action: null, detailOpen: false },
-  favorites: [],
+  activity: 'playground', favorites: [],
   pipeline: { draft: new PipelineDraft(), library: new PipelineLibrary({ getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value), removeItem: key => localStorage.removeItem(key) }), mode: 'library', capture: 'all',
     error: '', running: false, includeInput: false, includeKeys: false },
 };
@@ -28,26 +31,40 @@ try {
 let runtime;
 let activeController;
 let section = 'playground';
+let sidebar; let drawer; let mountedKey;
+let nextFocus;
+const viewMemory=new Map();
 let rendered = false;
-function beginRun() { clearTimeout(state.playground.autoTimer); activeController?.abort(); activeController = new AbortController(); return activeController; }
-function navigate(next) { if (location.hash === `#/${next}`) route(); else location.hash = `#/${next}`; }
-function useTool(action) {
-  state.playground.controller?.abort(); state.playground.auxiliary?.abort(); clearTimeout(state.playground.autoTimer); state.playground.readingFile = null; state.playground.secondaryReading = null;
-  state.playground.session.invalidate(); state.playground.revision++;
-  state.playground.tool = action.id; state.playground.running = false;
-  state.playground.status = 'Tool selected. Review its options, then run with your current input.';
-  if (action.id.endsWith('.encode')) state.playground.mode = 'Encode';
-  if (action.id.endsWith('.decode')) state.playground.mode = 'Decode';
-  navigate('playground');
+function beginRun() { activeController?.abort(); activeController = new AbortController(); return activeController; }
+function navigate(next) {
+  if(next==='tools'){drawer?.open();sidebar?.focusSearch();return;}
+  const hash=`#/${next}`;
+  if(location.hash!==hash)history.pushState(null,'',hash);
+  route();
 }
-function addStep(action) {
+function useTool(action,{focusId='playground-input'}={}) {
+  // Revoke on the selection intent, before the browser's queued hashchange.
+  // A file/import completion in that interval still belongs to the old tool.
+  if(action.id!==state.playground.tool||state.catalog.routeError)revokePreview();
+  nextFocus={action:action.id,id:focusId};
+  const link=toolLink(action);
+  if(location.hash!==link)history.pushState(null,'',link);
+  route();
+}
+async function addStep(action) {
+  const draft=state.pipeline.draft;
+  const revision=draft.revision, editRevision=state.playground.revision;
   try {
-    if (!action.pipeline) throw new Error('This tool has no supported linear pipeline adapter.');
-    if (state.pipeline.draft.advanced) throw new Error('Start a new pipeline to add editable steps. The imported exact definition is preserved.');
+    if(state.catalog.routeError)throw new Error('Open the current operation version before adding this step.');
+    const compatibility=pipelineCompatibility(draft,action,runtime);
+    if(!compatibility.compatible)throw new Error(compatibility.reason);
+    const raw=snapshot(state.playground.parameters[action.id]??{});
+    const parameters=await parametersFor(runtime,action,raw);
+    if(state.pipeline.draft!==draft||draft.revision!==revision||state.playground.revision!==editRevision)throw new Error('The input or pipeline changed before the step was added. Try again.');
     state.pipeline.controller?.abort();
-    state.pipeline.draft.add({ operation: action.id, version: action.pipeline.version });
-    state.pipeline.mode = 'editor'; navigate('pipelines');
-  } catch (error) { notify(error.message); }
+    draft.add({operation:action.id,version:action.pipeline.version,original:parameters});
+    state.pipeline.mode='editor';navigate('pipelines');
+  } catch(error){notify(error.message);}
 }
 async function fromSequence(steps, input, outputType) {
   try {
@@ -63,49 +80,72 @@ async function fromSequence(steps, input, outputType) {
     navigate('pipelines');
   } catch (error) { notify(error.message); }
 }
-function render() {
+function workspaceKey(){return section==='playground'?`playground:${state.playground.tool??'multidecoder'}`:'pipelines';}
+function rememberView() {
+  if(!mountedKey)return;
+  const field=main.querySelector('#playground-input');
+  viewMemory.set(mountedKey,{scroll:scrollY,selection:field?.selectionStart===undefined?null:[field.selectionStart,field.selectionEnd]});
+}
+function render({restore=true}={}) {
   if (!runtime) return;
+  const focused=main.contains(document.activeElement)?document.activeElement?.id:null;
+  rememberView();
   state.playground.dispose?.(); state.playground.dispose = null;
   state.playground.redraw = null; state.playground.redrawParameters = null; state.pipeline.redraw = null;
-  const mountedSection = section;
-  const context = { runtime, state, render, navigate, beginRun, useTool, addStep, fromSequence, isCurrentView: () => section === mountedSection,
-    saveFavorites() { try { localStorage.setItem('cubearc.playground.favorites.v1', JSON.stringify(state.favorites)); } catch { notify('Favorites could not be saved in this browser.'); } },
+  const mountedSection = section, mountedTool=state.playground.tool;
+  const context = { runtime, state, render, navigate, beginRun, useTool, addStep, fromSequence,
+    isCurrentView: () => section === mountedSection && (section!=='playground'||state.playground.tool===mountedTool),
+    saveFavorites() { try { localStorage.setItem('cubearc.playground.favorites.v1', JSON.stringify(state.favorites)); } catch { notify('Favorites could not be saved in this browser.'); } sidebar?.updateFavorites(); },
     clearSession() {
       if (!confirm('Clear the current Playground history and pins? Saved pipelines will remain.')) return;
-      state.playground.controller?.abort(); clearTimeout(state.playground.autoTimer);
+      state.playground.controller?.abort(); state.playground.scheduler.cancel();
       state.playground.session = new Session(); state.playground.revision++; state.playground.inputRevision++; state.playground.running = false; state.playground.readingFile = null; state.playground.secondaryReading = null;
-      state.playground.errors = []; state.playground.pendingNext = false; state.playground.sourceName = null;
+      state.playground.errors = []; state.playground.pendingNext = false; state.playground.sourceName = null;state.playground.inputTouched=false;
       state.playground.outputChoices = {}; state.playground.viewChoices = {}; state.playground.presentation = undefined; state.playground.status = 'Session cleared.'; render();
     },
   };
-  ({ playground: mountPlayground, pipelines: mountPipelines, tools: mountTools }[section])(main, context);
-  rendered = true;
-  for (const link of document.querySelectorAll('nav a')) {
-    if (link.hash === `#/${section}`) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
-  }
+  ({ playground: mountPlayground, pipelines: mountPipelines }[section])(main, context);
+  mountedKey=workspaceKey();rendered=true;
+  const memory=viewMemory.get(mountedKey),field=main.querySelector('#playground-input');
+  if(memory?.selection&&field?.setSelectionRange)field.setSelectionRange(...memory.selection);
+  if(restore&&focused)main.querySelector(`#${CSS.escape(focused)}`)?.focus({preventScroll:true});
+  sidebar?.updateSelection();
+}
+function revokePreview() {
+  const page=state.playground;
+  page.scheduler.cancel();page.controller?.abort();page.auxiliary?.abort();
+  page.session.invalidate();page.revision++;page.readingFile=null;page.secondaryReading=null;page.running=false;page.errors=[];page.phase='selected';
 }
 function route() {
   if (!runtime) return;
-  if (location.hash && !location.hash.startsWith('#/')) {
-    if (!rendered) {
-      section = ['#steps-section', '#pipeline-result'].includes(location.hash) ? 'pipelines' : 'playground';
-      render();
-      (document.getElementById(location.hash.slice(1)) ?? main).focus();
-    }
+  let next=resolveWorkspaceRoute(location.hash,runtime.tools,state.playground.mode);
+  if(!next){
+    if(!rendered){section=['#steps-section','#pipeline-result'].includes(location.hash)?'pipelines':'playground';state.activity=section;render();}
     return;
   }
-  const [, requested] = location.hash.split('/');
-  section = ['playground', 'pipelines', 'tools'].includes(requested) ? requested : 'playground';
-  if (section === 'tools') {
-    Object.assign(state.catalog, resolveToolLink(location.hash, runtime.tools, state.playground.mode));
+  rememberView();
+  const nextId=next.action?.id??null;
+  if(section!==next.activity||state.playground.tool!==nextId||state.catalog.routeError!==next.routeError){revokePreview();}
+  section=next.activity;state.activity=section;
+  state.playground.tool=nextId;state.catalog.routeError=next.routeError;
+  if(next.action){
+    const family=runtime.tools.find(tool=>tool.actions.some(action=>action.id===nextId));
+    state.playground.lastActions[family.key]=nextId;
+    if(nextId.endsWith('.encode'))state.playground.mode='Encode';
+    if(nextId.endsWith('.decode'))state.playground.mode='Decode';
   }
-  render();
-  if (section === 'tools' && state.catalog.restoreList) {
-    state.catalog.restoreList = false;
-    const selected = document.querySelector(`[data-tool="${CSS.escape(state.catalog.listFocus ?? '')}"]`);
-    (selected ?? document.querySelector('#tool-search'))?.focus({ preventScroll: true });
-    scrollTo({ top: selected ? state.catalog.listScroll ?? 0 : 0, behavior: 'instant' });
-  } else main.focus({ preventScroll: true });
+  state.playground.status=next.routeError||'Ready.';
+  // A navigation replaces the operation view, while the app shell and sidebar
+  // stay mounted. Result updates never call this route renderer.
+  mountedKey=null;render({restore:false});
+  const memory=viewMemory.get(workspaceKey());
+  scrollTo({top:memory?.scroll??0,behavior:'instant'});
+  drawer?.close();
+  if(nextFocus?.action===nextId){
+    const target=nextFocus.id==='playground-input'&&matchMedia('(max-width:760px)').matches?main:document.getElementById(nextFocus.id)??main;
+    target.focus({preventScroll:true});nextFocus=undefined;
+  }
+  if(next.search){drawer?.open();sidebar.focusSearch();}
 }
 window.addEventListener('hashchange', route);
 async function start() {
@@ -116,6 +156,8 @@ async function start() {
     state.favorites = migrateFavorites(state.favorites, runtime.tools);
     document.querySelector('#runtime-details').textContent = JSON.stringify({ build: runtime.sdk.build, limits: runtime.sdk.limits,
       catalogOperations: runtime.catalog.operations.length, directExecutors: runtime.sdk.executors.length, pipelineAdapters: runtime.sdk.pipelineAdapters.length }, null, 2);
+    sidebar=mountSidebar(document.querySelector('#tool-sidebar'),{runtime,state,useTool,navigate});
+    drawer=navigationDrawer(document.querySelector('#tool-sidebar'),document.querySelector('#toggle-tools'),main);
     route();
   } catch (error) {
     main.replaceChildren(h('h1', {}, 'Local tools could not start'), h('p', { class: 'warning', role: 'alert' }, error.message), button('Retry loading tools', start, { class: 'primary' }), button('Reload site', () => location.reload()));

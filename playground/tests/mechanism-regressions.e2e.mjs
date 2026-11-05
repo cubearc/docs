@@ -1,3 +1,4 @@
+import { manualExecution } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFile,mkdir} from 'node:fs/promises';
@@ -17,7 +18,7 @@ test('mechanical editors preserve exact inputs and retained execution evidence',
   async function run(page){await page.locator('#run-tools').click();await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);}
   async function unconfigured(operation,kind){
     const page=await context.newPage();await page.goto(base+`#/tools/${operation}/1`);
-    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await manualExecution(page);
     await page.locator(`[data-instrument="${kind}"] .mechanism`).waitFor();return page;
   }
   await t.test('fresh Enigma requires an explicit choice of no plugboard pairs',async()=>{
@@ -46,7 +47,7 @@ test('mechanical editors preserve exact inputs and retained execution evidence',
     await page.locator('#m138-offsets').fill('[9007199254740993]');await page.locator('#m138-offsets').press('Tab');
     assert.ok((await page.locator('#extra-settings').inputValue()).includes('9007199254740993'),'The canonical settings must retain the exact invalid integer for Core validation.');
     assert.equal(await page.locator('#m138-offsets').inputValue(),'[9007199254740993]');
-    await run(page);await page.getByText(/Not applicable or needs options \(1\)/).waitFor();
+    await run(page);await page.locator('.execution-errors').waitFor();
     await page.close();
   });
   await t.test('new M138 order JSON must not round a wide integer',async()=>{
@@ -63,7 +64,7 @@ test('mechanical editors preserve exact inputs and retained execution evidence',
     assert.equal(await page.locator('#m138-offsets').inputValue(),'[1,','A redraw must not erase the malformed field draft.');
     const malformed=await page.locator('#extra-settings').inputValue();assert.throws(()=>JSON.parse(malformed));
     await capture(page,'m138-malformed-draft');
-    await run(page);await page.getByText(/Not applicable or needs options \(1\)/).waitFor();
+    await run(page);await page.locator('.execution-errors').waitFor();
     await page.getByText('Series import and accessible track list',{exact:true}).click();
     await page.locator('#m138-series').fill('example:unrelated-edit');await page.locator('#m138-series').press('Tab');
     assert.equal(await page.locator('#m138-offsets').inputValue(),'[1,','Other controls must not discard an invalid field.');

@@ -1,3 +1,4 @@
+import { selectInstrument, loadCoreExample } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdir,writeFile} from 'node:fs/promises';
@@ -19,10 +20,9 @@ test('all visual launchers retain their profile examples and usable narrow contr
   const page=await context.newPage();
   try{
    await page.goto(base+'#/tools');
-   await page.getByText('Visual instruments · 20 workbenches',{exact:true}).click({timeout:45000});
-   await page.locator(`[data-open-instrument="${kind}"]`).click();
-   await page.locator('#load-core-example').click();
-   await page.getByText('Synthetic Core example loaded. Run to produce your own result.',{exact:true}).waitFor();
+   await selectInstrument(page,kind);
+   await loadCoreExample(page);
+   await page.getByText('Core example loaded.',{exact:true}).waitFor();
    const view=page.locator(`[data-instrument="${kind}"]`);
    await view.locator('button,input,select,textarea').first().waitFor();
    const calls=await page.evaluate(()=>window.instrumentCalls);

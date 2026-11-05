@@ -1,3 +1,4 @@
+import { selectInstrument, loadCoreExample } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -28,13 +29,12 @@ test('resolve symbol and workbench accessibility review conditions', { timeout: 
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${base}#/tools`);
-    await page.getByText('Visual instruments · 20 workbenches', { exact: true }).click({ timeout: 45000 });
-    await page.locator(`[data-open-instrument="${kind}"]`).click();
+    await selectInstrument(page,kind);
     await page.locator(`[data-instrument="${kind}"]`).waitFor();
     if (kind === 'pigpen') await page.locator('#playground-input').fill('["A","B"," "]');
     else {
-      await page.locator('#load-core-example').click();
-      await page.getByText('Synthetic Core example loaded. Run to produce your own result.', { exact: true }).waitFor();
+      await loadCoreExample(page);
+      await page.getByText('Core example loaded.', { exact: true }).waitFor();
     }
     await page.locator(`[data-instrument="${kind}"] button`).first().waitFor();
     if (kind === 'morse') {

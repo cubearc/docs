@@ -7,14 +7,18 @@
   <title>Cube Playground</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body>
+<body class="workbench-app">
   <a class="skip-link" href="#main">Skip to tools</a>
   <header class="site-header">
     <a class="brand" href="#/playground" aria-label="Cube Playground"><img src="./assets/cubearc-logo.png" width="44" height="44" alt=""><span>Cube</span></a>
-    <nav aria-label="Primary"><a href="#/playground">Playground</a><a href="#/pipelines">Pipelines</a><a href="#/tools">All tools</a></nav>
+    <button type="button" id="toggle-tools" aria-controls="tool-sidebar" aria-expanded="false">Tools</button>
+    <span class="header-context">Playground</span>
     <div class="external-links"><a href="../index.html">Docs</a><a href="https://github.com/cubearc/cube">GitHub</a></div>
   </header>
-  <main id="main" tabindex="-1"><h1>Cube Playground</h1><p role="status">Loading the local tools…</p></main>
+  <div class="app-layout">
+    <aside id="tool-sidebar" class="tool-sidebar" aria-label="Tools"></aside>
+    <main id="main" tabindex="-1"><h1>Cube Playground</h1><p role="status">Loading the local tools…</p></main>
+  </div>
   <div id="notice" class="notice" role="status" aria-live="polite"></div>
   <footer><span>Processing stays on this device.</span><details><summary>About this runtime</summary><pre id="runtime-details"></pre></details></footer>
   <script type="module" src="./app.mjs"></script>

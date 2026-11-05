@@ -1,3 +1,4 @@
+import { selectInstrument, loadCoreExample } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdir} from 'node:fs/promises';
@@ -22,10 +23,9 @@ test('action menus and paired glyph targets fit narrow enlarged-text views', {ti
       const page = await context.newPage();
       try {
         await page.goto(base + '#/tools');
-        await page.getByText('Visual instruments · 20 workbenches', {exact:true}).click({timeout:45000});
-        await page.locator(`[data-open-instrument="${kind}"]`).click();
-        await page.locator('#load-core-example').click();
-        await page.getByText('Synthetic Core example loaded. Run to produce your own result.', {exact:true}).waitFor();
+        await selectInstrument(page,kind);
+        await loadCoreExample(page);
+        await page.getByText('Core example loaded.', {exact:true}).waitFor();
         await page.setViewportSize({width:320, height:1000});
         for (const size of [100, 200]) {
           await page.evaluate(size => { document.documentElement.style.fontSize = `${size}%`; }, size);
@@ -72,8 +72,9 @@ test('action menus and paired glyph targets fit narrow enlarged-text views', {ti
         }
         const action = page.locator('#instrument-action');
         const original = await action.inputValue();
-        await page.locator('.section-jumps a').last().focus();
+        await action.focus();
         await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
         assert.equal(await page.evaluate(() => document.activeElement.id), 'instrument-action', 'The native menu remains in the keyboard focus order.');
         const next = await action.locator('option').evaluateAll((options, current) => options.find(option => option.value !== current).value, original);
         await action.selectOption(next);
@@ -116,10 +117,9 @@ test('visual instruments keep compact input above the working surface and eviden
       const page = await context.newPage();
       try {
         await page.goto(base + '#/tools');
-        await page.getByText('Visual instruments · 20 workbenches', {exact:true}).click({timeout:45000});
-        await page.locator(`[data-open-instrument="${kind}"]`).click();
-        await page.locator('#load-core-example').click();
-        await page.getByText('Synthetic Core example loaded. Run to produce your own result.', {exact:true}).waitFor();
+        await selectInstrument(page,kind);
+        await loadCoreExample(page);
+        await page.getByText('Core example loaded.', {exact:true}).waitFor();
         await page.locator(`[data-instrument="${kind}"] button, [data-instrument="${kind}"] input`).first().waitFor();
         if (kind === 'enigma') await page.getByLabel('Record post-step windows', {exact:true}).check();
         await page.locator('#run-tools').click();
@@ -141,7 +141,7 @@ test('visual instruments keep compact input above the working surface and eviden
           assert.ok(input.height < 180, 'The input is a compact strip above the machine.');
           assert.ok(input.y + input.height <= surface.y, 'Input precedes the machine.');
           assert.ok(result.y >= surface.y + surface.height, 'Full evidence follows the machine.');
-        assert.ok(surface.y < 360, 'The instrument starts within the first viewport.');
+        assert.ok(surface.y < 360, `The instrument starts within the first viewport: ${JSON.stringify({surface,input})}`);
         await page.mouse.move(0,0);
         const runStyle = await page.locator('#run-tools').evaluate(node => {
           const style = getComputedStyle(node);

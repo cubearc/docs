@@ -106,7 +106,7 @@ export async function parametersFor(runtime, action, raw, options = {}, original
 export function resultViewer(value, representations, { title = 'Result', id = 'viewer', onContinue, onPin, pinned = false, choice, onChoice } = {}) {
   const names = Object.keys(representations);
   let selected = names.includes(choice) ? choice : names[0];
-  const text = h('pre', { role: 'region', tabindex: 0, 'aria-label': `${title} contents` }, representations[selected].slice(0, 4096));
+  const text = h('pre', { id:`${id}-contents`, role: 'region', tabindex: 0, 'aria-label': `${title} contents` }, representations[selected].slice(0, 4096));
   const truncation = h('p', { class: 'small muted' });
   const update = () => {
     text.textContent = representations[selected].slice(0, 4096);
@@ -116,10 +116,10 @@ export function resultViewer(value, representations, { title = 'Result', id = 'v
   return h('div', {}, names.length > 1 ? h('div', { class: 'field' }, h('label', { for: `${id}-representation` }, 'View and copy as'), h('select', { id: `${id}-representation`, onChange: event => { selected = event.target.value; onChoice?.(selected); update(); } }, names.map(name => h('option', { value: name, selected: name === selected }, name)))) : h('span', { class: 'tag' }, selected),
     h('div', { class: 'viewer' }, text), truncation,
     h('div', { class: 'toolbar' },
-      button('Copy', () => copyText(representations[selected]), { 'aria-label': `Copy ${title}` }),
+      button('Copy', () => copyText(representations[selected]), { id:`${id}-copy`, 'aria-label': `Copy ${title}` }),
       onPin ? button(pinned ? 'Unpin' : 'Pin', onPin, { id: `${id}-pin`, 'aria-pressed': String(pinned), 'aria-label': `${pinned ? 'Unpin' : 'Pin'} ${title}` }) : null,
-      onContinue ? button('Continue', onContinue, { id: `${id}-continue`, 'aria-label': `Continue with ${title}` }) : null),
-    h('details', {}, h('summary', {}, 'Export'), h('div', { class: 'toolbar' },
-      button('Download selected view', () => download(representations[selected], `${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.txt`, 'text/plain;charset=utf-8')),
-      value.type === 'bytes' ? button('Download exact bytes', () => download(value.data, 'cube-result.bin')) : null)));
+      onContinue ? button('Use as input', onContinue, { id: `${id}-continue`, 'aria-label': `Use as input: ${title}` }) : null),
+    h('details', {id:`${id}-export`}, h('summary', {id:`${id}-export-toggle`}, 'Export'), h('div', { class: 'toolbar' },
+      button('Download selected view', () => download(representations[selected], `${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.txt`, 'text/plain;charset=utf-8'),{id:`${id}-download-view`}),
+      value.type === 'bytes' ? button('Download exact bytes', () => download(value.data, 'cube-result.bin'),{id:`${id}-download-bytes`}) : null)));
 }

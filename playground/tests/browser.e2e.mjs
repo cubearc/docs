@@ -1,3 +1,4 @@
+import { navigateActivity, manualExecution } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { verifyFileReadOrdering } from './support/file-ordering.mjs';
@@ -42,12 +43,8 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
     await writeFile(accessibilityReport, `${JSON.stringify({ formatVersion: 1, scope: 'Automated WCAG A/AA rules, not manual accessibility certification', browser: engine, browserVersion: browser.version(), snapshots: accessibility }, null, 2)}\n`);
   });
   async function waitForSection(section) {
-    await page.waitForFunction(section => {
-      const active = document.querySelector('nav[aria-label="Primary"] a[aria-current="page"]');
-      const marker = section === 'playground' ? '#playground-heading' : section === 'tools' ? '#tool-search' : '#main h1';
-      return active?.hash === `#/${section}` && Boolean(document.querySelector(marker)) &&
-        (section !== 'pipelines' || document.querySelector(marker).textContent === 'Pipelines');
-    }, section);
+    if(section==='tools'){await page.locator('#tool-search').waitFor();return;}
+    await page.getByRole('heading',{level:1,name:section==='playground'?'Multidecoder':'Pipelines',exact:true}).waitFor();
   }
   async function auditAccessibility(label, target = page) {
     await target.evaluate(() => document.fonts.ready);
@@ -59,7 +56,8 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
         violations: result.violations.map(summary), incomplete: result.incomplete.map(summary) };
     });
     accessibility.push({ label, ...result });
-    if (label.startsWith('narrow-')) assert.equal(result.section, `#/${label.slice('narrow-'.length)}`, 'Accessibility evidence must describe the requested rendered section.');
+    if(label==='narrow-tools')assert.equal(result.heading,'Base64','Narrow tool evidence describes its active workspace.');
+    else if(label.startsWith('narrow-'))assert.equal(result.section,`#/${label.slice('narrow-'.length)}`);
   }
 
   if (evidence) await mkdir(evidence, { recursive: true });
@@ -81,13 +79,14 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   page.on('request', request => { if (!request.url().startsWith(origin) && !request.url().startsWith('blob:')) external.push(request.url()); });
   await page.goto(`${origin}/docs/playground/`);
   await verifyNewBindings(context,origin,auditAccessibility);
-  await page.getByRole('heading', { name: 'Decode text', exact: true }).waitFor({ timeout: 45000 });
+  await page.getByRole('heading', { name: 'Multidecoder', exact: true }).waitFor({ timeout: 45000 });
   await auditAccessibility('first-use');
-  await page.getByRole('button', { name: 'Try an example', exact: true }).click();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await manualExecution(page);
+  await page.locator('#playground-input').fill('SGVsbG8sIEN1YmUh');
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   const base64 = page.locator('[data-result-operation="encoding.base64.decode"]');
   await base64.getByText('Hello, Cube!', { exact: true }).waitFor({ timeout: 30000 });
-  await page.getByRole('button', { name: 'Run tools', exact: true }).waitFor({ state: 'visible' });
+  await page.getByRole('button', { name: 'Run', exact: true }).waitFor({ state: 'visible' });
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   await captureScreen('decode-results');
   await auditAccessibility('decode-results');
@@ -99,7 +98,7 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await base64.getByRole('button', { name: 'Copy', exact: false }).click();
   if (engine === 'chromium') assert.equal(await page.evaluate(() => navigator.clipboard.readText()), 'Hello, Cube!');
   else await page.waitForFunction(() => /Copied the complete|Clipboard access is unavailable/.test(document.querySelector('#notice').textContent));
-  await base64.getByRole('button', { name: 'Continue', exact: false }).click();
+  await base64.getByRole('button', { name: 'Use as input:', exact: false }).click();
   await page.getByRole('button', { name: 'Continue as UTF-8 text', exact: true }).click();
   assert.equal(await page.locator('#playground-input').inputValue(), 'Hello, Cube!');
   await page.getByRole('button', { name: 'Save chosen sequence', exact: true }).click();
@@ -156,9 +155,11 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await page.locator('[data-step="2"]').getByRole('button', { name: 'Remove', exact: true }).click();
 
 
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'All tools', exact: true }).click();
+  await navigateActivity(page,'All tools');
   await page.locator('#tool-search').fill('Base64');
   await page.locator('[data-tool="encoding.base64"]').click();
+  await manualExecution(page);
+  await page.getByText('About this tool',{exact:true}).click();
   await page.getByRole('heading', { name: 'Example', exact: true }).waitFor({ timeout: 3000 });
   assert.ok((await page.getByLabel('Example input input', { exact: true }).textContent()).includes('AP8='));
   assert.ok((await page.getByLabel('Example output output', { exact: true }).textContent()).includes('base64'));
@@ -169,6 +170,7 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   const staleDetails = '**/tool-details/encoding.base64.encode.json';
   await page.route(staleDetails, async route => { const response = await route.fetch(); const data = await response.json(); await route.fulfill({ response, json: { ...data, catalog_sha256: 'stale' } }); });
   await page.locator('#tool-action').selectOption('encoding.base64.encode');
+  await page.getByText('About this tool',{exact:true}).click();
   await page.getByText('Tool detail identity differs from the selected operation. Reload the complete site.', { exact: true }).waitFor({ timeout: 3000 });
   await page.unroute(staleDetails);
   await page.getByRole('button', { name: 'Retry reference details', exact: true }).click();
@@ -179,15 +181,16 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   assert.equal(await page.locator('#tool-action').inputValue(), 'encoding.base64.encode');
   await page.goto(`${origin}/docs/playground/#/tools/encoding.base64.decode/999`);
   await page.getByText('This link requests operation version 999. This catalog provides version 1. Choose the current version to use this tool.', { exact: true }).waitFor();
-  assert.equal(await page.getByRole('button', { name: 'Use tool', exact: true }).isDisabled(), true);
+  assert.equal(await page.locator('#run-tools').isDisabled(), true);
+  await manualExecution(page);
   await page.getByRole('button', { name: 'Open current version', exact: true }).click();
   assert.equal(await page.locator('#tool-action').inputValue(), 'encoding.base64.decode');
-  await page.getByRole('button', { name: 'Use tool', exact: true }).click();
+  await manualExecution(page);
   await page.locator('#playground-input').fill('!not base64!');
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
-  await page.getByText('Not applicable or needs options (1)', { exact: true }).waitFor({ timeout: 30000 });
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
+  await page.locator('.execution-errors').waitFor({ timeout: 30000 });
   await page.locator('#playground-input').fill('AP8=');
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.locator('[data-result-operation="encoding.base64.decode"]').waitFor({ timeout: 30000 });
   const binary = page.locator('[data-result-operation="encoding.base64.decode"]');
   await binary.getByText('Export', { exact: true }).click();
@@ -196,42 +199,45 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await page.locator('#playground-input').fill('changed');
   await binary.getByText('From an earlier input or settings.', { exact: true }).waitFor();
 
+  await navigateActivity(page,'Playground');
   await page.getByRole('button', { name: 'Encode', exact: true }).click();
   await page.locator('#playground-file').setInputFiles({ name: 'exact-bytes.bin', mimeType: 'application/octet-stream', buffer: Buffer.from([0, 255]) });
   await page.getByText('exact-bytes.bin', { exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   assert.equal(await page.getByLabel('Encode Base64 contents', { exact: true }).textContent(), 'AP8=', 'A binary file must reach Core without text replacement or coercion.');
   await auditAccessibility('binary-file-encode');
   await page.getByRole('button', { name: 'Decode', exact: true }).click();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   assert.equal(await page.locator('[data-result-operation]').count(), 0, 'Invalid UTF-8 bytes must not become replacement-character success.');
-  await page.getByText('Not applicable or needs options (1)', { exact: true }).click();
+  await page.locator('.execution-errors').waitFor();
   assert.match(await page.locator('#results-section .compact-list').textContent(), /UTF-8|encoding/i);
   await auditAccessibility('invalid-utf8-file');
   await page.locator('#playground-file').setInputFiles({ name: 'unicode-lines.txt', mimeType: 'text/plain', buffer: Buffer.from('café\r\n', 'utf8') });
   await page.getByText('unicode-lines.txt', { exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   assert.equal(await page.getByLabel('Decode UTF-8 contents', { exact: true }).textContent(), 'café\r\n', 'Files retain Unicode and exact CRLF data through the explicit UTF-8 operation.');
   await auditAccessibility('unicode-file-decode');
   await page.getByRole('button', { name: 'Encode', exact: true }).click();
-  await page.getByRole('button', { name: 'Try an example', exact: true }).click();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByText('Input actions',{exact:true}).click();
+  await page.getByRole('button',{name:'Clear',exact:true}).click();
+  await page.locator('#playground-input').fill('Hello, Cube!');
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   assert.equal(await page.locator('[data-result-operation="encoding.base64.encode"]').count(), 1);
   assert.equal(await page.locator('.input-options').evaluate(node => [...node.childNodes].some(child => child.nodeType === 3 && child.textContent.includes('null'))), false);
   await captureScreen('encode-results');
   await auditAccessibility('encode-results');
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'All tools', exact: true }).click();
+  await navigateActivity(page,'All tools');
   await page.locator('#tool-search').fill('file.info.inspect');
   await page.locator('[data-tool="file.info.inspect"]').click();
-  assert.equal(await page.getByRole('button', { name: 'Use tool', exact: true }).isDisabled(), false);
-  await page.getByRole('button', { name: 'Use tool', exact: true }).click();
+  assert.equal(await page.locator('#run-tools').isDisabled(), false);
+  await manualExecution(page);
   await page.locator('#playground-file').setInputFiles({ name: 'opaque.bin', mimeType: 'application/octet-stream', buffer: Buffer.from([0,255,128]) });
   await page.getByText('opaque.bin', { exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   const inspected = JSON.parse(await page.locator('[data-result-operation="file.info.inspect"] .viewer pre').first().textContent());
   assert.equal(inspected.size,3);
@@ -240,15 +246,16 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   assert.equal(inspected.modified,null);
   assert.equal(inspected.created,null);
   await auditAccessibility('file-artifact-result');
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'All tools', exact: true }).click();
+  await navigateActivity(page,'All tools');
   await page.locator('#tool-search').fill('binary.xor');
   await page.locator('[data-tool="binary.xor"]').click();
-  await page.getByRole('button', { name: 'Use tool', exact: true }).click();
+  await manualExecution(page);
+  await page.getByText('Input actions',{exact:true}).click();
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
   await page.locator('#playground-input').fill('Keep this input');
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
-  await page.getByText('Not applicable or needs options (1)', { exact: true }).waitFor();
-  await page.getByText('Not applicable or needs options (1)', { exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
+  await page.locator('.execution-errors').waitFor();
+  await page.locator('.execution-errors').waitFor();
   await page.getByText('Add key to use this tool.', { exact: true }).waitFor();
   await auditAccessibility('missing-key');
   const beforeFile = await page.locator('#playground-input').inputValue();
@@ -258,7 +265,7 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   for (const width of [1440, 1100, 834, 700, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     for (const section of ['playground', 'pipelines', 'tools']) {
-      await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: section === 'playground' ? 'Playground' : section === 'pipelines' ? 'Pipelines' : 'All tools', exact: true }).click();
+      await navigateActivity(page,section === 'playground' ? 'Playground' : section === 'pipelines' ? 'Pipelines' : 'All tools');
       await waitForSection(section);
       if (section === 'tools') { await page.locator('#tool-search').fill('Base64'); await page.locator('[data-tool="encoding.base64"]').click(); }
       const smallControls = await page.evaluate(() => [...document.querySelectorAll('main button, main select, main input:not([type=file]), main .check')].filter(node => node.getClientRects().length && !(node.matches('input[type=checkbox]') && node.closest('.check'))).map(node => ({ tag: node.tagName, id: node.id, height: node.getBoundingClientRect().height })).filter(node => node.height < 43.5));
@@ -271,18 +278,17 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
       assert.ok(dimensions.scroll <= dimensions.width, `${section} overflow at ${width}: ${dimensions.scroll}`);
       if (evidence && [1440, 834, 390, 320].includes(width)) await page.screenshot({ path: `${evidence}/${section}-${width}.png`, fullPage: true });
       if (width === 320) await auditAccessibility(`narrow-${section}`);
-      if (section === 'tools' && width <= 700) {
-        await page.getByRole('button', { name: '← Back to tools', exact: true }).tap();
-        assert.equal(await page.locator('#tool-search').inputValue(), 'Base64');
-        await page.waitForFunction(() => document.activeElement?.getAttribute('data-tool') === 'encoding.base64');
-        assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-tool')), 'encoding.base64');
-        await page.locator('[data-tool="encoding.base64"]').waitFor({ state: 'visible' });
+      if(section==='tools'&&width<=700){
+        await page.locator('#toggle-tools').tap();
+        assert.equal(await page.locator('#tool-search').inputValue(),'Base64');
+        await page.getByRole('button',{name:'Close tools',exact:true}).click();
+        assert.equal(await page.locator('#toggle-tools').evaluate(node=>node===document.activeElement),true);
       }
     }
   }
   await page.keyboard.press('Tab');
   assert.ok(await page.evaluate(() => document.activeElement !== document.body));
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Pipelines', exact: true }).click();
+  await navigateActivity(page,'Pipelines');
   await page.locator('input[accept]').setInputFiles({ name: 'pipeline.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(exportedDocument)) });
   await page.waitForFunction(() => document.querySelector('#pipeline-input')?.value === '');
   assert.equal(await page.locator('[data-step]').count(), 2);
@@ -321,22 +327,23 @@ test('packed SDK powers responsive rounds, pipelines, persistence and complete d
   await blockedStorage.addInitScript(() => Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Storage disabled', 'SecurityError'); } }));
   blockedStorage.on('pageerror', error => errors.push(error.message));
   await blockedStorage.goto(`${origin}/docs/playground/`);
-  await blockedStorage.getByRole('heading', { name: 'Decode text', exact: true }).waitFor({ timeout: 45000 });
-  await blockedStorage.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Pipelines', exact: true }).click();
+  await blockedStorage.getByRole('heading', { name: 'Multidecoder', exact: true }).waitFor({ timeout: 45000 });
+  await navigateActivity(blockedStorage,'Pipelines');
   await blockedStorage.getByRole('heading', { name: 'Recover saved pipelines', exact: true }).waitFor();
   await blockedStorage.close();
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Playground', exact: true }).click();
+  await navigateActivity(page,'Playground');
   page.once('dialog', dialog => dialog.accept());
+  await page.getByText('Session history',{exact:true}).click();
   await page.getByRole('button', { name: 'Clear session history', exact: true }).click();
   await page.getByRole('button', { name: 'Encode', exact: true }).click();
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   assert.equal(await page.getByLabel('Encode Base64 contents', { exact: true }).textContent(), '', 'Empty output is a valid real result rather than a loading or missing-result state.');
   await auditAccessibility('empty-input-encode');
   const longText = 'x'.repeat(6000);
   const longEncoded = Buffer.from(longText).toString('base64');
   await page.locator('#playground-input').fill(longText);
-  await page.getByRole('button', { name: 'Run tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.waitForFunction(() => !document.querySelector('#run-tools').disabled);
   const longResult = page.locator('[data-result-operation="encoding.base64.encode"]');
   assert.equal(await longResult.getByLabel('Encode Base64 contents', { exact: true }).textContent(), longEncoded.slice(0, 4096));

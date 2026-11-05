@@ -1,5 +1,13 @@
 import { snapshot } from './data.mjs';
 
+export function pipelineCompatibility(draft,action,runtime) {
+  if(!action.pipeline)return {compatible:false,reason:'No supported linear pipeline adapter.'};
+  if(draft.advanced)return {compatible:false,reason:'This imported definition is preserved exactly. Start a new editable pipeline to add steps.'};
+  const previous=draft.steps.at(-1);
+  const type=previous?runtime.action(previous.operation)?.pipeline?.output_type:draft.input.type;
+  return type===action.pipeline.input_type?{compatible:true}:{compatible:false,reason:`The pipeline supplies ${type}; this step needs ${action.pipeline.input_type}. Add an explicit conversion in Pipelines first.`};
+}
+
 function failure(message) { const error = new Error(message); error.code = 'resource_limit'; return error; }
 function bytes(value) {
   if (value instanceof Uint8Array) return value.byteLength;

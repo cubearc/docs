@@ -70,10 +70,10 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     parameters: () => snapshot(parameters()),
     param: name => parameters()[name] ?? fieldsFor(action).find(field => field.name === name)?.default,
     extra: name => extra()[name] ?? '',
-    setInput,
-    setText: text => setInput({ type: 'text', data: text }, {preservePresentation:true}),
-    setParam(name, value) { Object.defineProperty(parameters(), name, {value,enumerable:true,configurable:true,writable:true}); changed(); },
-    setExtra(name, value) { Object.defineProperty(extra(), name, {value,enumerable:true,configurable:true,writable:true}); changed(); },
+    setInput(value,options) {if(!disposed&&page.tool===action.id)setInput(value,options);},
+    setText: text => api.setInput({ type: 'text', data: text }, {preservePresentation:true}),
+    setParam(name, value) { if(disposed||page.tool!==action.id)return;Object.defineProperty(parameters(), name, {value,enumerable:true,configurable:true,writable:true}); changed(); },
+    setExtra(name, value) { if(disposed||page.tool!==action.id)return;Object.defineProperty(extra(), name, {value,enumerable:true,configurable:true,writable:true}); changed(); },
     revision: () => page.revision,
     isCurrent: (revision = page.revision) => !disposed && page.tool === action.id && revision === page.revision,
     choices: name => fieldsFor(action).find(field => field.name === name)?.constraints.choices ?? [],
@@ -81,9 +81,9 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
     stale: () => Boolean(record()?.earlierInput),
     snapshot: () => snapshot(record()?.snapshot ?? null),
     refresh,
-    selectAction,
-    loadExample,
-    convertInput,
+    selectAction: id=>{if(!disposed&&page.tool===action.id)selectAction(id);},
+    loadExample: ()=>{if(!disposed&&page.tool===action.id)loadExample();},
+    convertInput: id=>{if(!disposed&&page.tool===action.id)convertInput(id);},
     useOutput(name) {
       if (!disposed && evidence?.outputs[name]) continueOutput?.(evidence, name);
     },
@@ -95,14 +95,19 @@ export function instrumentShell({ page, action, descriptor, runtime, changed, se
       page.redraw?.();
     },
     async execute(id, inputs, options = {}) {
+      if(disposed||page.tool!==action.id||page.routeError)throw new Error('Open the current tool version before running this analysis.');
+      page.scheduler?.cancel();
       const revision = page.revision;
       const controller = new AbortController();
       page.auxiliary?.abort(); page.auxiliary = controller;
       const current = runtime.action(id);
       if (!current?.direct) throw new Error('This analysis is not available in the installed SDK.');
-      const result = await runtime.call('execute', [{operation:id,version:current.direct.version,inputs,parameters:options}], { signal:controller.signal,context:{section:'instrument',revision} });
-      if (controller.signal.aborted || disposed || revision !== page.revision || page.tool !== action.id) throw new Error('The input or tool changed. This earlier analysis was not applied.');
-      return result;
+      page.auxiliaryRunning=true;page.redraw?.();
+      try {
+        const result = await runtime.call('execute', [{operation:id,version:current.direct.version,inputs,parameters:options}], { signal:controller.signal,context:{section:'instrument',revision} });
+        if (controller.signal.aborted || disposed || revision !== page.revision || page.tool !== action.id) throw new Error('The input or tool changed. This earlier analysis was not applied.');
+        return result;
+      } finally {if(page.auxiliary===controller){page.auxiliaryRunning=false;page.redraw?.();}}
     },
   };
   const token = state.open(descriptor.kind, page.revision);

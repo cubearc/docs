@@ -1,0 +1,137 @@
+/* Persistent shell: catalog navigation has its own scroll and lifetime. */
+.workbench-app{--workbench-header:max(56px,3.5rem)}
+.workbench-app .site-header{min-height:var(--workbench-header);padding:.25rem 1rem;gap:1rem;position:relative;z-index:20}
+.workbench-app .brand{font-size:1.25rem;letter-spacing:-.03em}
+.workbench-app .brand img{width:32px;height:32px}
+.header-context{font-size:.9rem;color:var(--muted);border-left:1px solid var(--line);padding-left:1rem}
+.workbench-app .external-links{margin-left:auto}
+#toggle-tools{display:none}
+.app-layout{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:calc(100vh - var(--workbench-header));align-items:start}
+.tool-sidebar{position:sticky;top:0;height:100dvh;overflow:auto;overscroll-behavior:contain;background:var(--surface);border-right:1px solid var(--line);padding:1rem .75rem;min-width:0;scrollbar-gutter:stable}
+.sidebar-search{padding:0 .25rem .6rem}
+.sidebar-search label{font-size:.85rem}
+.sidebar-search input{width:100%;font-size:.95rem}
+.sidebar-search p:empty{display:none}
+.sidebar-activities{display:grid;border-bottom:1px solid var(--line);padding-bottom:.75rem;margin-bottom:.5rem}
+.sidebar-activities a{display:flex;align-items:center;min-height:44px;border-radius:6px;padding:.6rem .75rem;text-decoration:none;color:var(--ink);font-weight:600;font-size:.9rem}
+.sidebar-activities a[aria-current=page],.sidebar-tool.selected{background:var(--pale);color:var(--blue);box-shadow:inset 3px 0 var(--blue)}
+.sidebar-section-title{font-size:.8rem;font-weight:650;color:var(--muted);margin:.75rem .75rem .3rem}
+.sidebar-favorites{padding-bottom:.75rem;border-bottom:1px solid var(--line)}
+.sidebar-favorites>p{margin:.3rem .75rem;font-size:.8rem}
+.sidebar-categories>details{border-bottom:1px solid var(--line)}
+.sidebar-categories summary{font-size:.85rem;padding:.75rem .4rem;line-height:1.35}
+.sidebar-tool{display:flex;text-align:left;justify-content:flex-start;width:100%;min-height:40px;border:0;border-radius:5px;background:transparent;padding:.55rem .75rem;font-size:.875rem;font-weight:450;line-height:1.4;margin:.1rem 0}
+.sidebar-tool:hover{background:var(--background)}
+.workbench-app main{max-width:1500px;width:100%;margin:0 auto;padding:1.25rem 1.5rem 2rem;min-height:0}
+.workbench-app .heading,.workbench-app .heading.instrument-heading{max-width:none;margin-bottom:.75rem;display:flex;align-items:baseline;gap:.5rem 1rem;flex-wrap:wrap}
+.workbench-app h1,.workbench-app .instrument-heading h1{font-size:1.55rem;letter-spacing:-.035em;margin:0;line-height:1.3}
+.workbench-app .heading>p{margin:0}
+.tool-help{font-size:.875rem;flex:1 1 15rem;min-width:0}
+.tool-help>summary{color:var(--muted);font-size:.85rem;min-height:32px;padding:.3rem 0}
+.tool-help[open]{flex-basis:100%;max-width:64rem}
+.tool-help[open]>p{max-width:75ch}
+.tool-help section{margin-top:1rem}
+.workspace-tool-actions{margin-bottom:.75rem}
+.workspace-tool-actions>button{font-size:.8rem;min-height:44px;padding:.35rem .7rem}
+.workbench-app .text-workspace{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.25rem}
+.workbench-app .text-workspace>.instrument-command-bar{grid-area:auto;grid-column:1/-1;padding-bottom:.5rem}
+.workbench-app .text-workspace .instrument-action{display:flex;align-items:center;gap:.75rem;margin:0;max-width:100%;min-width:0}
+.workbench-app .text-workspace .instrument-action select{width:auto;max-width:28rem;min-width:0}
+.workbench-app .text-workspace>.input-panel{display:block;min-width:0;padding:1rem}
+.workbench-app .text-workspace .input-text{min-height:250px}
+.workbench-app .text-workspace .result-grid{grid-template-columns:minmax(0,1fr)}
+.workbench-app .text-workspace .result-header h2{font-size:1.1rem;margin:0}
+.workbench-app .text-workspace .result-header{margin-top:.25rem}
+.workbench-app .text-workspace .result-header>p{margin:.6rem 0;font-size:.8rem}
+.workbench-app .section-jumps{display:none}
+.workbench-app .visual-workspace.instrument-study-workspace{gap:.85rem;grid-template-columns:minmax(0,1fr)}
+.workbench-app .instrument-study-workspace>.input-panel{padding:.75rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.6fr);gap:1rem}
+.workbench-app .instrument-study-workspace .input-options{display:block}
+.workbench-app .instrument-study-workspace .input-options>.check{margin:0}
+.workbench-app .instrument-study-workspace .input-options>.toolbar{border:0;padding:0}
+.workbench-app .instrument-study-workspace .input-options>.auto-status{margin:.3rem 0;font-size:.75rem}
+.workbench-app .instrument-study-workspace .input-options>[role=status]{margin:.3rem 0 0}
+.workbench-app .instrument-study-workspace .input-main{align-self:start}
+.workbench-app .instrument-study-workspace .input-text{min-height:72px}
+.workbench-app .instrument-study-workspace>.instrument-surface{padding:1rem}
+.workbench-app .auto-status{line-height:1.4;margin:.5rem 0}
+.workbench-app .result-card{padding:1rem}
+.workbench-app .result-card .viewer{max-height:360px}
+.workbench-app .result-card .row>h3{font-size:.95rem}
+.workbench-app .result-card>.row>.tag{font-size:.7rem}
+.workbench-app footer{max-width:none;margin-left:260px;padding:1rem 1.5rem;border-top:1px solid var(--line)}
+.drawer-close{display:none}
+.drawer-backdrop{position:fixed;inset:0;background:#14203366;border:0;border-radius:0;width:100%;height:100%;max-width:none;z-index:40}
+.workbench-app .workspace-navigation{margin-top:1.5rem}
+@media(max-width:1100px){
+  .app-layout{grid-template-columns:230px minmax(0,1fr)}
+  .workbench-app main{padding:1rem}
+  .workbench-app footer{margin-left:230px}
+  .workbench-app .text-workspace{grid-template-columns:minmax(0,1fr)}
+  .workbench-app .text-workspace .input-text{min-height:160px}
+  .workbench-app .instrument-study-workspace>.input-panel{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:760px){
+  .app-layout{display:block}
+  .tool-sidebar{display:none;position:fixed;inset:0 auto 0 0;z-index:50;top:0;width:min(320px,calc(100vw - 40px));height:100dvh;border-right:1px solid var(--line);box-shadow:8px 0 32px #14203322}
+  .tool-sidebar.drawer-open{display:block}
+  .drawer-close{display:flex;width:100%;margin-bottom:.75rem}
+  #toggle-tools{display:inline-flex;font-size:.85rem;margin-left:auto}
+  .workbench-app .external-links{margin-left:0;font-size:.8rem}
+  .workbench-app .external-links a:last-child{display:none}
+  .header-context{display:none}
+  .workbench-app .site-header{flex-wrap:wrap;padding:.25rem .75rem;gap:.6rem}
+  .workbench-app main{padding:1rem .75rem 1.5rem}
+  .workbench-app footer{margin-left:0;padding:1rem .75rem}
+  .workbench-app h1,.workbench-app .instrument-heading h1{font-size:1.35rem}
+  .workbench-app .heading{align-items:start}
+  .tool-help>summary{min-height:44px}
+  .workbench-app .text-workspace>.input-panel{padding:.8rem}
+  .workbench-app .text-workspace .input-text{min-height:180px}
+  .workbench-app .text-workspace .instrument-action{flex-wrap:wrap;width:100%}
+  .workbench-app .text-workspace .instrument-action select{width:100%;max-width:none}
+  .workbench-app .instrument-study-workspace>.input-panel{padding:.75rem;display:block}
+  .workbench-app .instrument-study-workspace .input-options{margin-top:.6rem}
+  .workbench-app .instrument-study-workspace>.instrument-surface{padding:.75rem}
+  .workspace-tool-actions{align-items:start}
+  .workspace-tool-actions>span{flex-basis:100%}
+  .drawer-visible{overflow:hidden}
+}
+@media(prefers-reduced-motion:reduce){.workbench-app{scroll-behavior:auto}}
+
+/* Compact working chrome; input and evidence remain the dominant surfaces. */
+.workbench-app .text-workspace .input-text{min-height:240px}
+.workbench-app .text-workspace .input-options>.check{margin:0}
+.workbench-app .text-workspace .input-options>[role=status]{margin:.25rem 0 0}
+.workbench-app .text-workspace .input-options>.toolbar:empty{display:none}
+.workbench-app .text-workspace .input-options>.toolbar:not(:has(button:not([hidden]))){display:none}
+.workbench-app .text-workspace .input-options>.auto-status:empty{display:none}
+.workbench-app .text-workspace .study-input-actions{margin:.5rem 0;font-size:.8rem}
+.workbench-app .text-workspace .study-input-actions[open]{padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+.workbench-app .text-workspace .result-header .segmented{background:transparent;border:0;padding:0}
+.workbench-app .text-workspace .result-header .segmented button{font-size:.8rem;padding:.4rem .75rem;min-height:44px;color:var(--muted)}
+.workbench-app .text-workspace .result-header .segmented button[aria-pressed=true]{color:var(--blue);background:var(--pale)}
+.workbench-app .text-workspace .result-card .viewer{min-height:100px;background:#f6f8fb;border:1px solid var(--line)}
+.workbench-app .text-workspace .result-card .viewer pre{line-height:1.65}
+.workbench-app .workspace-navigation{border-top:1px solid var(--line);padding-top:.3rem;font-size:.8rem;color:var(--muted);margin-top:1rem}
+.workbench-app .workspace-navigation>summary{min-height:44px}
+.workbench-app .workspace-navigation>button{color:var(--ink)}
+.sidebar-search>p{margin:.4rem 0 0;font-size:.75rem}
+.sidebar-activities{margin-top:.25rem}
+@media(max-width:760px){.workbench-app .text-workspace .input-text{min-height:160px}.workbench-app .text-workspace .result-card .viewer{min-height:80px}}
+
+.workbench-app .heading>.workspace-tool-actions{margin:0 0 0 auto;flex:0 1 auto}
+.workbench-app .heading{align-items:center}
+@media(max-width:760px){.workbench-app .heading>.workspace-tool-actions{margin:0;flex-basis:100%}}
+
+@media(max-width:760px){.workbench-app .section-jumps{display:flex;margin-bottom:.5rem;gap:.5rem}.workbench-app .section-jumps a{background:transparent;border-color:transparent;min-height:36px;padding:.3rem .5rem;font-size:.85rem}}
+
+/* Keep execution controls beside the live-update preference, leaving the
+   instrument within reach even for operations that require an explicit run. */
+.workbench-app .instrument-study-workspace .input-options{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.25rem .5rem;align-items:center}
+.workbench-app .instrument-study-workspace .input-options>.auto-control{grid-column:1;grid-row:1}
+.workbench-app .instrument-study-workspace .input-options>.toolbar{grid-column:2;grid-row:1;margin:0;flex-wrap:nowrap}
+.workbench-app .instrument-study-workspace .input-options>.toolbar button{flex:0 0 auto}
+.workbench-app .instrument-study-workspace .input-options>.auto-status,.workbench-app .instrument-study-workspace .input-options>[role=status],.workbench-app .instrument-study-workspace .input-options>.check:not(.auto-control){grid-column:1/-1}
+.workbench-app .instrument-study-workspace .input-options>.auto-status:empty{display:none}
+@media(max-width:390px){.workbench-app .instrument-study-workspace .input-options{grid-template-columns:minmax(0,1fr)}.workbench-app .instrument-study-workspace .input-options>.toolbar{grid-column:1;grid-row:auto}}

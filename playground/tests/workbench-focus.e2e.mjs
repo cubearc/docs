@@ -1,3 +1,4 @@
+import { navigateActivity, manualExecution } from './support/workspace.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { instrumentBrowser } from './support/instrument-browser.mjs';
@@ -99,9 +100,9 @@ test('leaving an indexing request does not write an old error into the next book
  const input=await page.locator('#book-source').inputValue();
  await page.evaluate(()=>{window.holdBookOperation='text.word.lengths';});
  await page.locator('#book-index').click();await page.waitForFunction(()=>typeof window.releaseBookReply==='function');
- await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'All tools',exact:true}).click();await page.locator('#tool-search').waitFor();
+ await navigateActivity(page,'All tools');await page.locator('#tool-search').fill('Base64');await page.locator('[data-tool="encoding.base64"]').click();
  await page.evaluate(()=>window.releaseBookReply());
- await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'Playground',exact:true}).click();await page.locator('.book-open-spread').waitFor();
+ await page.evaluate(()=>{location.hash='#/tools/cipher.book.decode/1';});await page.locator('.book-open-spread').waitFor();
  assert.equal(await page.locator('.instrument .error').count(),0,'A disposed index request must not leave an error on the replacement view.');
  assert.equal(await page.locator('#book-source').inputValue(),input);
  await page.locator('#book-index').click();await page.locator('#book-cell-0').waitFor();
@@ -119,7 +120,7 @@ test('keyboard viewport survives inspection and editor tabs but resets for repla
  await page.locator('#instrument-tab-parameters').click();await page.locator('#instrument-tab-visual').click();
  assert.equal(await source.evaluate(node=>node.scrollLeft),150,'Tabs retain the current local viewport.');
  await page.locator('#playground-file').setInputFiles({name:'replacement.txt',buffer:Buffer.from('replacement')});
- await page.getByText('File ready. Run tools with these exact bytes.',{exact:true}).waitFor();
+ await page.getByText('Exact file bytes loaded.',{exact:true}).waitFor();
  assert.equal(await source.evaluate(node=>node.scrollLeft),0,'A replacement source starts its own viewport.');
  await page.close();
 });
@@ -128,12 +129,12 @@ test('required book and graph choices never imply missing canonical values are c
  const {context,base}=await instrumentBrowser(t,{sourceFiles});
  const page=await context.newPage();
  await page.goto(base+'#/tools/cipher.book.encode/1');
- await page.getByRole('button',{name:'Use tool',exact:true}).click({timeout:45000});await page.locator('#book-scheme').waitFor();
+ await manualExecution(page);await page.locator('#book-scheme').waitFor();
  assert.equal(await page.locator('#book-scheme').inputValue(),'');
  assert.equal(await page.locator('#book-base').inputValue(),'');
  assert.equal(await page.locator('#book-matching').inputValue(),'');
  await page.goto(base+'#/tools/graph.shortest_path/1');
- await page.getByRole('button',{name:'Use tool',exact:true}).click();
+ await manualExecution(page);
  await page.locator('#playground-input').fill(JSON.stringify({directed:false,vertices:['A','B'],edges:[]}));
  assert.equal(await page.locator('#graph-source').inputValue(),'');
  assert.equal(await page.locator('#graph-target').inputValue(),'');

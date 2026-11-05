@@ -1,3 +1,4 @@
+import { navigateActivity, manualExecution, loadCoreExample } from './support/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createServer } from 'node:http';
@@ -35,11 +36,11 @@ test('five mechanical instruments edit canonical config and inspect real worker/
   async function open(id,kind,version = 1) {
     const page = await context.newPage(); page.on('pageerror',error=>errors.push(error.message));
     await page.goto(`${origin}#/tools/${id}/${version}`);
-    await page.getByRole('button',{name:'Use tool',exact:true}).waitFor({timeout:45000});
-    await page.getByRole('button',{name:'Use tool',exact:true}).click();
+    await page.locator('#playground-heading').waitFor({timeout:45000});
+    await manualExecution(page);
     await page.locator(`[data-instrument="${kind}"] .mechanism`).waitFor({timeout:30000});
-    await page.locator('#load-core-example').click();
-    await page.getByText('Synthetic Core example loaded. Run to produce your own result.', {exact:true}).waitFor();
+    await loadCoreExample(page);
+    await page.getByText('Core example loaded.', {exact:true}).waitFor();
     await page.locator(`[data-instrument="${kind}"] .mechanism`).waitFor();
     return page;
   }
@@ -72,7 +73,7 @@ test('five mechanical instruments edit canonical config and inspect real worker/
   async function invalidRun(page) {
     await page.locator('#run-tools').click();
     await page.waitForFunction(()=>!document.querySelector('#run-tools').disabled);
-    await page.getByText(/Not applicable or needs options \(1\)/).waitFor();
+    await page.locator('.execution-errors').waitFor();
     assert.ok((await page.locator('.instrument-surface > .warning').textContent()).includes('earlier input or settings'),'Invalid edits retain and label the earlier instrument evidence.');
     assert.ok(await page.getByText(/Previous rounds and original input/).count(),'Earlier rounds remain accessible.');
   }
@@ -185,10 +186,10 @@ test('five mechanical instruments edit canonical config and inspect real worker/
     await page.evaluate(text => window.__settingsReads[0].resolve(text),JSON.stringify({...settings,strip_series:'example:obsolete'}));
     assert.equal(JSON.parse(await page.locator('#extra-settings').inputValue()).strip_series,'example:second','A late first import cannot overwrite a newer one.');
     await page.locator('#m138-import').setInputFiles({name:'delayed-navigation.json',mimeType:'application/json',buffer:Buffer.from('{}')});
-    await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'All tools',exact:true}).click();
-    await page.locator('#tool-search').waitFor();
+    await navigateActivity(page,'All tools');
+    await page.locator('#tool-search').fill('Base64');await page.locator('[data-tool="encoding.base64"]').click();
     await page.evaluate(text => window.__settingsReads[2].resolve(text),JSON.stringify({...settings,strip_series:'example:obsolete-navigation'}));
-    await page.getByRole('navigation',{name:'Primary'}).getByRole('link',{name:'Playground',exact:true}).click();
+    await page.evaluate(()=>{location.hash='#/tools/cipher.m138a.encode/1';});
     await page.locator('[data-instrument="m138a"] .mechanism').waitFor();
     assert.equal(JSON.parse(await page.locator('#extra-settings').inputValue()).strip_series,'example:second','Leaving the instrument revokes pending settings reads even at the same input revision.');
     await page.locator('#m138-import').setInputFiles({name:'delayed-stop.json',mimeType:'application/json',buffer:Buffer.from('{}')});

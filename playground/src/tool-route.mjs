@@ -22,3 +22,17 @@ export function resolveToolLink(hash, tools, mode = 'Decode') {
       ? `This link requests operation version ${version}. This catalog provides version ${action.contract.operation_version}. Choose the current version to use this tool.` : '',
   };
 }
+
+/** Routes carry navigation only, never user input or sensitive options. */
+export function resolveWorkspaceRoute(hash,tools,mode='Decode') {
+  if(hash && !hash.startsWith('#/'))return null;
+  const [,section,key]=hash.split('/');
+  if(section==='pipelines')return {activity:'pipelines',action:null,routeError:''};
+  if(['tools','tool'].includes(section)&&key){
+    const route=resolveToolLink(hash.replace(/^#\/tool\//,'#/tools/'),tools,mode);
+    const action=tools.flatMap(tool=>tool.actions).find(action=>action.id===route.action)??null;
+    return {activity:'playground',action,routeError:route.routeError};
+  }
+  if(!section||section==='playground'||section==='tools')return {activity:'playground',action:null,routeError:'',search:section==='tools'};
+  return {activity:'playground',action:null,routeError:'This workspace link is unavailable. Select a tool or open Multidecoder.'};
+}

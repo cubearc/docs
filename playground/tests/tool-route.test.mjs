@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { toolLink, resolveToolLink } from '../src/tool-route.mjs';
+import { toolLink, resolveToolLink, resolveWorkspaceRoute } from '../src/tool-route.mjs';
 const action = id => ({ id, contract: { operation_version: 1 } });
 const tools = [{ key: 'encoding.base64', actions: [action('encoding.base64.encode'), action('encoding.base64.decode')] }];
 
@@ -27,4 +27,16 @@ test('split image tools retain their old unversioned family link', () => {
   assert.equal(resolveToolLink('#/tools/image', images).action, 'image.decode');
   assert.equal(resolveToolLink('#/tools/image', images, 'Encode').action, 'image.encode');
   assert.equal(resolveToolLink('#/tools/image.encode/1', images).action, 'image.encode');
+});
+
+
+test('workspace routes restore navigation without carrying input and preserve old links',()=>{
+  assert.equal(resolveWorkspaceRoute('',tools).activity,'playground');
+  assert.equal(resolveWorkspaceRoute('#/pipelines',tools).activity,'pipelines');
+  const route=resolveWorkspaceRoute('#/tools/encoding.base64.decode/1',tools);
+  assert.equal(route.action.id,'encoding.base64.decode');assert.equal(route.routeError,'');
+  assert.equal(resolveWorkspaceRoute('#/tool/encoding.base64.encode/1',tools).action.id,'encoding.base64.encode');
+  assert.match(resolveWorkspaceRoute('#/tools/encoding.base64.decode/999',tools).routeError,/version 999/);
+  assert.equal(resolveWorkspaceRoute('#input-section',tools),null,'in-page references retain mounted navigation');
+  assert.ok(resolveWorkspaceRoute('#/unknown',tools).routeError);
 });

@@ -17,16 +17,16 @@ export const inputBytes = value => value.type==='bytes' ? value.data.byteLength 
 export function automaticPolicy(action,input,{parameters={},extraInputs={},slow=false}={}) {
   if(!action?.available)return {eligible:false,reason:action?.unavailableReason??'This operation is unavailable in this runtime.'};
   if(!lightweight.has(action.id)||action.contract.operation_version!==1||action.contract.policy?.grants_filesystem_access||action.contract.policy?.grants_network_access)
-    return {eligible:false,reason:'Run explicitly for this operation. Searches, programs, media analysis and generation use deliberate execution.'};
+    return {eligible:false,reason:/^(audio|image)\./.test(action.id)?'Run explicitly for media processing.':action.id.startsWith('esolang.')?'Run explicitly within the program budget.':/search|solve|bruteforce|attack/.test(action.id)?'Run explicitly within the search budget.':'Run explicitly for this operation.'};
   if(inputBytes(input)>4096)return {eligible:false,reason:'Input exceeds the 4-KiB automatic budget. Run explicitly with the original input.'};
   if(new TextEncoder().encode(JSON.stringify({parameters,extraInputs},(_,v)=>typeof v==='bigint'?v.toString():v)).byteLength>8192)
     return {eligible:false,reason:'Settings and secondary inputs exceed the 8-KiB automatic budget. Run explicitly.'};
   if(slow)return {eligible:false,reason:'This operation exceeded the live-update time budget. Run explicitly.'};
   return {eligible:true,reason:'Automatic updates · input up to 4 KiB'};
 }
-export function comparisonCandidates(runtime,mode,input) {
+export function comparisonCandidates(runtime,mode,input,{slow=new Set()}={}) {
   const ids=input.type==='bytes'&&mode==='Decode'?['text.utf8.decode']:presets[mode]??presets.Decode;
-  return ids.filter(id=>automaticPolicy(runtime.action(id),input).eligible);
+  return ids.filter(id=>automaticPolicy(runtime.action(id),input,{slow:slow.has(id)}).eligible);
 }
 export function manualComparisons(mode,input) {
   return input.type==='bytes'&&mode==='Decode'?['text.utf8.decode']:presets[mode]??presets.Decode;

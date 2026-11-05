@@ -1,3 +1,4 @@
+import { manualExecution, loadCoreExample } from './workspace.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -30,7 +31,7 @@ export async function instrumentBrowser(t,{sourceFiles=[]}={}) {
  const errors=[];
  const base=`http://127.0.0.1:${server.address().port}/docs/playground/`;
  t.after(()=>assert.deepEqual(errors,[],'No browser errors.'));
- async function open(id,kind,version=1){const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));await page.goto(base+`#/tools/${id}/${version}`);await page.getByRole('button',{name:'Use tool',exact:true}).click({timeout:45000});await ready(page,kind);await page.locator('#load-core-example').click();await page.getByText('Synthetic Core example loaded. Run to produce your own result.',{exact:true}).waitFor();await ready(page,kind);return page;}
+ async function open(id,kind,version=1){const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));await page.goto(base+`#/tools/${id}/${version}`);await manualExecution(page);await ready(page,kind);await loadCoreExample(page);await page.getByText('Core example loaded.',{exact:true}).waitFor();await ready(page,kind);return page;}
  return {open,context,browser,base};
 }
 async function ready(page,kind){await page.waitForFunction(kind=>{const view=document.querySelector(`[data-instrument="${kind}"]`);return view&&!view.textContent.includes('Loading this instrument');},kind);}
