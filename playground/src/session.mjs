@@ -28,6 +28,7 @@ export class Session {
   #revision = 0;
   #rounds = [];
   #preview;
+  #pendingPreview;
   #previewGeneration = 0;
   #previousInput;
   #pins = [];
@@ -44,7 +45,7 @@ export class Session {
   get rounds() { return copy(this.#rounds); }
   get pins() { return copy(this.#pins); }
   get current() { return copy(this.#preview ?? this.#rounds.at(-1) ?? null); }
-  get preview() { return copy(this.#preview ?? null); }
+  get preview() { return copy(this.#preview?.kind === 'preview' ? this.#preview : null); }
   get canRestoreInput() { return Boolean(this.#previousInput); }
 
   latest(operation) {
@@ -58,12 +59,13 @@ export class Session {
   }
 
   #check(...added) {
-    const retained = size({ input: this.#input, root: this.#root, path: this.#path, rounds: this.#rounds, preview: this.#preview, previousInput: this.#previousInput, pins: this.#pins });
+    const retained = size({ input: this.#input, root: this.#root, path: this.#path, rounds: this.#rounds, preview: this.#rounds.includes(this.#preview) ? undefined : this.#preview, pendingPreview: this.#pendingPreview, previousInput: this.#previousInput, pins: this.#pins });
     if (retained + added.reduce((sum, value) => sum + size(value), 0) > this.#limits.maxRetainedBytes) throw limit('Retained session limit reached; export or clear this session.');
   }
 
   invalidate() {
     this.#revision++;
+    this.#pendingPreview = undefined;
     for (const result of this.#preview?.results ?? []) result.earlierInput = true;
     for (const round of this.#rounds) for (const result of round.results) result.earlierInput = true;
     for (const pin of this.#pins) pin.earlierInput = true;
@@ -77,6 +79,7 @@ export class Session {
     this.#root = undefined;
   }
   begin() {
+    this.#pendingPreview = undefined;
     if (this.#rounds.length >= this.#limits.maxRounds) throw limit('Round history limit reached; save the sequence or clear the session.');
     const root = this.#root ?? copy(this.#input);
     const round = { id: this.#nextRound + 1, kind: 'retained', revision: this.#revision, input: copy(this.#input), root: copy(root), path: copy(this.#path), results: [] };
@@ -92,24 +95,30 @@ export class Session {
   beginPreview() {
     const round = { id: `preview-${++this.#previewGeneration}`, kind: 'preview', revision: this.#revision,
       input: copy(this.#input), root: copy(this.#root ?? this.#input), path: copy(this.#path), results: [] };
-    const previous = this.#preview;
-    this.#preview = undefined;
-    try { this.#check(round); }
-    catch (error) { this.#preview = previous; throw error; }
-    this.#preview = round;
+    this.#pendingPreview = undefined;
+    this.#check(round);
+    this.#pendingPreview = round;
     return Object.freeze({ round: round.id, revision: round.revision, preview: true });
   }
+  completePreview(token) {
+    const round = this.#forToken(token);
+    if (!token.preview || !round || token.revision !== this.#revision) return false;
+    this.#pendingPreview = undefined;
+    if (!round.results.length) return false;
+    this.#preview = round;
+    return true;
+  }
   retainPreview() {
-    if (!this.#preview?.results.length) throw new Error('Run a tool before retaining its preview.');
+    if (this.#preview?.kind !== 'preview' || !this.#preview.results.length) throw new Error('Run a tool before retaining its preview.');
     if (this.#rounds.length >= this.#limits.maxRounds) throw limit('Round history limit reached; export or clear history before retaining another preview.');
     const round = this.#preview;
     round.id = ++this.#nextRound; round.kind = 'retained';
     for (const result of round.results) { result.round = round.id; result.kind = 'retained'; }
-    this.#rounds.push(round); this.#preview = undefined;
+    this.#rounds.push(round);
     return copy(round);
   }
   #forToken(token) {
-    return token.preview ? this.#preview?.id === token.round && this.#preview?.revision === token.revision ? this.#preview : null
+    return token.preview ? this.#pendingPreview?.id === token.round && this.#pendingPreview?.revision === token.revision ? this.#pendingPreview : null
       : this.#rounds.find(round => round.id === token.round && round.revision === token.revision);
   }
   inputFor(token) {
@@ -118,7 +127,7 @@ export class Session {
     return copy(round.input);
   }
   accept(token, result) {
-    const round = token.preview ? this.#preview : this.#rounds.at(-1);
+    const round = token.preview ? this.#pendingPreview : this.#rounds.at(-1);
     if (!round || round.id !== token.round || round.revision !== token.revision || this.#revision !== token.revision) return false;
     if (round.results.length >= this.#limits.maxResults) throw limit('Result limit reached for this round.');
     const entry = { ...copy(result), id: this.#nextResult + 1, kind: round.kind, round: round.id, revision: round.revision, earlierInput: false };
@@ -158,14 +167,17 @@ export class Session {
     this.invalidate(); this.#input = previous.input; this.#root = previous.root; this.#path = previous.path;
     this.#previousInput = undefined;
   }
-  pin(id) {
+  pin(id, {outputName,representation}={}) {
     const existing = this.#pins.findIndex(result => result.id === id);
     if (existing >= 0) { this.#pins.splice(existing, 1); return; }
     if (this.#pins.length >= this.#limits.maxPins) throw limit('Pin limit reached; unpin a retained result first.');
     let { result, round } = this.#find(id);
-    const pin = copy({ ...result, input: round.input, root: round.root, path: round.path });
+    if(outputName!==undefined&&!Object.hasOwn(result.outputs,outputName))throw new Error('Choose an exact named output.');
+    if(representation!==undefined&&(typeof representation!=='string'||representation.length>64))throw new Error('Choose a supported output representation.');
+    const selection={selectedOutput:outputName,representation};
+    const pin = copy({ ...result, ...selection, input: round.input, root: round.root, path: round.path });
     this.#check(pin);
     if (round.kind === 'preview') { this.retainPreview(); ({ result, round } = this.#find(id)); }
-    this.#pins.push(copy({ ...result, input: round.input, root: round.root, path: round.path }));
+    this.#pins.push(copy({ ...result, ...selection, input: round.input, root: round.root, path: round.path }));
   }
 }
