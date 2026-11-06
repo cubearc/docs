@@ -14,6 +14,10 @@ function parameterSchema(root, schema = {}) {
     if (!target || typeof target !== 'object') throw new Error('Missing parameter schema definition.');
     schema = { ...target, ...siblings };
   }
+  if (Array.isArray(schema.type)) {
+    const types = schema.type.filter(type => type !== 'null');
+    if (types.length === 1) schema = { ...schema, type: types[0] };
+  }
   return schema;
 }
 

@@ -8,6 +8,18 @@ const action = (schema, defaults = {}) => ({
 });
 const runtime = { call() { throw new Error('Text parameters require no conversion operation.'); } };
 
+test('optional scalar settings accept their native input without a JSON wrapper', async () => {
+  const optional = {
+    contract: { parameters: { type: 'object', properties: {
+      tweak_hex: { type: ['string', 'null'], pattern: '^[0-9a-f]{16}$' },
+      effective_key_bits: { type: ['integer', 'null'] },
+    } } }, direct: { parameters: {} },
+  };
+  assert.deepEqual(await parametersFor(runtime, optional, { tweak_hex: '17f291a9a3aa0400' }), { tweak_hex: '17f291a9a3aa0400' });
+  assert.deepEqual(await parametersFor(runtime, optional, { effective_key_bits: '63' }), { effective_key_bits: 63 });
+  assert.deepEqual(await parametersFor(runtime, optional, { tweak_hex: '', effective_key_bits: '' }), {});
+});
+
 test('referenced required profile enums remain explicit text choices rather than JSON documents', async()=>{
   const profile={contract:{parameters:{type:'object',properties:{profile:{$ref:'#/$defs/Profile'}},required:['profile'],$defs:{Profile:{type:'string',enum:['indexed_primes_v1']}}}},direct:{parameters:{}}};
   assert.deepEqual(fieldsFor(profile)[0].constraints,{type:'text',choices:['indexed_primes_v1']});

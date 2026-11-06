@@ -2045,6 +2045,32 @@
       "aliases": [
         "PURPLE"
       ]
+    },
+    "cipher.block.encrypt_blocks": {
+      "display_name": "Encrypt reference blocks",
+      "summary": "Encrypt complete blocks using an explicit legacy cipher profile and private key.",
+      "aliases": []
+    },
+    "cipher.block.decrypt_blocks": {
+      "display_name": "Decrypt reference blocks",
+      "summary": "Decrypt complete blocks using an explicit legacy cipher profile and private key.",
+      "aliases": []
+    },
+    "cipher.xxtea.encrypt_words": {
+      "display_name": "Encrypt XXTEA word sequence",
+      "summary": "Encrypt one complete little-endian word sequence using an exact private key.",
+      "aliases": [
+        "XXTEA",
+        "Corrected Block TEA"
+      ]
+    },
+    "cipher.xxtea.decrypt_words": {
+      "display_name": "Decrypt XXTEA word sequence",
+      "summary": "Decrypt one complete little-endian word sequence using an exact private key.",
+      "aliases": [
+        "XXTEA",
+        "Corrected Block TEA"
+      ]
     }
   },
   "operations": {
@@ -5052,6 +5078,148 @@
       "summary": "Decipher prepared contacts with qualified switch tables, daily alphabet, speeds and four switch positions.",
       "aliases": [
         "PURPLE"
+      ]
+    },
+    "cipher.block.encrypt_blocks": {
+      "tool_id": "cipher.block.encrypt_blocks",
+      "display_name": "Encrypt reference blocks",
+      "summary": "Encrypt complete blocks using an explicit cipher reference profile and private key.",
+      "aliases": [
+        "LEA",
+        "MIDORI",
+        "LBlock",
+        "KLEIN",
+        "CRAFT",
+        "BORON",
+        "KATAN",
+        "KTANTAN",
+        "SIMON",
+        "SPECK",
+        "PRINCE",
+        "PRIDE",
+        "RECTANGLE",
+        "SKINNY",
+        "GIFT",
+        "PRESENT",
+        "HIGHT",
+        "LED",
+        "Piccolo",
+        "TWINE",
+        "RC5",
+        "CAST-256",
+        "SHACAL-2",
+        "Khazad",
+        "Anubis",
+        "Square",
+        "Noekeon",
+        "Hierocrypt",
+        "TEA",
+        "XTEA",
+        "GOST 28147-89",
+        "Magma",
+        "Kuznyechik",
+        "Camellia",
+        "SEED",
+        "ARIA",
+        "SM4",
+        "CLEFIA",
+        "Twofish",
+        "Serpent",
+        "RC6",
+        "MARS",
+        "Crypton",
+        "E2",
+        "CAST-128",
+        "Skipjack",
+        "SAFER",
+        "MISTY1",
+        "KASUMI",
+        "DES",
+        "Triple DES",
+        "Blowfish",
+        "IDEA",
+        "RC2",
+        "Rijndael"
+      ]
+    },
+    "cipher.block.decrypt_blocks": {
+      "tool_id": "cipher.block.decrypt_blocks",
+      "display_name": "Decrypt reference blocks",
+      "summary": "Decrypt complete blocks using an explicit cipher reference profile and private key.",
+      "aliases": [
+        "LEA",
+        "MIDORI",
+        "LBlock",
+        "KLEIN",
+        "CRAFT",
+        "BORON",
+        "KATAN",
+        "KTANTAN",
+        "SIMON",
+        "SPECK",
+        "PRINCE",
+        "PRIDE",
+        "RECTANGLE",
+        "SKINNY",
+        "GIFT",
+        "PRESENT",
+        "HIGHT",
+        "LED",
+        "Piccolo",
+        "TWINE",
+        "RC5",
+        "CAST-256",
+        "SHACAL-2",
+        "Khazad",
+        "Anubis",
+        "Square",
+        "Noekeon",
+        "Hierocrypt",
+        "TEA",
+        "XTEA",
+        "GOST 28147-89",
+        "Magma",
+        "Kuznyechik",
+        "Camellia",
+        "SEED",
+        "ARIA",
+        "SM4",
+        "CLEFIA",
+        "Twofish",
+        "Serpent",
+        "RC6",
+        "MARS",
+        "Crypton",
+        "E2",
+        "CAST-128",
+        "Skipjack",
+        "SAFER",
+        "MISTY1",
+        "KASUMI",
+        "DES",
+        "Triple DES",
+        "Blowfish",
+        "IDEA",
+        "RC2",
+        "Rijndael"
+      ]
+    },
+    "cipher.xxtea.encrypt_words": {
+      "tool_id": "cipher.xxtea.encrypt_words",
+      "display_name": "Encrypt XXTEA word sequence",
+      "summary": "Encrypt one complete little-endian word sequence using an exact private key.",
+      "aliases": [
+        "XXTEA",
+        "Corrected Block TEA"
+      ]
+    },
+    "cipher.xxtea.decrypt_words": {
+      "tool_id": "cipher.xxtea.decrypt_words",
+      "display_name": "Decrypt XXTEA word sequence",
+      "summary": "Decrypt one complete little-endian word sequence using an exact private key.",
+      "aliases": [
+        "XXTEA",
+        "Corrected Block TEA"
       ]
     }
   }
