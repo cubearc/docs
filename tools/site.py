@@ -323,6 +323,8 @@ def main():
             from stage_playground import stage
             pins = json.loads((ROOT / "sources.lock.json").read_text())["sources"]
             stage(args.playground.resolve(), ROOT / "site", pins["cube"], development=not args.locked)
+        from site_home import stage as stage_home
+        stage_home(ROOT / "home", ROOT / "site")
         prepare_html(ROOT / "site")
         check_html(ROOT / "site")
 

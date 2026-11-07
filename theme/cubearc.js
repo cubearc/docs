@@ -38,7 +38,7 @@
   const header = element("header", "docs-header");
   header.innerHTML = `
     <button type="button" class="docs-icon-button docs-menu" aria-label="Open navigation" aria-controls="mdbook-sidebar" aria-expanded="false">${menuIcon}</button>
-    <a class="docs-brand" href="${href("index.html")}" aria-label="CubeArc documentation home"><img class="docs-brand-logo" src="${href("assets/cubearc-logo.png")}" width="40" height="40" alt=""><span class="docs-wordmark">CubeArc</span><span class="docs-brand-label">Docs</span></a>
+    <a class="docs-brand" href="${href("documentation.html")}" aria-label="CubeArc documentation home"><img class="docs-brand-logo" src="${href("assets/cubearc-logo.png")}" width="40" height="40" alt=""><span class="docs-wordmark">CubeArc</span><span class="docs-brand-label">Docs</span></a>
     <nav aria-label="Products">${Object.entries(names).map(([key, label]) => `<a href="${href(key + "/index.html")}"${product === key ? ' aria-current="true"' : ""}>${label}</a>`).join("")}</nav>
     <div class="docs-header-actions">
       <button type="button" class="docs-icon-button docs-mobile-search" aria-label="Search documentation">${searchIcon}</button>

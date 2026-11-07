@@ -87,3 +87,17 @@ The palette follows the logo's blue face and dark neutral surfaces. Light-theme
 links use `#005fcc`; dark-theme links use `#75b7ff`. Keep the related accent,
 background and focus colors together in `theme/cubearc.css`. Verify contrast on
 the actual backgrounds when adjusting them.
+
+## Product home
+
+`home/index.html` and `home/styles.css` own the Cube product landing page.
+The build publishes it at the site's entry URL and retains the mdBook overview
+at `documentation.html`. Product guides and Playground keep their existing URLs.
+The **Create a challenge** action opens the local challenge authoring guide;
+it does not imply an online publishing service.
+
+The Midnight Signal hero uses an original ImageGen illustration optimized as
+WebP. Its copy, clue labels and Morse symbols are accessible HTML. The artwork
+is an illustrative challenge, not an executable package or hidden payload.
+When revising it, review desktop and mobile layouts and keep the explanatory
+**Follow the clues** disclosure available to keyboard and screen reader users.
