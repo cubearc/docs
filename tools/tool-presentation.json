@@ -2071,6 +2071,59 @@
         "XXTEA",
         "Corrected Block TEA"
       ]
+    },
+    "cipher.stream.encrypt": {
+      "display_name": "Encrypt a reference stream",
+      "summary": "Encrypt bytes or packed bits using an exact historical stream profile and private key/nonce settings.",
+      "aliases": [
+        "RC4",
+        "RC4A",
+        "VMPC",
+        "Spritz",
+        "HC-128",
+        "HC-256",
+        "Rabbit",
+        "SOSEMANUK",
+        "Grain",
+        "MICKEY",
+        "Trivium",
+        "SNOW",
+        "ZUC",
+        "ISAAC",
+        "SEAL",
+        "PANAMA",
+        "SOBER-128",
+        "F-FCSR",
+        "CryptMT",
+        "LEX",
+        "DECIM",
+        "Strumok",
+        "A5",
+        "E0"
+      ]
+    },
+    "cipher.stream.decrypt": {
+      "display_name": "Decrypt a reference stream",
+      "summary": "Decrypt bytes or packed bits using the same historical stream profile and private settings; raw output has no authentication.",
+      "aliases": [
+        "Stream ciphers"
+      ]
+    },
+    "cipher.stream.auth.encrypt": {
+      "display_name": "Encrypt and authenticate with Grain-128a",
+      "summary": "Return packed ciphertext and a detached original Grain-128a tag with explicit message and tag bit counts.",
+      "aliases": [
+        "Grain-128a",
+        "SKEW 2011"
+      ]
+    },
+    "cipher.stream.auth.decrypt": {
+      "display_name": "Verify and decrypt with Grain-128a",
+      "summary": "Verify the detached original Grain-128a tag before returning any plaintext bytes.",
+      "aliases": [
+        "Grain-128a",
+        "SKEW 2011"
+      ]
     }
   },
   "operations": {
@@ -5220,6 +5273,63 @@
       "aliases": [
         "XXTEA",
         "Corrected Block TEA"
+      ]
+    },
+    "cipher.stream.encrypt": {
+      "tool_id": "cipher.stream.encrypt",
+      "display_name": "Encrypt a reference stream",
+      "summary": "Encrypt bytes or packed bits using an exact historical stream profile and private key/nonce settings.",
+      "aliases": [
+        "RC4",
+        "RC4A",
+        "VMPC",
+        "Spritz",
+        "HC-128",
+        "HC-256",
+        "Rabbit",
+        "SOSEMANUK",
+        "Grain",
+        "MICKEY",
+        "Trivium",
+        "SNOW",
+        "ZUC",
+        "ISAAC",
+        "SEAL",
+        "PANAMA",
+        "SOBER-128",
+        "F-FCSR",
+        "CryptMT",
+        "LEX",
+        "DECIM",
+        "Strumok",
+        "A5",
+        "E0"
+      ]
+    },
+    "cipher.stream.decrypt": {
+      "tool_id": "cipher.stream.decrypt",
+      "display_name": "Decrypt a reference stream",
+      "summary": "Decrypt bytes or packed bits using the same historical stream profile and private settings; raw output has no authentication.",
+      "aliases": [
+        "Stream ciphers"
+      ]
+    },
+    "cipher.stream.auth.encrypt": {
+      "tool_id": "cipher.stream.auth.encrypt",
+      "display_name": "Encrypt and authenticate with Grain-128a",
+      "summary": "Return packed ciphertext and a detached original Grain-128a tag with explicit message and tag bit counts.",
+      "aliases": [
+        "Grain-128a",
+        "SKEW 2011"
+      ]
+    },
+    "cipher.stream.auth.decrypt": {
+      "tool_id": "cipher.stream.auth.decrypt",
+      "display_name": "Verify and decrypt with Grain-128a",
+      "summary": "Verify the detached original Grain-128a tag before returning any plaintext bytes.",
+      "aliases": [
+        "Grain-128a",
+        "SKEW 2011"
       ]
     }
   }
