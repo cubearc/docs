@@ -2124,6 +2124,117 @@
         "Grain-128a",
         "SKEW 2011"
       ]
+    },
+    "cipher.aes.mode.encrypt": {
+      "display_name": "Encrypt with an AES byte mode",
+      "summary": "Encrypt bytes with explicit AES byte, CBC ciphertext-stealing or XTS/XEX storage settings. These modes do not authenticate messages.",
+      "aliases": [
+        "AES modes",
+        "SP800-38A",
+        "CBC-CS1/2/3",
+        "XTS-AES",
+        "IEEE1619 XEX"
+      ]
+    },
+    "cipher.aes.mode.decrypt": {
+      "display_name": "Decrypt with an AES byte mode",
+      "summary": "Decrypt bytes with explicit AES byte, CBC ciphertext-stealing or XTS/XEX storage settings. These modes do not authenticate messages.",
+      "aliases": [
+        "AES modes",
+        "SP800-38A",
+        "CBC-CS1/2/3",
+        "XTS-AES",
+        "IEEE1619 XEX"
+      ]
+    },
+    "cipher.aead.encrypt": {
+      "display_name": "Encrypt and authenticate bytes",
+      "summary": "Encrypt bytes with explicit associated data and an exact authenticated profile; return ciphertext and a detached full tag.",
+      "aliases": [
+        "AEAD"
+      ]
+    },
+    "cipher.aead.decrypt": {
+      "display_name": "Verify and decrypt bytes",
+      "summary": "Authenticate ciphertext, associated data and a detached full tag before returning any plaintext.",
+      "aliases": [
+        "AEAD"
+      ]
+    },
+    "cipher.aes.siv.encrypt": {
+      "display_name": "Encrypt with nonce-free AES-SIV",
+      "summary": "Return deterministic ciphertext and a detached synthetic IV while preserving ordered associated-data component boundaries.",
+      "aliases": [
+        "AES-SIV",
+        "RFC5297"
+      ]
+    },
+    "cipher.aes.siv.decrypt": {
+      "display_name": "Verify and decrypt AES-SIV",
+      "summary": "Verify the synthetic IV and ordered associated-data components before returning any plaintext.",
+      "aliases": [
+        "AES-SIV",
+        "RFC5297"
+      ]
+    },
+    "cipher.aes.key_wrap.wrap": {
+      "display_name": "Wrap key bytes with AES",
+      "summary": "Wrap key bytes using explicit RFC3394 AES-KW or RFC5649 AES-KWP settings.",
+      "aliases": [
+        "AES-KW",
+        "AES-KWP",
+        "RFC3394",
+        "RFC5649"
+      ]
+    },
+    "cipher.aes.key_wrap.unwrap": {
+      "display_name": "Verify and unwrap AES key bytes",
+      "summary": "Verify the fixed AES-KW or AES-KWP integrity checks before returning key bytes.",
+      "aliases": [
+        "AES-KW",
+        "AES-KWP",
+        "RFC3394",
+        "RFC5649"
+      ]
+    },
+    "cipher.fpe.encrypt": {
+      "display_name": "Encrypt exact numeral strings",
+      "summary": "Preserve numeral-string length and radix with explicit FF1 or historical FF3/FF3-1 settings.",
+      "aliases": [
+        "FPE",
+        "FF1",
+        "FF3",
+        "FF3-1"
+      ]
+    },
+    "cipher.fpe.decrypt": {
+      "display_name": "Decrypt exact numeral strings",
+      "summary": "Preserve numeral-string length and radix with explicit FF1 or historical FF3/FF3-1 settings.",
+      "aliases": [
+        "FPE",
+        "FF1",
+        "FF3",
+        "FF3-1"
+      ]
+    },
+    "cipher.openssl.decrypt": {
+      "display_name": "Decrypt an explicit OpenSSL legacy file",
+      "summary": "Recover bytes using an explicit Salted__ AES-CBC/KDF/salt profile. Padding success does not authenticate the output.",
+      "aliases": [
+        "OpenSSL enc",
+        "Salted__",
+        "EVP_BytesToKey",
+        "PBKDF2"
+      ]
+    },
+    "cipher.age.decrypt": {
+      "display_name": "Authenticate and decrypt an age file",
+      "summary": "Decrypt a bounded binary agev1 file using one private X25519 identity, authenticating the header and every payload chunk before output.",
+      "aliases": [
+        "age",
+        "agev1",
+        "X25519 file decryption"
+      ]
     }
   },
   "operations": {
@@ -5330,6 +5441,129 @@
       "aliases": [
         "Grain-128a",
         "SKEW 2011"
+      ]
+    },
+    "cipher.aes.mode.encrypt": {
+      "tool_id": "cipher.aes.mode.encrypt",
+      "display_name": "Encrypt with an AES byte mode",
+      "summary": "Encrypt bytes with explicit AES byte, CBC ciphertext-stealing or XTS/XEX storage settings. These modes do not authenticate messages.",
+      "aliases": [
+        "AES modes",
+        "SP800-38A",
+        "CBC-CS1/2/3",
+        "XTS-AES",
+        "IEEE1619 XEX"
+      ]
+    },
+    "cipher.aes.mode.decrypt": {
+      "tool_id": "cipher.aes.mode.decrypt",
+      "display_name": "Decrypt with an AES byte mode",
+      "summary": "Decrypt bytes with explicit AES byte, CBC ciphertext-stealing or XTS/XEX storage settings. These modes do not authenticate messages.",
+      "aliases": [
+        "AES modes",
+        "SP800-38A",
+        "CBC-CS1/2/3",
+        "XTS-AES",
+        "IEEE1619 XEX"
+      ]
+    },
+    "cipher.aead.encrypt": {
+      "tool_id": "cipher.aead.encrypt",
+      "display_name": "Encrypt and authenticate bytes",
+      "summary": "Encrypt bytes with explicit associated data and an exact authenticated profile; return ciphertext and a detached full tag.",
+      "aliases": [
+        "AEAD"
+      ]
+    },
+    "cipher.aead.decrypt": {
+      "tool_id": "cipher.aead.decrypt",
+      "display_name": "Verify and decrypt bytes",
+      "summary": "Authenticate ciphertext, associated data and a detached full tag before returning any plaintext.",
+      "aliases": [
+        "AEAD"
+      ]
+    },
+    "cipher.aes.siv.encrypt": {
+      "tool_id": "cipher.aes.siv.encrypt",
+      "display_name": "Encrypt with nonce-free AES-SIV",
+      "summary": "Return deterministic ciphertext and a detached synthetic IV while preserving ordered associated-data component boundaries.",
+      "aliases": [
+        "AES-SIV",
+        "RFC5297"
+      ]
+    },
+    "cipher.aes.siv.decrypt": {
+      "tool_id": "cipher.aes.siv.decrypt",
+      "display_name": "Verify and decrypt AES-SIV",
+      "summary": "Verify the synthetic IV and ordered associated-data components before returning any plaintext.",
+      "aliases": [
+        "AES-SIV",
+        "RFC5297"
+      ]
+    },
+    "cipher.aes.key_wrap.wrap": {
+      "tool_id": "cipher.aes.key_wrap.wrap",
+      "display_name": "Wrap key bytes with AES",
+      "summary": "Wrap key bytes using explicit RFC3394 AES-KW or RFC5649 AES-KWP settings.",
+      "aliases": [
+        "AES-KW",
+        "AES-KWP",
+        "RFC3394",
+        "RFC5649"
+      ]
+    },
+    "cipher.aes.key_wrap.unwrap": {
+      "tool_id": "cipher.aes.key_wrap.unwrap",
+      "display_name": "Verify and unwrap AES key bytes",
+      "summary": "Verify the fixed AES-KW or AES-KWP integrity checks before returning key bytes.",
+      "aliases": [
+        "AES-KW",
+        "AES-KWP",
+        "RFC3394",
+        "RFC5649"
+      ]
+    },
+    "cipher.fpe.encrypt": {
+      "tool_id": "cipher.fpe.encrypt",
+      "display_name": "Encrypt exact numeral strings",
+      "summary": "Preserve numeral-string length and radix with explicit FF1 or historical FF3/FF3-1 settings.",
+      "aliases": [
+        "FPE",
+        "FF1",
+        "FF3",
+        "FF3-1"
+      ]
+    },
+    "cipher.fpe.decrypt": {
+      "tool_id": "cipher.fpe.decrypt",
+      "display_name": "Decrypt exact numeral strings",
+      "summary": "Preserve numeral-string length and radix with explicit FF1 or historical FF3/FF3-1 settings.",
+      "aliases": [
+        "FPE",
+        "FF1",
+        "FF3",
+        "FF3-1"
+      ]
+    },
+    "cipher.openssl.decrypt": {
+      "tool_id": "cipher.openssl.decrypt",
+      "display_name": "Decrypt an explicit OpenSSL legacy file",
+      "summary": "Recover bytes using an explicit Salted__ AES-CBC/KDF/salt profile. Padding success does not authenticate the output.",
+      "aliases": [
+        "OpenSSL enc",
+        "Salted__",
+        "EVP_BytesToKey",
+        "PBKDF2"
+      ]
+    },
+    "cipher.age.decrypt": {
+      "tool_id": "cipher.age.decrypt",
+      "display_name": "Authenticate and decrypt an age file",
+      "summary": "Decrypt a bounded binary agev1 file using one private X25519 identity, authenticating the header and every payload chunk before output.",
+      "aliases": [
+        "age",
+        "agev1",
+        "X25519 file decryption"
       ]
     }
   }
