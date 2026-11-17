@@ -2387,6 +2387,101 @@
       "display_name": "Decrypt Merkle–Hellman reference blocks",
       "summary": "Decrypt exact tokens with the explicitly educational Merkle–Hellman reference profile.",
       "aliases": []
+    },
+    "cipher.bfv.add": {
+      "display_name": "Add encrypted BFV values",
+      "summary": "Add a pair of compatible SEAL BFV ciphertexts in a fixed coefficient format.",
+      "aliases": []
+    },
+    "cipher.bgv.add": {
+      "display_name": "Add encrypted BGV values",
+      "summary": "Add a pair of compatible SEAL BGV ciphertexts at one level.",
+      "aliases": []
+    },
+    "cipher.ckks.add": {
+      "display_name": "Add encrypted CKKS values",
+      "summary": "Add a pair of compatible SEAL CKKS ciphertexts at the same level and scale.",
+      "aliases": []
+    },
+    "cipher.damgard_jurik.add": {
+      "display_name": "Add encrypted Damgård–Jurik values",
+      "summary": "Combine two compatible Damgård–Jurik ciphertexts using the public modulus and extension 2.",
+      "aliases": []
+    },
+    "cipher.ntru_encrypt.decrypt": {
+      "display_name": "Decrypt with educational NTRUEncrypt",
+      "summary": "Recover one small polynomial using the matching synthetic private key.",
+      "aliases": []
+    },
+    "cipher.ntru_encrypt.encrypt": {
+      "display_name": "Encrypt with educational NTRUEncrypt",
+      "summary": "Encrypt one small polynomial with the fixed teaching profile and a synthetic public key.",
+      "aliases": []
+    },
+    "cipher.paillier.add": {
+      "display_name": "Add encrypted Paillier values",
+      "summary": "Combine two compatible Paillier ciphertexts with the public modulus.",
+      "aliases": []
+    },
+    "cipher.regev.decrypt": {
+      "display_name": "Decrypt with educational Regev PKE",
+      "summary": "Recover one bit using the matching synthetic private key.",
+      "aliases": []
+    },
+    "cipher.regev.encrypt": {
+      "display_name": "Encrypt with educational Regev PKE",
+      "summary": "Encrypt one bit with the fixed teaching profile and a synthetic public key.",
+      "aliases": []
+    },
+    "cipher.tfhe.not": {
+      "display_name": "Negate an encrypted TFHE Boolean",
+      "summary": "Evaluate NOT on a default-profile TFHE-rs Boolean ciphertext.",
+      "aliases": []
+    },
+    "crypto.bike.decapsulate": {
+      "display_name": "Decapsulate BIKE-L1",
+      "summary": "Recover a shared secret using the Round 4 BIKE-L1 format.",
+      "aliases": []
+    },
+    "crypto.classic_mceliece.decapsulate": {
+      "display_name": "Decapsulate Classic McEliece",
+      "summary": "Recover a shared secret using the Round 4 Classic McEliece 460896f format.",
+      "aliases": []
+    },
+    "crypto.frodo_kem.decapsulate": {
+      "display_name": "Decapsulate FrodoKEM",
+      "summary": "Recover a shared secret from a salted FrodoKEM-640-SHAKE ciphertext and matching private key.",
+      "aliases": []
+    },
+    "crypto.hqc.decapsulate": {
+      "display_name": "Decapsulate HQC-128",
+      "summary": "Recover a shared secret using the fixed February 2026 submission format.",
+      "aliases": []
+    },
+    "crypto.kyber.decapsulate": {
+      "display_name": "Decapsulate Kyber Round 3",
+      "summary": "Recover a shared secret using an explicitly named historical Kyber SHAKE profile.",
+      "aliases": []
+    },
+    "crypto.ml_kem.decapsulate": {
+      "display_name": "Decapsulate an ML-KEM secret",
+      "summary": "Use the expanded FIPS 203 private key and ciphertext to obtain the shared secret.",
+      "aliases": []
+    },
+    "crypto.ml_kem.encapsulate": {
+      "display_name": "Encapsulate an ML-KEM secret",
+      "summary": "Use a raw FIPS 203 public key to produce a ciphertext and a fresh shared secret.",
+      "aliases": []
+    },
+    "crypto.ml_kem.keygen": {
+      "display_name": "Generate an ML-KEM key pair",
+      "summary": "Generate a FIPS 203 public key and expanded private key for the chosen parameter set.",
+      "aliases": []
+    },
+    "crypto.ntru_kem.decapsulate": {
+      "display_name": "Decapsulate NTRU KEM",
+      "summary": "Recover a shared secret using the Round 3 NTRU-HPS-2048-509 format.",
+      "aliases": []
     }
   },
   "operations": {
@@ -5889,6 +5984,120 @@
       "tool_id": "cipher.merkle_hellman.decrypt",
       "display_name": "Decrypt Merkle–Hellman reference blocks",
       "summary": "Decrypt exact tokens with the explicitly educational Merkle–Hellman reference profile.",
+      "aliases": []
+    },
+    "cipher.bfv.add": {
+      "tool_id": "cipher.bfv.add",
+      "display_name": "Add encrypted BFV values",
+      "summary": "Add a pair of compatible SEAL BFV ciphertexts in a fixed coefficient format.",
+      "aliases": []
+    },
+    "cipher.bgv.add": {
+      "tool_id": "cipher.bgv.add",
+      "display_name": "Add encrypted BGV values",
+      "summary": "Add a pair of compatible SEAL BGV ciphertexts at one level.",
+      "aliases": []
+    },
+    "cipher.ckks.add": {
+      "tool_id": "cipher.ckks.add",
+      "display_name": "Add encrypted CKKS values",
+      "summary": "Add a pair of compatible SEAL CKKS ciphertexts at the same level and scale.",
+      "aliases": []
+    },
+    "cipher.damgard_jurik.add": {
+      "tool_id": "cipher.damgard_jurik.add",
+      "display_name": "Add encrypted Damgård–Jurik values",
+      "summary": "Combine two compatible Damgård–Jurik ciphertexts using the public modulus and extension 2.",
+      "aliases": []
+    },
+    "cipher.ntru_encrypt.decrypt": {
+      "tool_id": "cipher.ntru_encrypt.decrypt",
+      "display_name": "Decrypt with educational NTRUEncrypt",
+      "summary": "Recover one small polynomial using the matching synthetic private key.",
+      "aliases": []
+    },
+    "cipher.ntru_encrypt.encrypt": {
+      "tool_id": "cipher.ntru_encrypt.encrypt",
+      "display_name": "Encrypt with educational NTRUEncrypt",
+      "summary": "Encrypt one small polynomial with the fixed teaching profile and a synthetic public key.",
+      "aliases": []
+    },
+    "cipher.paillier.add": {
+      "tool_id": "cipher.paillier.add",
+      "display_name": "Add encrypted Paillier values",
+      "summary": "Combine two compatible Paillier ciphertexts with the public modulus.",
+      "aliases": []
+    },
+    "cipher.regev.decrypt": {
+      "tool_id": "cipher.regev.decrypt",
+      "display_name": "Decrypt with educational Regev PKE",
+      "summary": "Recover one bit using the matching synthetic private key.",
+      "aliases": []
+    },
+    "cipher.regev.encrypt": {
+      "tool_id": "cipher.regev.encrypt",
+      "display_name": "Encrypt with educational Regev PKE",
+      "summary": "Encrypt one bit with the fixed teaching profile and a synthetic public key.",
+      "aliases": []
+    },
+    "cipher.tfhe.not": {
+      "tool_id": "cipher.tfhe.not",
+      "display_name": "Negate an encrypted TFHE Boolean",
+      "summary": "Evaluate NOT on a default-profile TFHE-rs Boolean ciphertext.",
+      "aliases": []
+    },
+    "crypto.bike.decapsulate": {
+      "tool_id": "crypto.bike.decapsulate",
+      "display_name": "Decapsulate BIKE-L1",
+      "summary": "Recover a shared secret using the Round 4 BIKE-L1 format.",
+      "aliases": []
+    },
+    "crypto.classic_mceliece.decapsulate": {
+      "tool_id": "crypto.classic_mceliece.decapsulate",
+      "display_name": "Decapsulate Classic McEliece",
+      "summary": "Recover a shared secret using the Round 4 Classic McEliece 460896f format.",
+      "aliases": []
+    },
+    "crypto.frodo_kem.decapsulate": {
+      "tool_id": "crypto.frodo_kem.decapsulate",
+      "display_name": "Decapsulate FrodoKEM",
+      "summary": "Recover a shared secret from a salted FrodoKEM-640-SHAKE ciphertext and matching private key.",
+      "aliases": []
+    },
+    "crypto.hqc.decapsulate": {
+      "tool_id": "crypto.hqc.decapsulate",
+      "display_name": "Decapsulate HQC-128",
+      "summary": "Recover a shared secret using the fixed February 2026 submission format.",
+      "aliases": []
+    },
+    "crypto.kyber.decapsulate": {
+      "tool_id": "crypto.kyber.decapsulate",
+      "display_name": "Decapsulate Kyber Round 3",
+      "summary": "Recover a shared secret using an explicitly named historical Kyber SHAKE profile.",
+      "aliases": []
+    },
+    "crypto.ml_kem.decapsulate": {
+      "tool_id": "crypto.ml_kem.decapsulate",
+      "display_name": "Decapsulate an ML-KEM secret",
+      "summary": "Use the expanded FIPS 203 private key and ciphertext to obtain the shared secret.",
+      "aliases": []
+    },
+    "crypto.ml_kem.encapsulate": {
+      "tool_id": "crypto.ml_kem.encapsulate",
+      "display_name": "Encapsulate an ML-KEM secret",
+      "summary": "Use a raw FIPS 203 public key to produce a ciphertext and a fresh shared secret.",
+      "aliases": []
+    },
+    "crypto.ml_kem.keygen": {
+      "tool_id": "crypto.ml_kem.keygen",
+      "display_name": "Generate an ML-KEM key pair",
+      "summary": "Generate a FIPS 203 public key and expanded private key for the chosen parameter set.",
+      "aliases": []
+    },
+    "crypto.ntru_kem.decapsulate": {
+      "tool_id": "crypto.ntru_kem.decapsulate",
+      "display_name": "Decapsulate NTRU KEM",
+      "summary": "Recover a shared secret using the Round 3 NTRU-HPS-2048-509 format.",
       "aliases": []
     }
   }
