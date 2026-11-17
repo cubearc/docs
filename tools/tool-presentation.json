@@ -2235,6 +2235,158 @@
         "agev1",
         "X25519 file decryption"
       ]
+    },
+    "crypto.ecdh.agree": {
+      "display_name": "Compute an ECDH shared secret",
+      "summary": "Compute a raw X25519 or P-256 shared secret using explicit curve and key encodings. Apply a context-bound KDF before use.",
+      "aliases": [
+        "ECDH",
+        "X25519",
+        "P-256 key agreement"
+      ]
+    },
+    "cipher.rsa.oaep.encrypt": {
+      "display_name": "Encrypt RSA-OAEP bytes",
+      "summary": "Encrypt a bounded message with an explicit RSA-OAEP SHA-256 profile, public key format and label.",
+      "aliases": [
+        "RSA-OAEP"
+      ]
+    },
+    "cipher.rsa.oaep.decrypt": {
+      "display_name": "Decrypt RSA-OAEP bytes",
+      "summary": "Decrypt RSA-OAEP using an explicit SHA-256 profile and private key format.",
+      "aliases": [
+        "RSA-OAEP decryption"
+      ]
+    },
+    "cipher.rsa.pkcs1_v1_5.decrypt": {
+      "display_name": "Decrypt legacy RSA bytes",
+      "summary": "Inspect legacy RSAES-PKCS1-v1_5 with implicit rejection. Returned bytes do not establish padding validity or authenticity.",
+      "aliases": [
+        "RSAES-PKCS1-v1_5",
+        "legacy RSA"
+      ]
+    },
+    "crypto.dh.agree": {
+      "display_name": "Compute a finite-field DH secret",
+      "summary": "Compute a raw shared secret with a named RFC7919 group and validated subgroup. Apply an explicit context-bound KDF before use.",
+      "aliases": [
+        "Diffie-Hellman",
+        "FFDHE",
+        "RFC7919"
+      ]
+    },
+    "cipher.sm2.encrypt": {
+      "display_name": "Encrypt SM2/SM3 bytes",
+      "summary": "Encrypt nonempty bytes with the standard SM2 curve and an explicit raw or DER ciphertext representation.",
+      "aliases": [
+        "SM2",
+        "SM3 encryption",
+        "C1C3C2",
+        "C1C2C3"
+      ]
+    },
+    "cipher.sm2.decrypt": {
+      "display_name": "Validate and decrypt SM2/SM3 bytes",
+      "summary": "Validate SM2/SM3 ciphertext integrity before returning bytes, using the exact selected representation.",
+      "aliases": [
+        "SM2",
+        "SM3 encryption",
+        "C1C3C2",
+        "C1C2C3"
+      ]
+    },
+    "cipher.ies.encrypt": {
+      "display_name": "Encrypt with ECIES or DHIES",
+      "summary": "Encrypt bytes to a recipient using an explicit ephemeral agreement, KDF2-SHA256 and HMAC-SHA256 suite.",
+      "aliases": [
+        "ECIES",
+        "DHIES",
+        "integrated encryption",
+        "hybrid recipient encryption"
+      ]
+    },
+    "cipher.ies.decrypt": {
+      "display_name": "Validate and decrypt ECIES or DHIES",
+      "summary": "Validate the exact IES suite, ciphertext and context before returning recovered bytes.",
+      "aliases": [
+        "ECIES",
+        "DHIES",
+        "integrated encryption",
+        "hybrid recipient encryption"
+      ]
+    },
+    "cipher.elgamal.encrypt": {
+      "display_name": "Encrypt a raw ElGamal group element",
+      "summary": "Use an exact ffdhe2048 group profile. Raw ElGamal is malleable and provides no ciphertext integrity.",
+      "aliases": [
+        "ElGamal",
+        "raw group encryption"
+      ]
+    },
+    "cipher.elgamal.decrypt": {
+      "display_name": "Decrypt a raw ElGamal group element",
+      "summary": "Use an exact ffdhe2048 group profile. Raw ElGamal is malleable and provides no ciphertext integrity.",
+      "aliases": [
+        "ElGamal",
+        "raw group encryption"
+      ]
+    },
+    "cipher.cramer_shoup.encrypt": {
+      "display_name": "Encrypt a raw Cramer–Shoup group element",
+      "summary": "Use an exact ffdhe2048 group and transcript profile, validating the ciphertext before releasing a group message.",
+      "aliases": [
+        "Cramer–Shoup",
+        "raw group encryption"
+      ]
+    },
+    "cipher.cramer_shoup.decrypt": {
+      "display_name": "Decrypt a raw Cramer–Shoup group element",
+      "summary": "Use an exact ffdhe2048 group and transcript profile, validating the ciphertext before releasing a group message.",
+      "aliases": [
+        "Cramer–Shoup",
+        "raw group encryption"
+      ]
+    },
+    "cipher.rabin.encrypt": {
+      "display_name": "Encrypt Rabin reference tokens",
+      "summary": "Encrypt exact tokens with the explicitly educational Rabin reference profile.",
+      "aliases": []
+    },
+    "cipher.rabin.decrypt": {
+      "display_name": "List Rabin plaintext candidates",
+      "summary": "Return all sorted plaintext root candidates from exact decimal ciphertext tokens.",
+      "aliases": []
+    },
+    "cipher.goldwasser_micali.encrypt": {
+      "display_name": "Encrypt Goldwasser–Micali reference bits",
+      "summary": "Encrypt exact tokens with the explicitly educational Goldwasser–Micali reference profile.",
+      "aliases": []
+    },
+    "cipher.goldwasser_micali.decrypt": {
+      "display_name": "Decrypt Goldwasser–Micali reference bits",
+      "summary": "Decrypt exact tokens with the explicitly educational Goldwasser–Micali reference profile.",
+      "aliases": []
+    },
+    "cipher.benaloh.encrypt": {
+      "display_name": "Encrypt Benaloh reference residues",
+      "summary": "Encrypt exact tokens with the explicitly educational Benaloh reference profile.",
+      "aliases": []
+    },
+    "cipher.benaloh.decrypt": {
+      "display_name": "Decrypt Benaloh reference residues",
+      "summary": "Decrypt exact tokens with the explicitly educational Benaloh reference profile.",
+      "aliases": []
+    },
+    "cipher.merkle_hellman.encrypt": {
+      "display_name": "Encrypt Merkle–Hellman reference blocks",
+      "summary": "Encrypt exact tokens with the explicitly educational Merkle–Hellman reference profile.",
+      "aliases": []
+    },
+    "cipher.merkle_hellman.decrypt": {
+      "display_name": "Decrypt Merkle–Hellman reference blocks",
+      "summary": "Decrypt exact tokens with the explicitly educational Merkle–Hellman reference profile.",
+      "aliases": []
     }
   },
   "operations": {
@@ -5565,6 +5717,179 @@
         "agev1",
         "X25519 file decryption"
       ]
+    },
+    "crypto.ecdh.agree": {
+      "tool_id": "crypto.ecdh.agree",
+      "display_name": "Compute an ECDH shared secret",
+      "summary": "Compute a raw X25519 or P-256 shared secret using explicit curve and key encodings. Apply a context-bound KDF before use.",
+      "aliases": [
+        "ECDH",
+        "X25519",
+        "P-256 key agreement"
+      ]
+    },
+    "cipher.rsa.oaep.encrypt": {
+      "tool_id": "cipher.rsa.oaep.encrypt",
+      "display_name": "Encrypt RSA-OAEP bytes",
+      "summary": "Encrypt a bounded message with an explicit RSA-OAEP SHA-256 profile, public key format and label.",
+      "aliases": [
+        "RSA-OAEP"
+      ]
+    },
+    "cipher.rsa.oaep.decrypt": {
+      "tool_id": "cipher.rsa.oaep.decrypt",
+      "display_name": "Decrypt RSA-OAEP bytes",
+      "summary": "Decrypt RSA-OAEP using an explicit SHA-256 profile and private key format.",
+      "aliases": [
+        "RSA-OAEP decryption"
+      ]
+    },
+    "cipher.rsa.pkcs1_v1_5.decrypt": {
+      "tool_id": "cipher.rsa.pkcs1_v1_5.decrypt",
+      "display_name": "Decrypt legacy RSA bytes",
+      "summary": "Inspect legacy RSAES-PKCS1-v1_5 with implicit rejection. Returned bytes do not establish padding validity or authenticity.",
+      "aliases": [
+        "RSAES-PKCS1-v1_5",
+        "legacy RSA"
+      ]
+    },
+    "crypto.dh.agree": {
+      "tool_id": "crypto.dh.agree",
+      "display_name": "Compute a finite-field DH secret",
+      "summary": "Compute a raw shared secret with a named RFC7919 group and validated subgroup. Apply an explicit context-bound KDF before use.",
+      "aliases": [
+        "Diffie-Hellman",
+        "FFDHE",
+        "RFC7919"
+      ]
+    },
+    "cipher.sm2.encrypt": {
+      "tool_id": "cipher.sm2.encrypt",
+      "display_name": "Encrypt SM2/SM3 bytes",
+      "summary": "Encrypt nonempty bytes with the standard SM2 curve and an explicit raw or DER ciphertext representation.",
+      "aliases": [
+        "SM2",
+        "SM3 encryption",
+        "C1C3C2",
+        "C1C2C3"
+      ]
+    },
+    "cipher.sm2.decrypt": {
+      "tool_id": "cipher.sm2.decrypt",
+      "display_name": "Validate and decrypt SM2/SM3 bytes",
+      "summary": "Validate SM2/SM3 ciphertext integrity before returning bytes, using the exact selected representation.",
+      "aliases": [
+        "SM2",
+        "SM3 encryption",
+        "C1C3C2",
+        "C1C2C3"
+      ]
+    },
+    "cipher.ies.encrypt": {
+      "tool_id": "cipher.ies.encrypt",
+      "display_name": "Encrypt with ECIES or DHIES",
+      "summary": "Encrypt bytes to a recipient using an explicit ephemeral agreement, KDF2-SHA256 and HMAC-SHA256 suite.",
+      "aliases": [
+        "ECIES",
+        "DHIES",
+        "integrated encryption",
+        "hybrid recipient encryption"
+      ]
+    },
+    "cipher.ies.decrypt": {
+      "tool_id": "cipher.ies.decrypt",
+      "display_name": "Validate and decrypt ECIES or DHIES",
+      "summary": "Validate the exact IES suite, ciphertext and context before returning recovered bytes.",
+      "aliases": [
+        "ECIES",
+        "DHIES",
+        "integrated encryption",
+        "hybrid recipient encryption"
+      ]
+    },
+    "cipher.elgamal.encrypt": {
+      "tool_id": "cipher.elgamal.encrypt",
+      "display_name": "Encrypt a raw ElGamal group element",
+      "summary": "Use an exact ffdhe2048 group profile. Raw ElGamal is malleable and provides no ciphertext integrity.",
+      "aliases": [
+        "ElGamal",
+        "raw group encryption"
+      ]
+    },
+    "cipher.elgamal.decrypt": {
+      "tool_id": "cipher.elgamal.decrypt",
+      "display_name": "Decrypt a raw ElGamal group element",
+      "summary": "Use an exact ffdhe2048 group profile. Raw ElGamal is malleable and provides no ciphertext integrity.",
+      "aliases": [
+        "ElGamal",
+        "raw group encryption"
+      ]
+    },
+    "cipher.cramer_shoup.encrypt": {
+      "tool_id": "cipher.cramer_shoup.encrypt",
+      "display_name": "Encrypt a raw Cramer–Shoup group element",
+      "summary": "Use an exact ffdhe2048 group and transcript profile, validating the ciphertext before releasing a group message.",
+      "aliases": [
+        "Cramer–Shoup",
+        "raw group encryption"
+      ]
+    },
+    "cipher.cramer_shoup.decrypt": {
+      "tool_id": "cipher.cramer_shoup.decrypt",
+      "display_name": "Decrypt a raw Cramer–Shoup group element",
+      "summary": "Use an exact ffdhe2048 group and transcript profile, validating the ciphertext before releasing a group message.",
+      "aliases": [
+        "Cramer–Shoup",
+        "raw group encryption"
+      ]
+    },
+    "cipher.rabin.encrypt": {
+      "tool_id": "cipher.rabin.encrypt",
+      "display_name": "Encrypt Rabin reference tokens",
+      "summary": "Encrypt exact tokens with the explicitly educational Rabin reference profile.",
+      "aliases": []
+    },
+    "cipher.rabin.decrypt": {
+      "tool_id": "cipher.rabin.decrypt",
+      "display_name": "List Rabin plaintext candidates",
+      "summary": "Return all sorted plaintext root candidates from exact decimal ciphertext tokens.",
+      "aliases": []
+    },
+    "cipher.goldwasser_micali.encrypt": {
+      "tool_id": "cipher.goldwasser_micali.encrypt",
+      "display_name": "Encrypt Goldwasser–Micali reference bits",
+      "summary": "Encrypt exact tokens with the explicitly educational Goldwasser–Micali reference profile.",
+      "aliases": []
+    },
+    "cipher.goldwasser_micali.decrypt": {
+      "tool_id": "cipher.goldwasser_micali.decrypt",
+      "display_name": "Decrypt Goldwasser–Micali reference bits",
+      "summary": "Decrypt exact tokens with the explicitly educational Goldwasser–Micali reference profile.",
+      "aliases": []
+    },
+    "cipher.benaloh.encrypt": {
+      "tool_id": "cipher.benaloh.encrypt",
+      "display_name": "Encrypt Benaloh reference residues",
+      "summary": "Encrypt exact tokens with the explicitly educational Benaloh reference profile.",
+      "aliases": []
+    },
+    "cipher.benaloh.decrypt": {
+      "tool_id": "cipher.benaloh.decrypt",
+      "display_name": "Decrypt Benaloh reference residues",
+      "summary": "Decrypt exact tokens with the explicitly educational Benaloh reference profile.",
+      "aliases": []
+    },
+    "cipher.merkle_hellman.encrypt": {
+      "tool_id": "cipher.merkle_hellman.encrypt",
+      "display_name": "Encrypt Merkle–Hellman reference blocks",
+      "summary": "Encrypt exact tokens with the explicitly educational Merkle–Hellman reference profile.",
+      "aliases": []
+    },
+    "cipher.merkle_hellman.decrypt": {
+      "tool_id": "cipher.merkle_hellman.decrypt",
+      "display_name": "Decrypt Merkle–Hellman reference blocks",
+      "summary": "Decrypt exact tokens with the explicitly educational Merkle–Hellman reference profile.",
+      "aliases": []
     }
   }
 }

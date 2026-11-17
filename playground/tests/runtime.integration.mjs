@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { isDeepStrictEqual } from 'node:util';
+import {dirname,resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import test from 'node:test';
 import { createCube } from '../.build/runtime/node_modules/@cubearc/cube/dist/node.mjs';
 import { Runtime } from '../dist/runtime.mjs';
@@ -13,6 +14,8 @@ const sdk=Object.fromEntries(['execute','runRecipe','validateRecipe'].map(method
 const runtime=new Runtime(sdk,catalog,presentation,tools);
 const fixturePath=process.env.CUBE_CONFORMANCE_FIXTURES;
 if(!fixturePath) throw new Error('Provide the matching reviewed Core conformance fixture path.');
+const {verifyFixtureResult,sdkWireExecutor}=await import(pathToFileURL(resolve(dirname(fixturePath),'../../../../../bindings/javascript/scripts/fixture-verification.mjs')));
+const executeWire=sdkWireExecutor(cube);
 const fixtures=JSON.parse(await readFile(fixturePath,'utf8'));
 const bytes=value=>Uint8Array.from(Buffer.from(value.base64,'base64'));
 
@@ -37,7 +40,7 @@ test('every catalog tool is available and every direct-only tool executes its re
     const actual=await runtime.perform(action,input,fixture.parameters,{extraInputs});
     const wire=Object.fromEntries(Object.entries(actual.outputs).map(([name,v])=>[name,
       v.type==='bytes'?action.direct.outputs[name]==='byte_array'?Array.from(v.data):{base64:Buffer.from(v.data).toString('base64')}:v.data]));
-    assert.ok(isDeepStrictEqual(wire,fixture.outputs),action.id+' actual portal/SDK known answer');
+    await verifyFixtureResult({fixture,actual:wire,contract:action.contract,execute:executeWire});
   }
 });
 
