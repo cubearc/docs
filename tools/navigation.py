@@ -23,6 +23,7 @@ CATEGORIES = {
     "pipelines": "Pipelines",
     "probability": "Probability",
     "recipes": "Recipes",
+    "sequence": "Sequence analysis",
     "symbols": "Symbolic encodings",
     "text": "Text and Unicode",
     "video": "Video",

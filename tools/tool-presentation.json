@@ -2717,6 +2717,74 @@
       "display_name": "UTF-16",
       "summary": "Encode or decode data using the UTF-16 profile.",
       "aliases": []
+    },
+    "sequence.align": {
+      "display_name": "Align sequences",
+      "summary": "Compute global or local sequence alignment and traceback."
+    },
+    "sequence.bitap": {
+      "display_name": "Find approximate byte patterns",
+      "summary": "Find exact Shift-And matches or approximate Levenshtein endings."
+    },
+    "sequence.common_spans": {
+      "display_name": "Find common spans",
+      "summary": "Locate longest common prefixes, suffixes and substrings."
+    },
+    "sequence.diff": {
+      "display_name": "Compare sequence edits",
+      "summary": "Review a minimum edit script or a Patience or Histogram line diff."
+    },
+    "sequence.dtw": {
+      "display_name": "Warp numeric series",
+      "summary": "Compute a bounded dynamic time warping path and cost."
+    },
+    "sequence.edit_distance": {
+      "display_name": "Measure edit distance",
+      "summary": "Compare two exact sequences with a selected edit-distance profile."
+    },
+    "sequence.exact_search": {
+      "display_name": "Find exact byte patterns",
+      "summary": "Search for overlapping exact byte patterns with a named algorithm."
+    },
+    "sequence.hamming": {
+      "display_name": "Count positional mismatches",
+      "summary": "Count differing byte, scalar or packed-bit positions."
+    },
+    "sequence.jaro": {
+      "display_name": "Score Jaro similarity",
+      "summary": "Compare exact scalar strings with Jaro or Jaro–Winkler."
+    },
+    "sequence.lcs": {
+      "display_name": "Find a common subsequence",
+      "summary": "Recover a longest common subsequence and its source positions."
+    },
+    "sequence.monge_elkan": {
+      "display_name": "Match similar tokens",
+      "summary": "Find best token matches and a directional similarity score."
+    },
+    "sequence.multi_search": {
+      "display_name": "Find several byte patterns",
+      "summary": "Search ordered patterns with a bounded Aho–Corasick automaton."
+    },
+    "sequence.ratcliff_obershelp": {
+      "display_name": "Score common blocks",
+      "summary": "Compare recursively selected contiguous blocks."
+    },
+    "sequence.set_similarity": {
+      "display_name": "Compare sets and q-grams",
+      "summary": "Compare token sets or overlapping q-gram inventories."
+    },
+    "sequence.tfidf_compare": {
+      "display_name": "Compare documents with TF-IDF",
+      "summary": "Score two documents with a verified caller-owned model."
+    },
+    "sequence.tfidf_model": {
+      "display_name": "Build a TF-IDF model",
+      "summary": "Build document frequencies and a stable identity from caller tokens."
+    },
+    "sequence.vector_similarity": {
+      "display_name": "Compare vector scores",
+      "summary": "Compute cosine, Kullback–Leibler or Jensen–Shannon scores."
     }
   },
   "operations": {
@@ -6693,6 +6761,108 @@
       "tool_id": "text.utf16",
       "display_name": "Encode UTF-16",
       "summary": "Encode using the UTF-16 profile. Encode Unicode scalars in the selected byte order and initial marker policy.",
+      "aliases": []
+    },
+    "sequence.align": {
+      "tool_id": "sequence.align",
+      "display_name": "Align sequences",
+      "summary": "Compute global or local sequence alignment and traceback.",
+      "aliases": []
+    },
+    "sequence.bitap": {
+      "tool_id": "sequence.bitap",
+      "display_name": "Find approximate byte patterns",
+      "summary": "Find exact Shift-And matches or approximate Levenshtein endings.",
+      "aliases": []
+    },
+    "sequence.common_spans": {
+      "tool_id": "sequence.common_spans",
+      "display_name": "Find common spans",
+      "summary": "Locate longest common prefixes, suffixes and substrings.",
+      "aliases": []
+    },
+    "sequence.diff": {
+      "tool_id": "sequence.diff",
+      "display_name": "Compare sequence edits",
+      "summary": "Review a minimum edit script or a Patience or Histogram line diff.",
+      "aliases": []
+    },
+    "sequence.dtw": {
+      "tool_id": "sequence.dtw",
+      "display_name": "Warp numeric series",
+      "summary": "Compute a bounded dynamic time warping path and cost.",
+      "aliases": []
+    },
+    "sequence.edit_distance": {
+      "tool_id": "sequence.edit_distance",
+      "display_name": "Measure edit distance",
+      "summary": "Compare two exact sequences with a selected edit-distance profile.",
+      "aliases": []
+    },
+    "sequence.exact_search": {
+      "tool_id": "sequence.exact_search",
+      "display_name": "Find exact byte patterns",
+      "summary": "Search for overlapping exact byte patterns with a named algorithm.",
+      "aliases": []
+    },
+    "sequence.hamming": {
+      "tool_id": "sequence.hamming",
+      "display_name": "Count positional mismatches",
+      "summary": "Count differing byte, scalar or packed-bit positions.",
+      "aliases": []
+    },
+    "sequence.jaro": {
+      "tool_id": "sequence.jaro",
+      "display_name": "Score Jaro similarity",
+      "summary": "Compare exact scalar strings with Jaro or Jaro–Winkler.",
+      "aliases": []
+    },
+    "sequence.lcs": {
+      "tool_id": "sequence.lcs",
+      "display_name": "Find a common subsequence",
+      "summary": "Recover a longest common subsequence and its source positions.",
+      "aliases": []
+    },
+    "sequence.monge_elkan": {
+      "tool_id": "sequence.monge_elkan",
+      "display_name": "Match similar tokens",
+      "summary": "Find best token matches and a directional similarity score.",
+      "aliases": []
+    },
+    "sequence.multi_search": {
+      "tool_id": "sequence.multi_search",
+      "display_name": "Find several byte patterns",
+      "summary": "Search ordered patterns with a bounded Aho–Corasick automaton.",
+      "aliases": []
+    },
+    "sequence.ratcliff_obershelp": {
+      "tool_id": "sequence.ratcliff_obershelp",
+      "display_name": "Score common blocks",
+      "summary": "Compare recursively selected contiguous blocks.",
+      "aliases": []
+    },
+    "sequence.set_similarity": {
+      "tool_id": "sequence.set_similarity",
+      "display_name": "Compare sets and q-grams",
+      "summary": "Compare token sets or overlapping q-gram inventories.",
+      "aliases": []
+    },
+    "sequence.tfidf_compare": {
+      "tool_id": "sequence.tfidf_compare",
+      "display_name": "Compare documents with TF-IDF",
+      "summary": "Score two documents with a verified caller-owned model.",
+      "aliases": []
+    },
+    "sequence.tfidf_model": {
+      "tool_id": "sequence.tfidf_model",
+      "display_name": "Build a TF-IDF model",
+      "summary": "Build document frequencies and a stable identity from caller tokens.",
+      "aliases": []
+    },
+    "sequence.vector_similarity": {
+      "tool_id": "sequence.vector_similarity",
+      "display_name": "Compare vector scores",
+      "summary": "Compute cosine, Kullback–Leibler or Jensen–Shannon scores.",
       "aliases": []
     }
   }
