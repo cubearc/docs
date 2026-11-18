@@ -2482,6 +2482,241 @@
       "display_name": "Decapsulate NTRU KEM",
       "summary": "Recover a shared secret using the Round 3 NTRU-HPS-2048-509 format.",
       "aliases": []
+    },
+    "binary.compress.decode": {
+      "display_name": "Decompress bytes",
+      "summary": "Read one complete frame in the named wire format and reject trailing data.",
+      "aliases": []
+    },
+    "binary.compress.encode": {
+      "display_name": "Compress bytes",
+      "summary": "Compress exact bytes with one named wire format and bounded output.",
+      "aliases": []
+    },
+    "binary.reverse_bits": {
+      "display_name": "Bit reversal within units",
+      "summary": "Reverse bits within complete unsigned big-endian units, preserving unit order.",
+      "aliases": []
+    },
+    "cipher.kdf.argon2id": {
+      "display_name": "Argon2id",
+      "summary": "Version 0x13 Argon2id with explicit memory, iterations, lanes and output length.",
+      "aliases": []
+    },
+    "cipher.kdf.evp_bytes_to_key": {
+      "display_name": "EVP_BytesToKey",
+      "summary": "Legacy OpenSSL digest chaining with an explicit digest, count, eight-byte salt and key and IV sizes.",
+      "aliases": []
+    },
+    "cipher.kdf.hkdf": {
+      "display_name": "HKDF",
+      "summary": "RFC 5869 extract and expand with SHA256 or SHA512 and explicit salt and info.",
+      "aliases": []
+    },
+    "cipher.kdf.pbkdf2": {
+      "display_name": "PBKDF2-HMAC",
+      "summary": "PBKDF2-HMAC-SHA256 or SHA512 with explicit iterations and output length.",
+      "aliases": []
+    },
+    "cipher.kdf.scrypt": {
+      "display_name": "Scrypt key derivation",
+      "summary": "RFC 7914 scrypt with explicit N, r, p and output length.",
+      "aliases": []
+    },
+    "encoding.ascii85": {
+      "display_name": "Framed Adobe Ascii85",
+      "summary": "Encode or decode data using the Framed Adobe Ascii85 profile.",
+      "aliases": []
+    },
+    "encoding.ascii85_bare": {
+      "display_name": "Bare Adobe Ascii85",
+      "summary": "Encode or decode data using the Bare Adobe Ascii85 profile.",
+      "aliases": []
+    },
+    "encoding.base36": {
+      "display_name": "Base36 bytes",
+      "summary": "Encode or decode data using the Base36 bytes profile.",
+      "aliases": []
+    },
+    "encoding.base62": {
+      "display_name": "Base62 bytes",
+      "summary": "Encode or decode data using the Base62 bytes profile.",
+      "aliases": []
+    },
+    "encoding.base91": {
+      "display_name": "Original basE91",
+      "summary": "Encode or decode data using the Original basE91 profile.",
+      "aliases": []
+    },
+    "encoding.base92": {
+      "display_name": "Original Base92",
+      "summary": "Encode or decode data using the Original Base92 profile.",
+      "aliases": []
+    },
+    "encoding.binary": {
+      "display_name": "Binary byte tokens",
+      "summary": "Encode or decode data using the Binary byte tokens profile.",
+      "aliases": []
+    },
+    "encoding.octal": {
+      "display_name": "Octal byte tokens",
+      "summary": "Encode or decode data using the Octal byte tokens profile.",
+      "aliases": []
+    },
+    "encoding.url_component": {
+      "display_name": "RFC 3986 component",
+      "summary": "Encode or decode data using the RFC 3986 component profile.",
+      "aliases": []
+    },
+    "hash.adler32": {
+      "display_name": "Adler-32",
+      "summary": "RFC 1950 Adler-32 with sums initialized to 1 and 0, modulo 65521.",
+      "aliases": []
+    },
+    "hash.blake2b512": {
+      "display_name": "BLAKE2b-512",
+      "summary": "Unkeyed BLAKE2b with a 64-byte digest and sequential default parameters.",
+      "aliases": []
+    },
+    "hash.blake2s256": {
+      "display_name": "BLAKE2s-256",
+      "summary": "Unkeyed BLAKE2s with a 32-byte digest and sequential default parameters.",
+      "aliases": []
+    },
+    "hash.blake3": {
+      "display_name": "BLAKE3",
+      "summary": "Unkeyed BLAKE3 with the fixed 32-byte digest.",
+      "aliases": []
+    },
+    "hash.crc16_arc": {
+      "display_name": "CRC-16/ARC",
+      "summary": "Polynomial 0x8005, init 0x0000, reflected input and output, xorout 0x0000.",
+      "aliases": []
+    },
+    "hash.crc64_ecma182": {
+      "display_name": "CRC-64/ECMA-182",
+      "summary": "Polynomial 0x42f0e1eba9ea3693, init 0, no reflection, xorout 0.",
+      "aliases": []
+    },
+    "hash.crc8_smbus": {
+      "display_name": "CRC-8/SMBUS",
+      "summary": "Polynomial 0x07, init 0x00, no reflection, xorout 0x00.",
+      "aliases": []
+    },
+    "hash.fletcher16": {
+      "display_name": "Fletcher-16",
+      "summary": "Eight-bit words and zero-initialized sums modulo 255, second sum in the high byte.",
+      "aliases": []
+    },
+    "hash.fletcher32": {
+      "display_name": "Fletcher-32",
+      "summary": "Big-endian 16-bit words and zero-initialized sums modulo 65535, second sum in the high half. Odd byte counts fail.",
+      "aliases": []
+    },
+    "hash.keccak224": {
+      "display_name": "Keccak-224",
+      "summary": "Original Keccak-224 with delimited suffix 0x01.",
+      "aliases": []
+    },
+    "hash.keccak384": {
+      "display_name": "Keccak-384",
+      "summary": "Original Keccak-384 with delimited suffix 0x01.",
+      "aliases": []
+    },
+    "hash.keccak512": {
+      "display_name": "Keccak-512",
+      "summary": "Original Keccak-512 with delimited suffix 0x01.",
+      "aliases": []
+    },
+    "hash.md4": {
+      "display_name": "MD4",
+      "summary": "RFC 1320 legacy MD4 compatibility digest.",
+      "aliases": []
+    },
+    "hash.ripemd128": {
+      "display_name": "RIPEMD-128",
+      "summary": "RIPEMD-128 compatibility digest.",
+      "aliases": []
+    },
+    "hash.ripemd256": {
+      "display_name": "RIPEMD-256",
+      "summary": "RIPEMD-256 compatibility digest.",
+      "aliases": []
+    },
+    "hash.ripemd320": {
+      "display_name": "RIPEMD-320",
+      "summary": "RIPEMD-320 compatibility digest.",
+      "aliases": []
+    },
+    "hash.sha224": {
+      "display_name": "SHA-224",
+      "summary": "SHA-224 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.sha384": {
+      "display_name": "SHA-384",
+      "summary": "SHA-384 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.sha3_224": {
+      "display_name": "SHA3-224",
+      "summary": "FIPS 202 SHA3-224 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha3_256": {
+      "display_name": "SHA3-256",
+      "summary": "FIPS 202 SHA3-256 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha3_384": {
+      "display_name": "SHA3-384",
+      "summary": "FIPS 202 SHA3-384 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha3_512": {
+      "display_name": "SHA3-512",
+      "summary": "FIPS 202 SHA3-512 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha512_224": {
+      "display_name": "SHA-512/224",
+      "summary": "SHA-512/224 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.sha512_256": {
+      "display_name": "SHA-512/256",
+      "summary": "SHA-512/256 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.whirlpool": {
+      "display_name": "Whirlpool",
+      "summary": "Final 2003 Whirlpool compatibility digest.",
+      "aliases": []
+    },
+    "image.jpeg.coefficients.extract": {
+      "display_name": "JPEG coefficient parity",
+      "summary": "Inspect baseline JPEG quantized AC magnitude parity in row-major block and zigzag AC order.",
+      "aliases": []
+    },
+    "text.ascii": {
+      "display_name": "ASCII",
+      "summary": "Encode or decode data using the ASCII profile.",
+      "aliases": []
+    },
+    "text.html_entity": {
+      "display_name": "HTML character references",
+      "summary": "Encode or decode data using the HTML character references profile.",
+      "aliases": []
+    },
+    "text.json_escape": {
+      "display_name": "JSON string escape",
+      "summary": "Encode or decode data using the JSON string escape profile.",
+      "aliases": []
+    },
+    "text.utf16": {
+      "display_name": "UTF-16",
+      "summary": "Encode or decode data using the UTF-16 profile.",
+      "aliases": []
     }
   },
   "operations": {
@@ -6098,6 +6333,366 @@
       "tool_id": "crypto.ntru_kem.decapsulate",
       "display_name": "Decapsulate NTRU KEM",
       "summary": "Recover a shared secret using the Round 3 NTRU-HPS-2048-509 format.",
+      "aliases": []
+    },
+    "binary.compress.decode": {
+      "tool_id": "binary.compress.decode",
+      "display_name": "Decompress bytes",
+      "summary": "Read one complete frame in the named wire format and reject trailing data.",
+      "aliases": []
+    },
+    "binary.compress.encode": {
+      "tool_id": "binary.compress.encode",
+      "display_name": "Compress bytes",
+      "summary": "Compress exact bytes with one named wire format and bounded output.",
+      "aliases": []
+    },
+    "binary.reverse_bits": {
+      "tool_id": "binary.reverse_bits",
+      "display_name": "Bit reversal within units",
+      "summary": "Reverse bits within complete unsigned big-endian units, preserving unit order.",
+      "aliases": []
+    },
+    "cipher.kdf.argon2id": {
+      "tool_id": "cipher.kdf.argon2id",
+      "display_name": "Derive bytes with Argon2id",
+      "summary": "Version 0x13 Argon2id with explicit memory, iterations, lanes and output length.",
+      "aliases": []
+    },
+    "cipher.kdf.evp_bytes_to_key": {
+      "tool_id": "cipher.kdf.evp_bytes_to_key",
+      "display_name": "Derive bytes with EVP_BytesToKey",
+      "summary": "Legacy OpenSSL digest chaining with an explicit digest, count, eight-byte salt and key and IV sizes.",
+      "aliases": []
+    },
+    "cipher.kdf.hkdf": {
+      "tool_id": "cipher.kdf.hkdf",
+      "display_name": "Derive bytes with HKDF",
+      "summary": "RFC 5869 extract and expand with SHA256 or SHA512 and explicit salt and info.",
+      "aliases": []
+    },
+    "cipher.kdf.pbkdf2": {
+      "tool_id": "cipher.kdf.pbkdf2",
+      "display_name": "Derive bytes with PBKDF2-HMAC",
+      "summary": "PBKDF2-HMAC-SHA256 or SHA512 with explicit iterations and output length.",
+      "aliases": []
+    },
+    "cipher.kdf.scrypt": {
+      "tool_id": "cipher.kdf.scrypt",
+      "display_name": "Derive bytes with scrypt",
+      "summary": "RFC 7914 scrypt with explicit N, r, p and output length.",
+      "aliases": []
+    },
+    "encoding.ascii85.decode": {
+      "tool_id": "encoding.ascii85",
+      "display_name": "Decode Framed Adobe Ascii85",
+      "summary": "Decode using the Framed Adobe Ascii85 profile. Explicit Adobe framing with canonical zero shorthand and final group.",
+      "aliases": []
+    },
+    "encoding.ascii85.encode": {
+      "tool_id": "encoding.ascii85",
+      "display_name": "Encode Framed Adobe Ascii85",
+      "summary": "Encode using the Framed Adobe Ascii85 profile. Explicit Adobe framing with canonical zero shorthand and final group.",
+      "aliases": []
+    },
+    "encoding.ascii85_bare.decode": {
+      "tool_id": "encoding.ascii85_bare",
+      "display_name": "Decode Bare Adobe Ascii85",
+      "summary": "Decode using the Bare Adobe Ascii85 profile. Adobe packing with canonical zero shorthand and final group, without framing.",
+      "aliases": []
+    },
+    "encoding.ascii85_bare.encode": {
+      "tool_id": "encoding.ascii85_bare",
+      "display_name": "Encode Bare Adobe Ascii85",
+      "summary": "Encode using the Bare Adobe Ascii85 profile. Adobe packing with canonical zero shorthand and final group, without framing.",
+      "aliases": []
+    },
+    "encoding.base36.decode": {
+      "tool_id": "encoding.base36",
+      "display_name": "Decode Base36 bytes",
+      "summary": "Decode using the Base36 bytes profile. Lowercase GMP magnitude alphabet with one leading zero digit per leading zero byte.",
+      "aliases": []
+    },
+    "encoding.base36.encode": {
+      "tool_id": "encoding.base36",
+      "display_name": "Encode Base36 bytes",
+      "summary": "Encode using the Base36 bytes profile. Lowercase GMP magnitude alphabet with one leading zero digit per leading zero byte.",
+      "aliases": []
+    },
+    "encoding.base62.decode": {
+      "tool_id": "encoding.base62",
+      "display_name": "Decode Base62 bytes",
+      "summary": "Decode using the Base62 bytes profile. GMP digits, uppercase letters, then lowercase letters, with one leading zero digit per leading zero byte.",
+      "aliases": []
+    },
+    "encoding.base62.encode": {
+      "tool_id": "encoding.base62",
+      "display_name": "Encode Base62 bytes",
+      "summary": "Encode using the Base62 bytes profile. GMP digits, uppercase letters, then lowercase letters, with one leading zero digit per leading zero byte.",
+      "aliases": []
+    },
+    "encoding.base91.decode": {
+      "tool_id": "encoding.base91",
+      "display_name": "Decode Original basE91",
+      "summary": "Decode using the Original basE91 profile. Original basE91 alphabet and 13/14-bit packing with a strict canonical tail.",
+      "aliases": []
+    },
+    "encoding.base91.encode": {
+      "tool_id": "encoding.base91",
+      "display_name": "Encode Original basE91",
+      "summary": "Encode using the Original basE91 profile. Original basE91 alphabet and 13/14-bit packing with a strict canonical tail.",
+      "aliases": []
+    },
+    "encoding.base92.decode": {
+      "tool_id": "encoding.base92",
+      "display_name": "Decode Original Base92",
+      "summary": "Decode using the Original Base92 profile. Original Base92 alphabet and 13-bit packing, canonical tail and tilde empty marker.",
+      "aliases": []
+    },
+    "encoding.base92.encode": {
+      "tool_id": "encoding.base92",
+      "display_name": "Encode Original Base92",
+      "summary": "Encode using the Original Base92 profile. Original Base92 alphabet and 13-bit packing, canonical tail and tilde empty marker.",
+      "aliases": []
+    },
+    "encoding.binary.decode": {
+      "tool_id": "encoding.binary",
+      "display_name": "Decode Binary byte tokens",
+      "summary": "Decode using the Binary byte tokens profile. Eight binary digits per byte with one ASCII space between tokens.",
+      "aliases": []
+    },
+    "encoding.binary.encode": {
+      "tool_id": "encoding.binary",
+      "display_name": "Encode Binary byte tokens",
+      "summary": "Encode using the Binary byte tokens profile. Eight binary digits per byte with one ASCII space between tokens.",
+      "aliases": []
+    },
+    "encoding.octal.decode": {
+      "tool_id": "encoding.octal",
+      "display_name": "Decode Octal byte tokens",
+      "summary": "Decode using the Octal byte tokens profile. Three octal digits per byte with one ASCII space between tokens. Values above 377 fail.",
+      "aliases": []
+    },
+    "encoding.octal.encode": {
+      "tool_id": "encoding.octal",
+      "display_name": "Encode Octal byte tokens",
+      "summary": "Encode using the Octal byte tokens profile. Three octal digits per byte with one ASCII space between tokens. Values above 377 fail.",
+      "aliases": []
+    },
+    "encoding.url_component.decode": {
+      "tool_id": "encoding.url_component",
+      "display_name": "Decode RFC 3986 component",
+      "summary": "Decode using the RFC 3986 component profile. Unreserved ASCII or percent triplets. Encoding emits uppercase triplets. Decoding accepts either hex case.",
+      "aliases": []
+    },
+    "encoding.url_component.encode": {
+      "tool_id": "encoding.url_component",
+      "display_name": "Encode RFC 3986 component",
+      "summary": "Encode using the RFC 3986 component profile. Unreserved ASCII or percent triplets. Encoding emits uppercase triplets. Decoding accepts either hex case.",
+      "aliases": []
+    },
+    "hash.adler32": {
+      "tool_id": "hash.adler32",
+      "display_name": "Adler-32",
+      "summary": "RFC 1950 Adler-32 with sums initialized to 1 and 0, modulo 65521.",
+      "aliases": []
+    },
+    "hash.blake2b512": {
+      "tool_id": "hash.blake2b512",
+      "display_name": "BLAKE2b-512",
+      "summary": "Unkeyed BLAKE2b with a 64-byte digest and sequential default parameters.",
+      "aliases": []
+    },
+    "hash.blake2s256": {
+      "tool_id": "hash.blake2s256",
+      "display_name": "BLAKE2s-256",
+      "summary": "Unkeyed BLAKE2s with a 32-byte digest and sequential default parameters.",
+      "aliases": []
+    },
+    "hash.blake3": {
+      "tool_id": "hash.blake3",
+      "display_name": "BLAKE3",
+      "summary": "Unkeyed BLAKE3 with the fixed 32-byte digest.",
+      "aliases": []
+    },
+    "hash.crc16_arc": {
+      "tool_id": "hash.crc16_arc",
+      "display_name": "CRC-16/ARC",
+      "summary": "Polynomial 0x8005, init 0x0000, reflected input and output, xorout 0x0000.",
+      "aliases": []
+    },
+    "hash.crc64_ecma182": {
+      "tool_id": "hash.crc64_ecma182",
+      "display_name": "CRC-64/ECMA-182",
+      "summary": "Polynomial 0x42f0e1eba9ea3693, init 0, no reflection, xorout 0.",
+      "aliases": []
+    },
+    "hash.crc8_smbus": {
+      "tool_id": "hash.crc8_smbus",
+      "display_name": "CRC-8/SMBUS",
+      "summary": "Polynomial 0x07, init 0x00, no reflection, xorout 0x00.",
+      "aliases": []
+    },
+    "hash.fletcher16": {
+      "tool_id": "hash.fletcher16",
+      "display_name": "Fletcher-16",
+      "summary": "Eight-bit words and zero-initialized sums modulo 255, second sum in the high byte.",
+      "aliases": []
+    },
+    "hash.fletcher32": {
+      "tool_id": "hash.fletcher32",
+      "display_name": "Fletcher-32",
+      "summary": "Big-endian 16-bit words and zero-initialized sums modulo 65535, second sum in the high half. Odd byte counts fail.",
+      "aliases": []
+    },
+    "hash.keccak224": {
+      "tool_id": "hash.keccak224",
+      "display_name": "Keccak-224",
+      "summary": "Original Keccak-224 with delimited suffix 0x01.",
+      "aliases": []
+    },
+    "hash.keccak384": {
+      "tool_id": "hash.keccak384",
+      "display_name": "Keccak-384",
+      "summary": "Original Keccak-384 with delimited suffix 0x01.",
+      "aliases": []
+    },
+    "hash.keccak512": {
+      "tool_id": "hash.keccak512",
+      "display_name": "Keccak-512",
+      "summary": "Original Keccak-512 with delimited suffix 0x01.",
+      "aliases": []
+    },
+    "hash.md4": {
+      "tool_id": "hash.md4",
+      "display_name": "MD4",
+      "summary": "RFC 1320 legacy MD4 compatibility digest.",
+      "aliases": []
+    },
+    "hash.ripemd128": {
+      "tool_id": "hash.ripemd128",
+      "display_name": "RIPEMD-128",
+      "summary": "RIPEMD-128 compatibility digest.",
+      "aliases": []
+    },
+    "hash.ripemd256": {
+      "tool_id": "hash.ripemd256",
+      "display_name": "RIPEMD-256",
+      "summary": "RIPEMD-256 compatibility digest.",
+      "aliases": []
+    },
+    "hash.ripemd320": {
+      "tool_id": "hash.ripemd320",
+      "display_name": "RIPEMD-320",
+      "summary": "RIPEMD-320 compatibility digest.",
+      "aliases": []
+    },
+    "hash.sha224": {
+      "tool_id": "hash.sha224",
+      "display_name": "SHA-224",
+      "summary": "SHA-224 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.sha384": {
+      "tool_id": "hash.sha384",
+      "display_name": "SHA-384",
+      "summary": "SHA-384 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.sha3_224": {
+      "tool_id": "hash.sha3_224",
+      "display_name": "SHA3-224",
+      "summary": "FIPS 202 SHA3-224 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha3_256": {
+      "tool_id": "hash.sha3_256",
+      "display_name": "SHA3-256",
+      "summary": "FIPS 202 SHA3-256 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha3_384": {
+      "tool_id": "hash.sha3_384",
+      "display_name": "SHA3-384",
+      "summary": "FIPS 202 SHA3-384 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha3_512": {
+      "tool_id": "hash.sha3_512",
+      "display_name": "SHA3-512",
+      "summary": "FIPS 202 SHA3-512 with delimited suffix 0x06.",
+      "aliases": []
+    },
+    "hash.sha512_224": {
+      "tool_id": "hash.sha512_224",
+      "display_name": "SHA-512/224",
+      "summary": "SHA-512/224 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.sha512_256": {
+      "tool_id": "hash.sha512_256",
+      "display_name": "SHA-512/256",
+      "summary": "SHA-512/256 with the initial values specified in FIPS 180-4.",
+      "aliases": []
+    },
+    "hash.whirlpool": {
+      "tool_id": "hash.whirlpool",
+      "display_name": "Whirlpool",
+      "summary": "Final 2003 Whirlpool compatibility digest.",
+      "aliases": []
+    },
+    "image.jpeg.coefficients.extract": {
+      "tool_id": "image.jpeg.coefficients.extract",
+      "display_name": "JPEG coefficient parity",
+      "summary": "Inspect baseline JPEG quantized AC magnitude parity in row-major block and zigzag AC order.",
+      "aliases": []
+    },
+    "text.ascii.decode": {
+      "tool_id": "text.ascii",
+      "display_name": "Decode ASCII",
+      "summary": "Decode using the ASCII profile. Strict ASCII bytes to their corresponding Unicode scalars.",
+      "aliases": []
+    },
+    "text.ascii.encode": {
+      "tool_id": "text.ascii",
+      "display_name": "Encode ASCII",
+      "summary": "Encode using the ASCII profile. Strict U+0000 through U+007F to exact bytes.",
+      "aliases": []
+    },
+    "text.html_entity.decode": {
+      "tool_id": "text.html_entity",
+      "display_name": "Decode HTML character references",
+      "summary": "Decode using the HTML character references profile. Decode WHATWG text-context named and numeric references in exact text.",
+      "aliases": []
+    },
+    "text.html_entity.encode": {
+      "tool_id": "text.html_entity",
+      "display_name": "Encode HTML character references",
+      "summary": "Encode using the HTML character references profile. Encode markup-sensitive scalars as canonical hexadecimal character references.",
+      "aliases": []
+    },
+    "text.json_escape.decode": {
+      "tool_id": "text.json_escape",
+      "display_name": "Decode JSON string escape",
+      "summary": "Decode using the JSON string escape profile. Decode exact JSON string content, rejecting raw controls and malformed escapes.",
+      "aliases": []
+    },
+    "text.json_escape.encode": {
+      "tool_id": "text.json_escape",
+      "display_name": "Encode JSON string escape",
+      "summary": "Encode using the JSON string escape profile. JSON string content escapes without surrounding quotes, ASCII-only by default.",
+      "aliases": []
+    },
+    "text.utf16.decode": {
+      "tool_id": "text.utf16",
+      "display_name": "Decode UTF-16",
+      "summary": "Decode using the UTF-16 profile. Strict complete UTF-16 code units with the selected byte order and marker policy.",
+      "aliases": []
+    },
+    "text.utf16.encode": {
+      "tool_id": "text.utf16",
+      "display_name": "Encode UTF-16",
+      "summary": "Encode using the UTF-16 profile. Encode Unicode scalars in the selected byte order and initial marker policy.",
       "aliases": []
     }
   }
