@@ -2829,6 +2829,98 @@
     "text.unicode_transform": {
       "display_name": "Fold case or filter Unicode categories",
       "summary": "Apply ASCII casing, Unicode folding or General_Category filtering."
+    },
+    "number.balanced_ternary": {
+      "display_name": "Convert balanced ternary",
+      "summary": "Convert between signed integers and balanced trits."
+    },
+    "number.benford": {
+      "display_name": "Measure first-digit frequencies",
+      "summary": "Count first significant digits and compare with theoretical Benford weights."
+    },
+    "number.correlation": {
+      "display_name": "Measure numerical correlation",
+      "summary": "Compute explicit lag overlaps, Pearson correlation or Spearman correlation."
+    },
+    "number.crt": {
+      "display_name": "Solve Chinese remainder constraints",
+      "summary": "Find an exact congruence solution or report conflicting moduli."
+    },
+    "number.de_bruijn": {
+      "display_name": "Generate a de Bruijn sequence",
+      "summary": "Generate an ordered cyclic sequence containing each word of the given length."
+    },
+    "number.decimal_check": {
+      "display_name": "Summarize or check decimal digits",
+      "summary": "Compute the digit sum, decimal root or a casting-out-nines check."
+    },
+    "number.entropy": {
+      "display_name": "Estimate entropy from counts",
+      "summary": "Choose Shannon, Rényi or Miller–Madow in bits."
+    },
+    "number.factor": {
+      "display_name": "Find integer factors",
+      "summary": "Factor a u32 or search for one u64 divisor with explicitly seeded Pollard rho."
+    },
+    "number.factoradic": {
+      "display_name": "Convert factorial-base digits",
+      "summary": "Convert exact integers to and from canonical factoradic digits."
+    },
+    "number.gray": {
+      "display_name": "Convert reflected Gray codes",
+      "summary": "Encode or decode an unsigned integer with an explicit bit width."
+    },
+    "number.interpolation": {
+      "display_name": "Evaluate exact interpolation",
+      "summary": "Build a difference table or evaluate exact Lagrange and Newton interpolants."
+    },
+    "number.lehmer": {
+      "display_name": "Rank distinct permutations",
+      "summary": "Convert exact Lehmer digits, ranks and zero-based permutations."
+    },
+    "number.letter_values": {
+      "display_name": "Evaluate letter values",
+      "summary": "Apply explicit ASCII, Cheiro, Hebrew, Abjad or custom tables and aggregates."
+    },
+    "number.lexicographic_rank": {
+      "display_name": "Rank multiset text",
+      "summary": "Rank or unrank identical scalar classes in a caller-defined alphabet order."
+    },
+    "number.markov": {
+      "display_name": "Count state transitions",
+      "summary": "Build an empirical transition matrix with exact row probabilities."
+    },
+    "number.matrix": {
+      "display_name": "Compute exact matrix results",
+      "summary": "Use rational matrices for elimination, rank, determinant, inverse or solve."
+    },
+    "number.partitions": {
+      "display_name": "Count or list integer partitions",
+      "summary": "Count exact partitions and list a bounded reverse-lexicographic prefix."
+    },
+    "number.permutation_list": {
+      "display_name": "List permutations",
+      "summary": "Enumerate distinct multisets or adjacent-swap permutations."
+    },
+    "number.primality": {
+      "display_name": "Test primality",
+      "summary": "Use trial division or deterministic Miller–Rabin for a u32."
+    },
+    "number.recurrence": {
+      "display_name": "Generate integer recurrences",
+      "summary": "Build exact progressions and Fibonacci, Lucas or Collatz prefixes."
+    },
+    "number.roman": {
+      "display_name": "Convert Roman numerals",
+      "summary": "Encode or decode strict canonical Roman numerals through 3,999."
+    },
+    "number.runs": {
+      "display_name": "Measure runs in two categories",
+      "summary": "Count runs and compute Wald–Wolfowitz evidence with the selected tie policy."
+    },
+    "number.sieve": {
+      "display_name": "List primes through a limit",
+      "summary": "Choose Eratosthenes or Atkin for a bounded inclusive prime list."
     }
   },
   "operations": {
@@ -7015,6 +7107,223 @@
         "casefold",
         "Unicode",
         "General Category"
+      ]
+    },
+    "number.balanced_ternary": {
+      "tool_id": "number.balanced_ternary",
+      "display_name": "Convert balanced ternary",
+      "summary": "Convert between signed integers and balanced trits.",
+      "aliases": [
+        "balanced ternary",
+        "radix"
+      ]
+    },
+    "number.benford": {
+      "tool_id": "number.benford",
+      "display_name": "Measure first-digit frequencies",
+      "summary": "Count first significant digits and compare with theoretical Benford weights.",
+      "aliases": [
+        "Benford",
+        "digit histogram"
+      ]
+    },
+    "number.correlation": {
+      "tool_id": "number.correlation",
+      "display_name": "Measure numerical correlation",
+      "summary": "Compute explicit lag overlaps, Pearson correlation or Spearman correlation.",
+      "aliases": [
+        "autocorrelation",
+        "Pearson",
+        "Spearman"
+      ]
+    },
+    "number.crt": {
+      "tool_id": "number.crt",
+      "display_name": "Solve Chinese remainder constraints",
+      "summary": "Find an exact congruence solution or report conflicting moduli.",
+      "aliases": [
+        "CRT",
+        "congruence",
+        "Chinese remainder theorem"
+      ]
+    },
+    "number.de_bruijn": {
+      "tool_id": "number.de_bruijn",
+      "display_name": "Generate a de Bruijn sequence",
+      "summary": "Generate an ordered cyclic sequence containing each word of the given length.",
+      "aliases": [
+        "de Bruijn",
+        "FKM",
+        "Lyndon"
+      ]
+    },
+    "number.decimal_check": {
+      "tool_id": "number.decimal_check",
+      "display_name": "Summarize or check decimal digits",
+      "summary": "Compute the digit sum, decimal root or a casting-out-nines check.",
+      "aliases": [
+        "casting out nines",
+        "digit sum"
+      ]
+    },
+    "number.entropy": {
+      "tool_id": "number.entropy",
+      "display_name": "Estimate entropy from counts",
+      "summary": "Choose Shannon, Rényi or Miller–Madow in bits.",
+      "aliases": [
+        "Shannon",
+        "Rényi",
+        "Miller–Madow"
+      ]
+    },
+    "number.factor": {
+      "tool_id": "number.factor",
+      "display_name": "Find integer factors",
+      "summary": "Factor a u32 or search for one u64 divisor with explicitly seeded Pollard rho.",
+      "aliases": [
+        "factorization",
+        "Pollard rho"
+      ]
+    },
+    "number.factoradic": {
+      "tool_id": "number.factoradic",
+      "display_name": "Convert factorial-base digits",
+      "summary": "Convert exact integers to and from canonical factoradic digits.",
+      "aliases": [
+        "factorial number system",
+        "factoradic"
+      ]
+    },
+    "number.gray": {
+      "tool_id": "number.gray",
+      "display_name": "Convert reflected Gray codes",
+      "summary": "Encode or decode an unsigned integer with an explicit bit width.",
+      "aliases": [
+        "Gray code",
+        "bits"
+      ]
+    },
+    "number.interpolation": {
+      "tool_id": "number.interpolation",
+      "display_name": "Evaluate exact interpolation",
+      "summary": "Build a difference table or evaluate exact Lagrange and Newton interpolants.",
+      "aliases": [
+        "finite differences",
+        "Lagrange",
+        "Newton"
+      ]
+    },
+    "number.lehmer": {
+      "tool_id": "number.lehmer",
+      "display_name": "Rank distinct permutations",
+      "summary": "Convert exact Lehmer digits, ranks and zero-based permutations.",
+      "aliases": [
+        "Lehmer",
+        "permutation rank"
+      ]
+    },
+    "number.letter_values": {
+      "tool_id": "number.letter_values",
+      "display_name": "Evaluate letter values",
+      "summary": "Apply explicit ASCII, Cheiro, Hebrew, Abjad or custom tables and aggregates.",
+      "aliases": [
+        "gematria",
+        "Abjad",
+        "Cheiro",
+        "Chaldean"
+      ]
+    },
+    "number.lexicographic_rank": {
+      "tool_id": "number.lexicographic_rank",
+      "display_name": "Rank multiset text",
+      "summary": "Rank or unrank identical scalar classes in a caller-defined alphabet order.",
+      "aliases": [
+        "lexical rank",
+        "multiset"
+      ]
+    },
+    "number.markov": {
+      "tool_id": "number.markov",
+      "display_name": "Count state transitions",
+      "summary": "Build an empirical transition matrix with exact row probabilities.",
+      "aliases": [
+        "Markov",
+        "transition matrix"
+      ]
+    },
+    "number.matrix": {
+      "tool_id": "number.matrix",
+      "display_name": "Compute exact matrix results",
+      "summary": "Use rational matrices for elimination, rank, determinant, inverse or solve.",
+      "aliases": [
+        "rational matrix",
+        "RREF",
+        "Gauss–Jordan"
+      ]
+    },
+    "number.partitions": {
+      "tool_id": "number.partitions",
+      "display_name": "Count or list integer partitions",
+      "summary": "Count exact partitions and list a bounded reverse-lexicographic prefix.",
+      "aliases": [
+        "integer partition",
+        "partition enumeration"
+      ]
+    },
+    "number.permutation_list": {
+      "tool_id": "number.permutation_list",
+      "display_name": "List permutations",
+      "summary": "Enumerate distinct multisets or adjacent-swap permutations.",
+      "aliases": [
+        "Johnson–Trotter",
+        "multiset permutations"
+      ]
+    },
+    "number.primality": {
+      "tool_id": "number.primality",
+      "display_name": "Test primality",
+      "summary": "Use trial division or deterministic Miller–Rabin for a u32.",
+      "aliases": [
+        "prime",
+        "Miller–Rabin"
+      ]
+    },
+    "number.recurrence": {
+      "tool_id": "number.recurrence",
+      "display_name": "Generate integer recurrences",
+      "summary": "Build exact progressions and Fibonacci, Lucas or Collatz prefixes.",
+      "aliases": [
+        "Fibonacci",
+        "Lucas",
+        "Collatz"
+      ]
+    },
+    "number.roman": {
+      "tool_id": "number.roman",
+      "display_name": "Convert Roman numerals",
+      "summary": "Encode or decode strict canonical Roman numerals through 3,999.",
+      "aliases": [
+        "Roman numerals",
+        "ASCII"
+      ]
+    },
+    "number.runs": {
+      "tool_id": "number.runs",
+      "display_name": "Measure runs in two categories",
+      "summary": "Count runs and compute Wald–Wolfowitz evidence with the selected tie policy.",
+      "aliases": [
+        "Wald–Wolfowitz",
+        "runs test"
+      ]
+    },
+    "number.sieve": {
+      "tool_id": "number.sieve",
+      "display_name": "List primes through a limit",
+      "summary": "Choose Eratosthenes or Atkin for a bounded inclusive prime list.",
+      "aliases": [
+        "prime sieve",
+        "Eratosthenes",
+        "Atkin"
       ]
     }
   }
