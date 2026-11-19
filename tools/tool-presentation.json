@@ -2785,6 +2785,50 @@
     "sequence.vector_similarity": {
       "display_name": "Compare vector scores",
       "summary": "Compute cosine, Kullback–Leibler or Jensen–Shannon scores."
+    },
+    "text.beider_morse": {
+      "display_name": "Encode Beider–Morse alternatives",
+      "summary": "Select name, language and rule profiles for bounded alternatives."
+    },
+    "text.daitch_mokotoff": {
+      "display_name": "Encode Daitch–Mokotoff Soundex",
+      "summary": "Return all unique six-digit phonetic alternatives."
+    },
+    "text.graphemes": {
+      "display_name": "Segment or reverse grapheme clusters",
+      "summary": "Use Unicode extended clusters and original byte and scalar spans."
+    },
+    "text.match_rating": {
+      "display_name": "Encode or compare Match Rating keys",
+      "summary": "Compare ASCII-letter names with a documented integer rating."
+    },
+    "text.phonetic": {
+      "display_name": "Encode phonetic spelling keys",
+      "summary": "Choose Soundex, NYSIIS, Metaphone, Caverphone or Cologne."
+    },
+    "text.regex": {
+      "display_name": "Match, capture or split text with regex",
+      "summary": "Use a bounded Rust regex engine with original spans."
+    },
+    "text.scalar_weave": {
+      "display_name": "Pad or interleave text scalars",
+      "summary": "Set exact widths or interleave and recover explicit lanes."
+    },
+    "text.select_words": {
+      "display_name": "Select words by signed index",
+      "summary": "Return whole words with duplicates and original source spans."
+    },
+    "text.sort": {
+      "display_name": "Sort scalars or tokens",
+      "summary": "Use exact lexical ordering with stable ties."
+    },
+    "text.tokenize": {
+      "display_name": "Tokenize on Unicode whitespace",
+      "summary": "Return original words and their byte and scalar spans."
+    },
+    "text.unicode_transform": {
+      "display_name": "Fold case or filter Unicode categories",
+      "summary": "Apply ASCII casing, Unicode folding or General_Category filtering."
     }
   },
   "operations": {
@@ -6864,6 +6908,114 @@
       "display_name": "Compare vector scores",
       "summary": "Compute cosine, Kullback–Leibler or Jensen–Shannon scores.",
       "aliases": []
+    },
+    "text.beider_morse": {
+      "tool_id": "text.beider_morse",
+      "display_name": "Encode Beider–Morse alternatives",
+      "summary": "Select name, language and rule profiles for bounded alternatives.",
+      "aliases": [
+        "phonetic",
+        "Beider Morse"
+      ]
+    },
+    "text.daitch_mokotoff": {
+      "tool_id": "text.daitch_mokotoff",
+      "display_name": "Encode Daitch–Mokotoff Soundex",
+      "summary": "Return all unique six-digit phonetic alternatives.",
+      "aliases": [
+        "phonetic",
+        "Daitch Mokotoff",
+        "Soundex"
+      ]
+    },
+    "text.graphemes": {
+      "tool_id": "text.graphemes",
+      "display_name": "Segment or reverse grapheme clusters",
+      "summary": "Use Unicode extended clusters and original byte and scalar spans.",
+      "aliases": [
+        "segmentation",
+        "Unicode",
+        "reverse"
+      ]
+    },
+    "text.match_rating": {
+      "tool_id": "text.match_rating",
+      "display_name": "Encode or compare Match Rating keys",
+      "summary": "Compare ASCII-letter names with a documented integer rating.",
+      "aliases": [
+        "phonetic",
+        "MRA"
+      ]
+    },
+    "text.phonetic": {
+      "tool_id": "text.phonetic",
+      "display_name": "Encode phonetic spelling keys",
+      "summary": "Choose Soundex, NYSIIS, Metaphone, Caverphone or Cologne.",
+      "aliases": [
+        "Soundex",
+        "NYSIIS",
+        "Metaphone",
+        "Caverphone",
+        "Cologne"
+      ]
+    },
+    "text.regex": {
+      "tool_id": "text.regex",
+      "display_name": "Match, capture or split text with regex",
+      "summary": "Use a bounded Rust regex engine with original spans.",
+      "aliases": [
+        "regex",
+        "regular expression",
+        "split",
+        "captures"
+      ]
+    },
+    "text.scalar_weave": {
+      "tool_id": "text.scalar_weave",
+      "display_name": "Pad or interleave text scalars",
+      "summary": "Set exact widths or interleave and recover explicit lanes.",
+      "aliases": [
+        "padding",
+        "interleave",
+        "deinterleave"
+      ]
+    },
+    "text.select_words": {
+      "tool_id": "text.select_words",
+      "display_name": "Select words by signed index",
+      "summary": "Return whole words with duplicates and original source spans.",
+      "aliases": [
+        "token extraction",
+        "word selection"
+      ]
+    },
+    "text.sort": {
+      "tool_id": "text.sort",
+      "display_name": "Sort scalars or tokens",
+      "summary": "Use exact lexical ordering with stable ties.",
+      "aliases": [
+        "lexical sort",
+        "alphabetic"
+      ]
+    },
+    "text.tokenize": {
+      "tool_id": "text.tokenize",
+      "display_name": "Tokenize on Unicode whitespace",
+      "summary": "Return original words and their byte and scalar spans.",
+      "aliases": [
+        "tokenization",
+        "split"
+      ]
+    },
+    "text.unicode_transform": {
+      "tool_id": "text.unicode_transform",
+      "display_name": "Fold case or filter Unicode categories",
+      "summary": "Apply ASCII casing, Unicode folding or General_Category filtering.",
+      "aliases": [
+        "casefold",
+        "Unicode",
+        "General Category"
+      ]
     }
   }
 }
