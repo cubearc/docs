@@ -1,6 +1,7 @@
 import { sdkRoot, expectedBuild } from './runtime-config.mjs';
 import { toolsFor } from './catalog.mjs';
 import { snapshot } from './data.mjs';
+import { startupAssetBytes } from './startup-assets.mjs';
 
 async function metadata(path, maxBytes) {
   const response = await fetch(new URL(path, import.meta.url), { cache: 'no-cache' });
@@ -30,12 +31,12 @@ export async function initializeRuntime() {
     for (const key of ['sourceSha256', 'wasmSha256', 'catalogSha256', 'sdkVersion']) {
       if (sdk.build[key] !== expectedBuild[key]) throw new Error('The site and local SDK assets have different versions. Reload the complete site.');
     }
-    const rawCatalog = await metadata('./catalog.json', 4 * 1024 * 1024);
+    const rawCatalog = await metadata('./catalog.json', startupAssetBytes['catalog.json']);
     const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawCatalog.trim())));
     const hash = Array.from(digest, value => value.toString(16).padStart(2, '0')).join('');
     if (hash !== sdk.build.catalogSha256) throw new Error('The catalog does not match this runtime. Reload the complete site.');
     const catalog = JSON.parse(rawCatalog);
-    const presentation = JSON.parse(await metadata('./presentation.json', 256 * 1024));
+    const presentation = JSON.parse(await metadata('./presentation.json', startupAssetBytes['presentation.json']));
     const tools = toolsFor(catalog.operations, presentation, sdk);
     if (tools.flatMap(tool => tool.actions).length !== catalog.operations.length) throw new Error('The complete tool catalog could not be represented.');
     return new Runtime(sdk, catalog, presentation, tools);
