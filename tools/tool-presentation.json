@@ -2921,6 +2921,58 @@
     "number.sieve": {
       "display_name": "List primes through a limit",
       "summary": "Choose Eratosthenes or Atkin for a bounded inclusive prime list."
+    },
+    "graph.traversal": {
+      "display_name": "Traverse a graph",
+      "summary": "Find ordered depth-first visits, a topological order or strongly connected components."
+    },
+    "graph.weighted_path": {
+      "display_name": "Find a weighted shortest path",
+      "summary": "Use Dijkstra, Bellman–Ford or A* and return the exact cost and edge IDs."
+    },
+    "graph.all_pairs_paths": {
+      "display_name": "Find shortest paths between all vertices",
+      "summary": "Use Floyd–Warshall to compute distances and identify unbounded pairs."
+    },
+    "graph.disjoint_sets": {
+      "display_name": "Merge and query disjoint sets",
+      "summary": "Apply ordered union and query actions with a canonical representative for each component."
+    },
+    "graph.bipartite_matching": {
+      "display_name": "Find a maximum bipartite matching",
+      "summary": "Match left and right vertices with an optional minimum vertex cover."
+    },
+    "logic.exact_cover": {
+      "display_name": "Enumerate exact covers",
+      "summary": "Choose rows covering every primary column with bounded dancing links."
+    },
+    "logic.dpll": {
+      "display_name": "Solve a CNF formula with DPLL",
+      "summary": "Search explicit clauses with deterministic branching and unit propagation."
+    },
+    "logic.cdcl": {
+      "display_name": "Solve a CNF formula with CDCL",
+      "summary": "Learn conflict clauses or verify an unsatisfiability proof."
+    },
+    "esolang.lambda": {
+      "display_name": "Reduce a lambda term",
+      "summary": "Use normal or applicative order with capture-avoiding beta and optional eta reduction."
+    },
+    "esolang.ski": {
+      "display_name": "Reduce an SKI term",
+      "summary": "Apply bounded leftmost-outermost reductions to S, K and I combinators."
+    },
+    "esolang.cellular_automaton": {
+      "display_name": "Evolve a cellular automaton",
+      "summary": "Run Conway’s Life or an elementary rule from an explicit binary grid."
+    },
+    "number.lfsr": {
+      "display_name": "Generate a linear-feedback bit stream",
+      "summary": "Use an explicit Fibonacci shift register, tap mask and byte packing."
+    },
+    "number.prng": {
+      "display_name": "Generate reproducible pseudorandom words",
+      "summary": "Produce exact u32 words and a continuation state with MT19937 or xorshift32."
     }
   },
   "operations": {
@@ -7324,6 +7376,129 @@
         "prime sieve",
         "Eratosthenes",
         "Atkin"
+      ]
+    },
+    "graph.traversal": {
+      "tool_id": "graph.traversal",
+      "display_name": "Traverse a graph",
+      "summary": "Find ordered depth-first visits, a topological order or strongly connected components.",
+      "aliases": [
+        "DFS",
+        "Tarjan",
+        "topological order"
+      ]
+    },
+    "graph.weighted_path": {
+      "tool_id": "graph.weighted_path",
+      "display_name": "Find a weighted shortest path",
+      "summary": "Use Dijkstra, Bellman–Ford or A* and return the exact cost and edge IDs.",
+      "aliases": [
+        "Dijkstra",
+        "Bellman–Ford",
+        "A*"
+      ]
+    },
+    "graph.all_pairs_paths": {
+      "tool_id": "graph.all_pairs_paths",
+      "display_name": "Find shortest paths between all vertices",
+      "summary": "Use Floyd–Warshall to compute distances and identify unbounded pairs.",
+      "aliases": [
+        "Floyd–Warshall",
+        "distance matrix"
+      ]
+    },
+    "graph.disjoint_sets": {
+      "tool_id": "graph.disjoint_sets",
+      "display_name": "Merge and query disjoint sets",
+      "summary": "Apply ordered union and query actions with a canonical representative for each component.",
+      "aliases": [
+        "union-find",
+        "disjoint-set union"
+      ]
+    },
+    "graph.bipartite_matching": {
+      "tool_id": "graph.bipartite_matching",
+      "display_name": "Find a maximum bipartite matching",
+      "summary": "Match left and right vertices with an optional minimum vertex cover.",
+      "aliases": [
+        "Hopcroft–Karp",
+        "Kőnig cover"
+      ]
+    },
+    "logic.exact_cover": {
+      "tool_id": "logic.exact_cover",
+      "display_name": "Enumerate exact covers",
+      "summary": "Choose rows covering every primary column with bounded dancing links.",
+      "aliases": [
+        "Algorithm X",
+        "DLX"
+      ]
+    },
+    "logic.dpll": {
+      "tool_id": "logic.dpll",
+      "display_name": "Solve a CNF formula with DPLL",
+      "summary": "Search explicit clauses with deterministic branching and unit propagation.",
+      "aliases": [
+        "CNF",
+        "SAT",
+        "Davis–Putnam–Logemann–Loveland"
+      ]
+    },
+    "logic.cdcl": {
+      "tool_id": "logic.cdcl",
+      "display_name": "Solve a CNF formula with CDCL",
+      "summary": "Learn conflict clauses or verify an unsatisfiability proof.",
+      "aliases": [
+        "first UIP",
+        "RUP proof",
+        "SAT"
+      ]
+    },
+    "esolang.lambda": {
+      "tool_id": "esolang.lambda",
+      "display_name": "Reduce a lambda term",
+      "summary": "Use normal or applicative order with capture-avoiding beta and optional eta reduction.",
+      "aliases": [
+        "lambda calculus",
+        "beta reduction"
+      ]
+    },
+    "esolang.ski": {
+      "tool_id": "esolang.ski",
+      "display_name": "Reduce an SKI term",
+      "summary": "Apply bounded leftmost-outermost reductions to S, K and I combinators.",
+      "aliases": [
+        "combinatory logic",
+        "SKI combinators"
+      ]
+    },
+    "esolang.cellular_automaton": {
+      "tool_id": "esolang.cellular_automaton",
+      "display_name": "Evolve a cellular automaton",
+      "summary": "Run Conway’s Life or an elementary rule from an explicit binary grid.",
+      "aliases": [
+        "Game of Life",
+        "rule 30",
+        "rule 110"
+      ]
+    },
+    "number.lfsr": {
+      "tool_id": "number.lfsr",
+      "display_name": "Generate a linear-feedback bit stream",
+      "summary": "Use an explicit Fibonacci shift register, tap mask and byte packing.",
+      "aliases": [
+        "LFSR",
+        "Fibonacci register"
+      ]
+    },
+    "number.prng": {
+      "tool_id": "number.prng",
+      "display_name": "Generate reproducible pseudorandom words",
+      "summary": "Produce exact u32 words and a continuation state with MT19937 or xorshift32.",
+      "aliases": [
+        "MT19937",
+        "Mersenne Twister",
+        "xorshift32"
       ]
     }
   }
