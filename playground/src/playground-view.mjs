@@ -23,6 +23,8 @@ export function mountPlayground(container, context) {
   const originalAction = page.tool ? runtime.action(page.tool) : null;
   const descriptor = presentationFor(originalAction, page.parameters[page.tool] ?? {});
   const selected = descriptor && originalAction?.direct ? { ...originalAction, pipeline: null } : originalAction;
+  const secretPorts = new Set(selected?.contract.inputs.filter(port => port.schema['x-cube-secret'] === true).map(port => port.name));
+  const privateTool = secretPorts.size > 0;
   const enigmaStudy = descriptor?.kind === 'enigma';
   const instrumentStudy = isInstrumentStudy(descriptor);
   let instrument;
@@ -35,7 +37,7 @@ export function mountPlayground(container, context) {
   const editorTab=()=>page.editorTabs[selected?.id]??'Visual';
   const policyStatus=h('p',{class:'small muted auto-status',id:'automatic-status'});
   const routeError=state.catalog.routeError;page.routeError=routeError;
-  function policy(){return selected?automaticPolicy(selected,session.input,{parameters:page.parameters[selected.id]??{},extraInputs:page.extraInputs[selected.id]??{},slow:page.slow.has(selected.id)}):{eligible:comparisonCandidates(runtime,page.mode,session.input,{slow:page.slow}).length>0,reason:bytesOf(session.input)>4096?'Input exceeds the 4-KiB automatic budget. Run explicitly.':'Automatic updates · up to 6 independent alternatives'};}
+  function policy(){return privateTool ? {eligible:false,reason:'Run explicitly. The key and result are excluded from session history.'} : selected?automaticPolicy(selected,session.input,{parameters:page.parameters[selected.id]??{},extraInputs:page.extraInputs[selected.id]??{},slow:page.slow.has(selected.id)}):{eligible:comparisonCandidates(runtime,page.mode,session.input,{slow:page.slow}).length>0,reason:bytesOf(session.input)>4096?'Input exceeds the 4-KiB automatic budget. Run explicitly.':'Automatic updates · up to 6 independent alternatives'};}
   function schedulePreview(delay=250) {
     page.scheduler.cancel();
     const eligibility=policy();
@@ -51,7 +53,7 @@ export function mountPlayground(container, context) {
 
   function rejectedInput(error) {
     page.scheduler.cancel();page.controller?.abort();page.auxiliary?.abort();session.invalidate();page.revision++;
-    page.readingFile=null;page.secondaryReading=null;
+    page.readingFile=null;page.secondaryReading=null;page.privateResult=null;
     page.running=false;page.phase='invalid';page.errors=[{title:'Input not accepted',message:`${error.message} The previous input is retained.`,code:error.code??'invalid_input'}];
     page.status='Input not accepted. The previous input is retained.';page.redraw?.();instrument?.refresh();
   }
@@ -62,7 +64,7 @@ export function mountPlayground(container, context) {
     if(input)session.setInput(input);else session.invalidate();
     page.controller?.abort(); page.auxiliary?.abort();page.scheduler.cancel();
     page.revision++;page.readingFile=null;page.secondaryReading=null;page.running=false;
-    page.errors=[];page.pendingNext=false;page.phase='edited';
+    page.errors=[];page.pendingNext=false;page.phase='edited';page.privateResult=null;
     if(input){page.sourceName=null;page.inputTouched=true;if(!preservePresentation)page.inputRevision=(page.inputRevision??0)+1;}
     schedulePreview();
   }
@@ -109,23 +111,34 @@ export function mountPlayground(container, context) {
     if(routeError)return;
     const revision = page.revision;
     if(!automatic){page.scheduler.cancel();page.controller?.abort();await page.scheduler.idle();if(revision!==page.revision||!isCurrentView())return;}
+    const transient = privateTool && (!ids || ids.length === 1 && ids[0] === selected.id);
+    if (transient && automatic) return;
     const utf8 = page.utf8;
     const controller = beginRun();
     page.auxiliary?.abort();
     page.controller = controller;
     let token;
     let acceptedCount = 0;
-    try { token = automatic ? session.beginPreview() : session.begin(); }
+    try { if (!transient) token = automatic ? session.beginPreview() : session.begin(); }
     catch (error) { page.running=false;page.phase='failure';page.status=error.message;page.errors=[{title:'Session limit',message:error.message,code:error.code}];page.redraw?.();return; }
     page.running = true; page.errors = []; page.pendingNext = false; page.showRound = null;
     page.phase='updating';page.status=automatic?'Updating…':selected?'Running locally…':'Comparing independent alternatives…';
     page.redraw?.();
-    const rootInput = session.inputFor(token);
+    const rootInput = transient ? session.input : session.inputFor(token);
     const sourceName = page.sourceName;
     const candidates = ids ?? (page.tool ? [page.tool] : automatic ? comparisonCandidates(runtime,page.mode,rootInput,{slow:page.slow}) : manualComparisons(page.mode,rootInput));
     const rawParameters=snapshot(Object.fromEntries(candidates.map(id=>[id,page.parameters[id]??{}])));
     const rawExtras=snapshot(Object.fromEntries(candidates.map(id=>[id,page.extraInputs[id]??{}])));
-    const options = { signal: controller.signal, context: { section: 'playground', revision, round: token.round }, timeoutMs: automatic ? 2000 : 30000 };
+    if (transient) {
+      Object.assign(rawExtras[selected.id], page.privateInputs);
+      page.privateResult = null;
+      for (const name of secretPorts) {
+        delete page.privateInputs?.[name];
+        const field = parameterRegion.querySelector(`#extra-${CSS.escape(name)}`);
+        if (field) field.value = '';
+      }
+    }
+    const options = { signal: controller.signal, context: { section: 'playground', revision, round: token?.round }, timeoutMs: automatic ? 2000 : 30000 };
     try {
       for (const id of candidates) {
         if (controller.signal.aborted || page.revision !== revision) break;
@@ -136,10 +149,15 @@ export function mountPlayground(container, context) {
           let parameters;
           try {parameters=await parametersFor(runtime, action, rawParameters[id] ?? {}, options);}
           catch(error){error.code??='invalid_parameter';throw error;}
-          const result = await runtime.perform(action, session.inputFor(token), parameters, { ...options, utf8, extraInputs: rawExtras[id] ?? {} });
+          const result = await runtime.perform(action, rootInput, parameters, { ...options, utf8, extraInputs: rawExtras[id] ?? {} });
           const views = {};
           for (const [name, value] of Object.entries(result.outputs)) views[name] = await runtime.representations(value, options);
           if (controller.signal.aborted || page.revision !== revision) break;
+          if (transient) {
+            page.privateResult = { id:'private', kind:'transient', operation:id, outputs:result.outputs, views };
+            acceptedCount++;
+            break;
+          }
           const accepted=session.accept(token, { ...result, snapshot: {input:rootInput, parameters, extraInputs:rawExtras[id] ?? {}, namedInputs:result.namedInputs}, views, sourceName, producingBuild: runtime.sdk.build.sourceSha256, producingIdentity:runtime.sdk.build });
           if(!accepted)break;
           acceptedCount++;
@@ -161,7 +179,7 @@ export function mountPlayground(container, context) {
         const count = acceptedCount;
         const invalid=page.errors.every(error=>['invalid_input','invalid_parameter','missing_parameter'].includes(error.code));
         page.phase=controller.signal.aborted?'stopped':count?'current':page.errors.length?invalid?'invalid':'failure':'empty';
-        page.status=controller.signal.aborted?'Stop requested; no further results will be accepted. Core completion is not confirmed.':count?(automatic?'Up to date.': 'Result retained.') : page.errors.length?invalid?'Check input or parameters.':'Execution failed. Review the details and retry.':'No result.';
+        page.status=controller.signal.aborted?'Stop requested; no further results will be accepted. Core completion is not confirmed.':count?(transient?'Result ready.':automatic?'Up to date.':'Result retained.') : page.errors.length?invalid?'Check input or parameters.':'Execution failed. Review the details and retry.':'No result.';
         page.redraw?.(); instrument?.refresh();
       }
     }
@@ -194,6 +212,7 @@ export function mountPlayground(container, context) {
 
   function card(result) {
     const action = runtime.action(result.operation);
+    const privateRun = result.kind === 'transient';
     const names = Object.keys(result.outputs);
     const defaultName = descriptor ? primaryOutputName(descriptor, result) : undefined;
     const viewKey=result.kind==='preview'?`live-${result.operation}`:result.id;
@@ -202,15 +221,15 @@ export function mountPlayground(container, context) {
     const view = selectedName ? resultViewer(result.outputs[selectedName], result.views[selectedName], {
       title: action?.title ?? 'Result', id: `result-${viewKey}`, pinned,
       choice: page.viewChoices[`${viewKey}:${selectedName}`]??result.representation, onChoice: choice => { page.viewChoices[`${viewKey}:${selectedName}`] = choice; },
-      onPin: () => { try { const representation=page.viewChoices[`${viewKey}:${selectedName}`]??Object.keys(result.views[selectedName])[0];page.outputChoices[result.id]=selectedName;page.viewChoices[`${result.id}:${selectedName}`]=representation;session.pin(result.id,{outputName:selectedName,representation}); page.redraw?.(); document.getElementById(`result-${result.id}-pin`)?.focus({preventScroll:true}); } catch (error) { notify(error.message); } },
-      onContinue: () => chooseContinue(result, selectedName),
+      onPin: privateRun ? undefined : () => { try { const representation=page.viewChoices[`${viewKey}:${selectedName}`]??Object.keys(result.views[selectedName])[0];page.outputChoices[result.id]=selectedName;page.viewChoices[`${result.id}:${selectedName}`]=representation;session.pin(result.id,{outputName:selectedName,representation}); page.redraw?.(); document.getElementById(`result-${result.id}-pin`)?.focus({preventScroll:true}); } catch (error) { notify(error.message); } },
+      onContinue: privateRun ? undefined : () => chooseContinue(result, selectedName),
     }) : h('p', { class: 'muted' }, 'Choose which named output to view, copy or continue.');
     const safeParameters = Object.fromEntries(Object.entries(result.parameters ?? {}).map(([name, value]) => [name, action?.contract.policy.sensitive_parameters.includes(name) ? '[provided; hidden]' : value]));
-    return h('article', { class: 'panel result-card', 'data-result-operation': result.operation, 'data-result-current':String(!result.earlierInput), 'data-result-kind':result.kind }, h('div', { class: 'row between' }, h('h3', {}, action?.title ?? 'Result'), h('span', { class: 'tag' }, result.kind==='preview'?'Live preview':`Retained · round ${result.round}`)),
+    return h('article', { class: 'panel result-card', 'data-result-operation': result.operation, 'data-result-current':String(!result.earlierInput), 'data-result-kind':result.kind }, h('div', { class: 'row between' }, h('h3', {}, action?.title ?? 'Result'), h('span', { class: 'tag' }, privateRun?'Current result':result.kind==='preview'?'Live preview':`Retained · round ${result.round}`)),
       result.earlierInput ? h('p', { class: 'warning small' }, 'From an earlier input or settings.') : null,
       names.length > 1 ? h('div', { class: 'field' }, h('label', { for: `output-${viewKey}` }, 'Choose an output'), h('select', { id: `output-${viewKey}`, onChange: event => { page.outputChoices[viewKey] = event.target.value; page.redraw?.(); } }, h('option', { value: '' }, 'Choose an output'), names.map(name => h('option', { value: name, selected: name === selectedName }, `${labelFor(name)} (${result.outputs[name].type})`)))) : null,
       action?.contract.inputs.length === 0 ? h('p', { class: 'small muted' }, 'Generated from options; no starting input was used.') : null,
-      view, result.outputs[selectedName]?.data===''||result.outputs[selectedName]?.data?.byteLength===0?h('p',{class:'small muted'},'Empty output · valid result'):null, h('details', {id:`result-${viewKey}-settings`}, h('summary', {id:`result-${viewKey}-settings-toggle`}, 'Used settings'), h('pre', {}, JSON.stringify({ operation: result.operation, version: result.version, parameters: safeParameters, conversions: result.steps?.slice(0, -1) ?? result.conversions ?? [] }, (_, value) => typeof value === 'bigint' ? value.toString() : value, 2)), h('details',{id:`result-${viewKey}-inputs`},h('summary',{id:`result-${viewKey}-inputs-toggle`},'Inputs from this result'),h('pre',{},JSON.stringify({type:result.snapshot?.input?.type,secondaryInputs:result.snapshot?.extraInputs??{}},null,2).slice(0,4096))),button('Download run details (includes input and settings)',async()=>{try{const wire=await runtime.call('recipeJson',[{operation:result.operation,version:result.version,primary_input_name:action?.contract.inputs[0]?.name??null,input:result.snapshot?.input??null,parameters:result.parameters??{},secondary_inputs:result.snapshot?.extraInputs??{},steps:result.steps??result.conversions??[],selected_output:selectedName??null,source_name:result.sourceName??null,producing_build:result.producingIdentity??result.producingBuild??null,sdk_request:result.sdkRequest??null}]);download(wire,'cube-run-details.json','application/json');}catch(error){notify(error.message);}},{id:`result-${viewKey}-download-run`})));
+      view, result.outputs[selectedName]?.data===''||result.outputs[selectedName]?.data?.byteLength===0?h('p',{class:'small muted'},'Empty output · valid result'):null, privateRun ? null : h('details', {id:`result-${viewKey}-settings`}, h('summary', {id:`result-${viewKey}-settings-toggle`}, 'Used settings'), h('pre', {}, JSON.stringify({ operation: result.operation, version: result.version, parameters: safeParameters, conversions: result.steps?.slice(0, -1) ?? result.conversions ?? [] }, (_, value) => typeof value === 'bigint' ? value.toString() : value, 2)), h('details',{id:`result-${viewKey}-inputs`},h('summary',{id:`result-${viewKey}-inputs-toggle`},'Inputs from this result'),h('pre',{},JSON.stringify({type:result.snapshot?.input?.type,secondaryInputs:result.snapshot?.extraInputs??{}},null,2).slice(0,4096))),privateRun ? null : button('Download run details (includes input and settings)',async()=>{try{const wire=await runtime.call('recipeJson',[{operation:result.operation,version:result.version,primary_input_name:action?.contract.inputs[0]?.name??null,input:result.snapshot?.input??null,parameters:result.parameters??{},secondary_inputs:result.snapshot?.extraInputs??{},steps:result.steps??result.conversions??[],selected_output:selectedName??null,source_name:result.sourceName??null,producing_build:result.producingIdentity??result.producingBuild??null,sdk_request:result.sdkRequest??null}]);download(wire,'cube-run-details.json','application/json');}catch(error){notify(error.message);}},{id:`result-${viewKey}-download-run`})));
   }
 
   function renderResults() {
@@ -220,9 +239,9 @@ export function mountPlayground(container, context) {
     const current = session.current;
     const retained = !current?.results.length && page.tool ? session.rounds.findLast(round => round.results.some(result => result.operation === page.tool)) : null;
     const round = page.showRound ? session.rounds.find(round => round.id === page.showRound) : retained ?? current;
-    const records = page.filter === 'pinned' ? session.pins : page.pendingNext ? [] : (round?.results ?? []).filter(result=>!page.tool||result.operation===page.tool);
-    const history = session.rounds;
-    replace(results, h('div', { class: 'result-header' }, h('div', { class: 'row between' }, h('h2', {}, selected?'Result':'Results'), h('div', { class: 'segmented' },
+    const records = privateTool ? (page.privateResult ? [page.privateResult] : []) : page.filter === 'pinned' ? session.pins : page.pendingNext ? [] : (round?.results ?? []).filter(result=>!page.tool||result.operation===page.tool);
+    const history = privateTool ? [] : session.rounds;
+    replace(results, h('div', { class: 'result-header' }, h('div', { class: 'row between' }, h('h2', {}, selected?'Result':'Results'), privateTool ? null : h('div', { class: 'segmented' },
       button('All', () => { page.filter = 'all'; renderResults(); }, { id: 'result-filter-all', 'aria-pressed': String(page.filter !== 'pinned') }),
       button('Pinned', () => { page.filter = 'pinned'; renderResults(); }, { id: 'result-filter-pinned', 'aria-pressed': String(page.filter === 'pinned') }))),
       selected ? null : h('p', { class: 'small muted' }, 'Each alternative starts from the same input snapshot.')),
@@ -270,15 +289,25 @@ export function mountPlayground(container, context) {
     const extra = selected.direct && !selected.pipeline ? selected.contract.inputs.slice(1).map(port => {
       page.extraInputs[selected.id] ??= {};
       const representation = selected.direct.inputs[port.name];
-      return h('div', { class: 'field' }, h('label', { for: `extra-${port.name}` }, `${labelFor(port.name)}${['bytes', 'byte_array'].includes(representation) ? ' (Base64 bytes)' : ['json', 'image_samples'].includes(representation) ? ' (JSON)' : ''}`),
-        h('textarea', { id: `extra-${port.name}`, rows: 2, value: page.extraInputs[selected.id][port.name] ?? '', maxlength: 131072, onInput: event => { page.extraInputs[selected.id][port.name] = event.target.value; changed(); instrument?.refresh(); } }));
+      const secret = secretPorts.has(port.name);
+      const values = secret ? (page.privateInputs ??= {}) : page.extraInputs[selected.id];
+      const attributes = { id: `extra-${port.name}`, value: values[port.name] ?? '',
+        onInput: event => { values[port.name] = event.target.value; changed(); instrument?.refresh(); } };
+      const control = secret
+        ? h('input', { ...attributes, type:'password', autocomplete:'off', maxlength:64 })
+        : h('textarea', { ...attributes, rows:2, maxlength:131072 });
+      return h('div', { class:'field' }, h('label', { for:attributes.id }, `${labelFor(port.name)}${['bytes', 'byte_array'].includes(representation) ? ' (Base64 bytes)' : ['json', 'image_samples'].includes(representation) ? ' (JSON)' : ''}`), control);
     }) : [];
     const namedFields = h('div', {}, ...extra);
     parameterRegion.prepend(namedFields);
     page.redrawParameters = () => {
       if (!parameterRegion.contains(document.activeElement)) { replace(parameterRegion, namedFields, form() ?? h('p',{class:'muted'},'No additional parameters.')); }
       if (inputControl?.tagName === 'TEXTAREA' && document.activeElement !== inputControl && session.input.type === 'text' && inputControl.value !== session.input.data) inputControl.value = session.input.data;
-      for (const port of selected.contract.inputs.slice(1)) { const field=document.getElementById(`extra-${port.name}`); if(field && field!==document.activeElement) field.value=page.extraInputs[selected.id]?.[port.name] ?? ''; }
+      for (const port of selected.contract.inputs.slice(1)) {
+        const field=document.getElementById(`extra-${port.name}`);
+        const values=secretPorts.has(port.name) ? page.privateInputs : page.extraInputs[selected.id];
+        if(field && field!==document.activeElement) field.value=values?.[port.name] ?? '';
+      }
     };
     append(inputOptions, descriptor ? null : parameterRegion);
   }
@@ -320,6 +349,11 @@ export function mountPlayground(container, context) {
       }
       if (!current()) return;
       page.parameters[id] = raw;
+      page.privateInputs = {};
+      for (const name of secretPorts) {
+        page.privateInputs[name] = extra[name];
+        delete extra[name];
+      }
       page.extraInputs[id] = extra;
       changed({input}); page.sourceName = 'Core conformance example'; page.phase='example'; page.status = 'Core example loaded.'; render();
     } catch(error) { if (current()) { page.status=error.message; page.redraw?.(); } }
@@ -347,7 +381,7 @@ export function mountPlayground(container, context) {
   }
   const autoControl=h('label',{class:'check auto-control'},h('input',{type:'checkbox',checked:page.auto,onChange:event=>{page.auto=event.target.checked;schedulePreview();}}),'Automatic updates');
   append(inputOptions, hasInput && value.type==='text' && (selected ? selected.pipeline?.input_type==='bytes'||['bytes','byte_array'].includes(selected.direct?.inputs[selected.contract.inputs[0].name]) : page.mode==='Encode') ? h('label', { class: 'check spacer' }, h('input', { type: 'checkbox', checked: page.utf8, onChange: event => { page.utf8 = event.target.checked; changed(); } }), 'Use UTF-8 for text sent to byte tools') : null,
-    autoControl,
+    privateTool ? null : autoControl,
     policyStatus,h('div',{class:'toolbar'},runButton,stopButton),status,
     session.canRestoreInput?button('Restore previous input',()=>{page.scheduler.cancel();page.controller?.abort();session.restoreInput();page.revision++;page.inputRevision++;page.inputTouched=true;page.sourceName=null;render();}):null);
   const actions=descriptor?descriptor.operations.map(id=>runtime.action(id)).filter(Boolean):family?.actions??[];
@@ -371,7 +405,7 @@ export function mountPlayground(container, context) {
       actionControl||editorTabs?h('div',{class:'instrument-command-bar'},actionControl,editorTabs):null,
       inputPanel,
       ...(descriptor ? [instrument.surface, h('section',{class:'panel instrument-options',id:'instrument-parameter-panel','aria-label':'Operation parameters'},parameterRegion)] : []), results),
-    h('details',{class:'workspace-navigation'},h('summary',{},'Session history'),h('p',{class:'small muted'},'Live previews replace each other. Pin or keep a result to retain its exact input and settings.'),button('Clear session history', () => context.clearSession())));
+    privateTool ? null : h('details',{class:'workspace-navigation'},h('summary',{},'Session history'),h('p',{class:'small muted'},'Live previews replace each other. Pin or keep a result to retain its exact input and settings.'),button('Clear session history', () => context.clearSession())));
   function updateTab() {
     if (!instrument) return;
     const visual = editorTab() === 'Visual';

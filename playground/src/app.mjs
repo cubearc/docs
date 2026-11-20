@@ -114,6 +114,7 @@ function render({restore=true}={}) {
 function revokePreview() {
   const page=state.playground;
   page.scheduler.cancel();page.controller?.abort();page.auxiliary?.abort();
+  page.privateInputs = {}; page.privateResult = null;
   page.session.invalidate();page.revision++;page.readingFile=null;page.secondaryReading=null;page.running=false;page.errors=[];page.phase='selected';
 }
 function route() {

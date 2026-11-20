@@ -2973,6 +2973,151 @@
     "number.prng": {
       "display_name": "Generate reproducible pseudorandom words",
       "summary": "Produce exact u32 words and a continuation state with MT19937 or xorshift32."
+    },
+    "binary.pack_bits": {
+      "display_name": "Pack bits",
+      "summary": "Pack exact zero and one bytes into bytes with explicit bit order and tail policy.",
+      "aliases": [
+        "bit packing"
+      ]
+    },
+    "binary.unpack_bits": {
+      "display_name": "Unpack bits",
+      "summary": "Expand an exact count of bits from packed bytes.",
+      "aliases": [
+        "bit unpacking"
+      ]
+    },
+    "binary.mask": {
+      "display_name": "Apply a bit mask",
+      "summary": "Apply one unsigned AND mask to complete big-endian units.",
+      "aliases": [
+        "bit masking"
+      ]
+    },
+    "binary.count_bits": {
+      "display_name": "Count bits",
+      "summary": "Count set bits or leading or trailing zeroes in complete units.",
+      "aliases": [
+        "popcount",
+        "leading zeros",
+        "trailing zeros"
+      ]
+    },
+    "binary.fixed_integer.encode": {
+      "display_name": "Encode fixed-width integers",
+      "summary": "Write exact integer values with explicit width, signedness and byte order.",
+      "aliases": [
+        "integer serialization"
+      ]
+    },
+    "binary.fixed_integer.decode": {
+      "display_name": "Decode fixed-width integers",
+      "summary": "Read complete byte-aligned units as exact signed or unsigned integers.",
+      "aliases": [
+        "integer deserialization"
+      ]
+    },
+    "binary.bcd.encode": {
+      "display_name": "Encode binary-coded decimal",
+      "summary": "Write fixed-width digit text as packed or unpacked decimal.",
+      "aliases": [
+        "BCD encode",
+        "packed decimal"
+      ]
+    },
+    "binary.bcd.decode": {
+      "display_name": "Decode binary-coded decimal",
+      "summary": "Recover exact digit text and sign from packed or unpacked decimal.",
+      "aliases": [
+        "BCD decode",
+        "unpacked decimal"
+      ]
+    },
+    "binary.varint.encode": {
+      "display_name": "Encode variable-length integers",
+      "summary": "Write shortest-form LEB128, Protobuf uint64 or ZigZag64 varints.",
+      "aliases": [
+        "LEB128 encode",
+        "ZigZag encode"
+      ]
+    },
+    "binary.varint.decode": {
+      "display_name": "Decode variable-length integers",
+      "summary": "Read a prefix, one complete varint or a batch and report consumed bytes.",
+      "aliases": [
+        "LEB128 decode",
+        "ZigZag decode"
+      ]
+    },
+    "binary.ieee754.inspect": {
+      "display_name": "Inspect IEEE 754 fields",
+      "summary": "Read raw binary32 or binary64 fields and preserve signed zero and NaN payloads.",
+      "aliases": [
+        "IEEE floating point",
+        "NaN payload"
+      ]
+    },
+    "binary.reed_solomon.encode": {
+      "display_name": "Encode Reed–Solomon blocks",
+      "summary": "Append systematic parity over a selected GF(256) field.",
+      "aliases": [
+        "Reed-Solomon parity",
+        "QR Reed-Solomon"
+      ]
+    },
+    "binary.reed_solomon.decode": {
+      "display_name": "Correct Reed–Solomon blocks",
+      "summary": "Correct bounded errors and erasures and verify the output syndromes.",
+      "aliases": [
+        "Reed-Solomon correction",
+        "error correction"
+      ]
+    },
+    "hash.noncrypto": {
+      "display_name": "Compute a noncryptographic hash",
+      "summary": "Select an exact seeded xxHash or MurmurHash3 digest profile.",
+      "aliases": [
+        "xxHash",
+        "MurmurHash3"
+      ]
+    },
+    "hash.siphash24": {
+      "display_name": "Compute SipHash-2-4",
+      "summary": "Use a private 16-byte key to compute a reproducible 64-bit digest.",
+      "aliases": [
+        "SipHash",
+        "keyed digest"
+      ]
+    },
+    "encoding.base32hex.encode": {
+      "display_name": "Encode Base32hex",
+      "summary": "Write canonical padded RFC 4648 Base32hex text.",
+      "aliases": [
+        "Base32hex encode",
+        "extended hex Base32"
+      ]
+    },
+    "encoding.base32hex.decode": {
+      "display_name": "Decode Base32hex",
+      "summary": "Recover exact bytes from canonical padded Base32hex text.",
+      "aliases": [
+        "Base32hex decode"
+      ]
+    },
+    "encoding.base64url.encode": {
+      "display_name": "Encode Base64url",
+      "summary": "Write URL-safe Base64 with the selected padding policy.",
+      "aliases": [
+        "URL-safe Base64 encode"
+      ]
+    },
+    "encoding.base64url.decode": {
+      "display_name": "Decode Base64url",
+      "summary": "Recover exact bytes from URL-safe Base64 with strict padding checks.",
+      "aliases": [
+        "URL-safe Base64 decode"
+      ]
     }
   },
   "operations": {
@@ -7499,6 +7644,170 @@
         "MT19937",
         "Mersenne Twister",
         "xorshift32"
+      ]
+    },
+    "binary.pack_bits": {
+      "tool_id": "binary.pack_bits",
+      "display_name": "Pack bits",
+      "summary": "Pack exact zero and one bytes into bytes with explicit bit order and tail policy.",
+      "aliases": [
+        "bit packing"
+      ]
+    },
+    "binary.unpack_bits": {
+      "tool_id": "binary.unpack_bits",
+      "display_name": "Unpack bits",
+      "summary": "Expand an exact count of bits from packed bytes.",
+      "aliases": [
+        "bit unpacking"
+      ]
+    },
+    "binary.mask": {
+      "tool_id": "binary.mask",
+      "display_name": "Apply a bit mask",
+      "summary": "Apply one unsigned AND mask to complete big-endian units.",
+      "aliases": [
+        "bit masking"
+      ]
+    },
+    "binary.count_bits": {
+      "tool_id": "binary.count_bits",
+      "display_name": "Count bits",
+      "summary": "Count set bits or leading or trailing zeroes in complete units.",
+      "aliases": [
+        "popcount",
+        "leading zeros",
+        "trailing zeros"
+      ]
+    },
+    "binary.fixed_integer.encode": {
+      "tool_id": "binary.fixed_integer.encode",
+      "display_name": "Encode fixed-width integers",
+      "summary": "Write exact integer values with explicit width, signedness and byte order.",
+      "aliases": [
+        "integer serialization"
+      ]
+    },
+    "binary.fixed_integer.decode": {
+      "tool_id": "binary.fixed_integer.decode",
+      "display_name": "Decode fixed-width integers",
+      "summary": "Read complete byte-aligned units as exact signed or unsigned integers.",
+      "aliases": [
+        "integer deserialization"
+      ]
+    },
+    "binary.bcd.encode": {
+      "tool_id": "binary.bcd.encode",
+      "display_name": "Encode binary-coded decimal",
+      "summary": "Write fixed-width digit text as packed or unpacked decimal.",
+      "aliases": [
+        "BCD encode",
+        "packed decimal"
+      ]
+    },
+    "binary.bcd.decode": {
+      "tool_id": "binary.bcd.decode",
+      "display_name": "Decode binary-coded decimal",
+      "summary": "Recover exact digit text and sign from packed or unpacked decimal.",
+      "aliases": [
+        "BCD decode",
+        "unpacked decimal"
+      ]
+    },
+    "binary.varint.encode": {
+      "tool_id": "binary.varint.encode",
+      "display_name": "Encode variable-length integers",
+      "summary": "Write shortest-form LEB128, Protobuf uint64 or ZigZag64 varints.",
+      "aliases": [
+        "LEB128 encode",
+        "ZigZag encode"
+      ]
+    },
+    "binary.varint.decode": {
+      "tool_id": "binary.varint.decode",
+      "display_name": "Decode variable-length integers",
+      "summary": "Read a prefix, one complete varint or a batch and report consumed bytes.",
+      "aliases": [
+        "LEB128 decode",
+        "ZigZag decode"
+      ]
+    },
+    "binary.ieee754.inspect": {
+      "tool_id": "binary.ieee754.inspect",
+      "display_name": "Inspect IEEE 754 fields",
+      "summary": "Read raw binary32 or binary64 fields and preserve signed zero and NaN payloads.",
+      "aliases": [
+        "IEEE floating point",
+        "NaN payload"
+      ]
+    },
+    "binary.reed_solomon.encode": {
+      "tool_id": "binary.reed_solomon.encode",
+      "display_name": "Encode Reed–Solomon blocks",
+      "summary": "Append systematic parity over a selected GF(256) field.",
+      "aliases": [
+        "Reed-Solomon parity",
+        "QR Reed-Solomon"
+      ]
+    },
+    "binary.reed_solomon.decode": {
+      "tool_id": "binary.reed_solomon.decode",
+      "display_name": "Correct Reed–Solomon blocks",
+      "summary": "Correct bounded errors and erasures and verify the output syndromes.",
+      "aliases": [
+        "Reed-Solomon correction",
+        "error correction"
+      ]
+    },
+    "hash.noncrypto": {
+      "tool_id": "hash.noncrypto",
+      "display_name": "Compute a noncryptographic hash",
+      "summary": "Select an exact seeded xxHash or MurmurHash3 digest profile.",
+      "aliases": [
+        "xxHash",
+        "MurmurHash3"
+      ]
+    },
+    "hash.siphash24": {
+      "tool_id": "hash.siphash24",
+      "display_name": "Compute SipHash-2-4",
+      "summary": "Use a private 16-byte key to compute a reproducible 64-bit digest.",
+      "aliases": [
+        "SipHash",
+        "keyed digest"
+      ]
+    },
+    "encoding.base32hex.encode": {
+      "tool_id": "encoding.base32hex.encode",
+      "display_name": "Encode Base32hex",
+      "summary": "Write canonical padded RFC 4648 Base32hex text.",
+      "aliases": [
+        "Base32hex encode",
+        "extended hex Base32"
+      ]
+    },
+    "encoding.base32hex.decode": {
+      "tool_id": "encoding.base32hex.decode",
+      "display_name": "Decode Base32hex",
+      "summary": "Recover exact bytes from canonical padded Base32hex text.",
+      "aliases": [
+        "Base32hex decode"
+      ]
+    },
+    "encoding.base64url.encode": {
+      "tool_id": "encoding.base64url.encode",
+      "display_name": "Encode Base64url",
+      "summary": "Write URL-safe Base64 with the selected padding policy.",
+      "aliases": [
+        "URL-safe Base64 encode"
+      ]
+    },
+    "encoding.base64url.decode": {
+      "tool_id": "encoding.base64url.decode",
+      "display_name": "Decode Base64url",
+      "summary": "Recover exact bytes from URL-safe Base64 with strict padding checks.",
+      "aliases": [
+        "URL-safe Base64 decode"
       ]
     }
   }
