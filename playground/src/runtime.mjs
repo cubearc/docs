@@ -93,9 +93,13 @@ export class Runtime {
     if (Object.keys(extraInputs).some(name => !names.includes(name))) throw new Error('An unknown named input was supplied.');
     const inputs = {};
     const conversions = [];
-    for (const name of names) {
+    for (const { name, required } of action.contract.inputs) {
       const value = name === primary ? input : { type: 'text', data: extraInputs[name] ?? '' };
       const representation = action.direct.inputs[name];
+      const omitted = name === primary
+        ? value.type === 'text' && value.data === '' && representation !== 'text'
+        : !Object.hasOwn(extraInputs, name);
+      if (!required && omitted) continue;
       if (representation === 'text' && value.type === 'text') inputs[name] = value.data;
       else if (['bytes', 'byte_array'].includes(representation)) {
         if (value.type === 'bytes') inputs[name] = value.data;
@@ -109,6 +113,10 @@ export class Runtime {
         else throw new Error('Choose exact bytes or an explicit UTF-8 input conversion.');
       } else if (['json', 'image_samples'].includes(representation)) {
         if (value.type === 'json') inputs[name] = value.data;
+        else if (representation === 'image_samples' && value.type === 'bytes') {
+          inputs[name] = (await this.call('execute', [{ operation: 'image.decode', version: 1, inputs: { input: value.data } }], options)).output;
+          conversions.push({ input: name, operation: 'image.decode', version: 1 });
+        }
         else if (value.type === 'text') {
           inputs[name] = (await this.call('execute', [{ operation: 'json.parse', version: 1, inputs: { input: value.data } }], options)).output;
           conversions.push({ input: name, operation: 'json.parse', version: 1 });

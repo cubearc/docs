@@ -3253,6 +3253,121 @@
       "display_name": "Inspect WebP",
       "summary": "Inspect checked RIFF/WebP chunks, canvas dimensions and padding.",
       "aliases": []
+    },
+    "image.resize": {
+      "display_name": "Resize an image",
+      "summary": "Choose the output dimensions and a resampling kernel.",
+      "aliases": []
+    },
+    "image.warp": {
+      "display_name": "Warp an image",
+      "summary": "Map output coordinates through an affine or perspective transform.",
+      "aliases": []
+    },
+    "image.color.convert": {
+      "display_name": "Measure image colors",
+      "summary": "Read sRGB samples as HSV, HSL or CIELAB with a D50 white point.",
+      "aliases": []
+    },
+    "image.quality.measure": {
+      "display_name": "Compare image quality",
+      "summary": "Measure MSE, PSNR or SSIM in one channel of two aligned images.",
+      "aliases": []
+    },
+    "image.filter": {
+      "display_name": "Smooth image samples",
+      "summary": "Apply a Gaussian or median filter to selected channels.",
+      "aliases": []
+    },
+    "image.edge.response": {
+      "display_name": "Measure signed edge responses",
+      "summary": "Read Sobel, Prewitt or Laplacian responses in a selected channel.",
+      "aliases": []
+    },
+    "image.edge.canny": {
+      "display_name": "Find Canny edges",
+      "summary": "Apply smoothing and hysteresis to produce a binary edge mask.",
+      "aliases": []
+    },
+    "image.mask.otsu": {
+      "display_name": "Threshold a channel with Otsu",
+      "summary": "Use the selected sample histogram to produce a binary mask.",
+      "aliases": []
+    },
+    "image.mask.morphology": {
+      "display_name": "Erode or dilate a mask",
+      "summary": "Apply a rectangular or cross-shaped element to a binary mask.",
+      "aliases": []
+    },
+    "image.mask.components": {
+      "display_name": "Label connected mask components",
+      "summary": "Find foreground regions and report their sizes and bounding boxes.",
+      "aliases": []
+    },
+    "image.mask.flood": {
+      "display_name": "Select mask regions from seeds",
+      "summary": "Keep components connected to the supplied foreground seeds.",
+      "aliases": []
+    },
+    "image.hough.lines": {
+      "display_name": "Find lines in an edge mask",
+      "summary": "Use polar voting to report line peaks and the accumulator.",
+      "aliases": []
+    },
+    "image.template.match": {
+      "display_name": "Find a template in an image",
+      "summary": "Score each eligible position using squared error or normalized correlation.",
+      "aliases": []
+    },
+    "image.traversal.order": {
+      "display_name": "List pixel coordinates in order",
+      "summary": "Choose a traversal, starting corner and direction for a region.",
+      "aliases": []
+    },
+    "image.traversal.permute": {
+      "display_name": "Reorder pixel coordinates",
+      "summary": "Validate a destination-to-source permutation of a rectangular region.",
+      "aliases": []
+    },
+    "image.png.scanlines": {
+      "display_name": "Extract native PNG scanlines",
+      "summary": "Read the filtered or reconstructed samples of a noninterlaced PNG.",
+      "aliases": []
+    },
+    "image.gif.indices": {
+      "display_name": "Extract native GIF palette indices",
+      "summary": "Read exact indices, the active palette and the frame offset from a GIF.",
+      "aliases": []
+    },
+    "image.stereo.separate": {
+      "display_name": "Separate stereo views",
+      "summary": "Split a red–cyan or side-by-side image into left and right views.",
+      "aliases": []
+    },
+    "image.stereo.anaglyph": {
+      "display_name": "Create a Dubois red–cyan anaglyph",
+      "summary": "Project two opaque sRGB views into one red–cyan image.",
+      "aliases": []
+    },
+    "image.hash.perceptual": {
+      "display_name": "Calculate an image similarity hash",
+      "summary": "Compare visual similarity with a fixed average, difference or DCT profile.",
+      "aliases": []
+    },
+    "image.qr.encode": {
+      "display_name": "Generate a QR code",
+      "summary": "Encode bytes or explicit segments and inspect the selected mask.",
+      "aliases": []
+    },
+    "image.barcode.scan": {
+      "display_name": "Scan a linear barcode",
+      "summary": "Read EAN-13, UPC-A, Code 39 or Code 128 from selected scanlines.",
+      "aliases": []
+    },
+    "image.barcode.decode": {
+      "display_name": "Decode cropped visual codes",
+      "summary": "Read Data Matrix, Aztec or PDF417 from selected grayscale crops.",
+      "aliases": []
     }
   },
   "operations": {
@@ -8105,6 +8220,144 @@
       "tool_id": "file.webp.inspect",
       "display_name": "Inspect WebP",
       "summary": "Inspect checked RIFF/WebP chunks, canvas dimensions and padding.",
+      "aliases": []
+    },
+    "image.resize": {
+      "tool_id": "image.resize",
+      "display_name": "Resize an image",
+      "summary": "Choose the output dimensions and a resampling kernel.",
+      "aliases": []
+    },
+    "image.warp": {
+      "tool_id": "image.warp",
+      "display_name": "Warp an image",
+      "summary": "Map output coordinates through an affine or perspective transform.",
+      "aliases": []
+    },
+    "image.color.convert": {
+      "tool_id": "image.color.convert",
+      "display_name": "Measure image colors",
+      "summary": "Read sRGB samples as HSV, HSL or CIELAB with a D50 white point.",
+      "aliases": []
+    },
+    "image.quality.measure": {
+      "tool_id": "image.quality.measure",
+      "display_name": "Compare image quality",
+      "summary": "Measure MSE, PSNR or SSIM in one channel of two aligned images.",
+      "aliases": []
+    },
+    "image.filter": {
+      "tool_id": "image.filter",
+      "display_name": "Smooth image samples",
+      "summary": "Apply a Gaussian or median filter to selected channels.",
+      "aliases": []
+    },
+    "image.edge.response": {
+      "tool_id": "image.edge.response",
+      "display_name": "Measure signed edge responses",
+      "summary": "Read Sobel, Prewitt or Laplacian responses in a selected channel.",
+      "aliases": []
+    },
+    "image.edge.canny": {
+      "tool_id": "image.edge.canny",
+      "display_name": "Find Canny edges",
+      "summary": "Apply smoothing and hysteresis to produce a binary edge mask.",
+      "aliases": []
+    },
+    "image.mask.otsu": {
+      "tool_id": "image.mask.otsu",
+      "display_name": "Threshold a channel with Otsu",
+      "summary": "Use the selected sample histogram to produce a binary mask.",
+      "aliases": []
+    },
+    "image.mask.morphology": {
+      "tool_id": "image.mask.morphology",
+      "display_name": "Erode or dilate a mask",
+      "summary": "Apply a rectangular or cross-shaped element to a binary mask.",
+      "aliases": []
+    },
+    "image.mask.components": {
+      "tool_id": "image.mask.components",
+      "display_name": "Label connected mask components",
+      "summary": "Find foreground regions and report their sizes and bounding boxes.",
+      "aliases": []
+    },
+    "image.mask.flood": {
+      "tool_id": "image.mask.flood",
+      "display_name": "Select mask regions from seeds",
+      "summary": "Keep components connected to the supplied foreground seeds.",
+      "aliases": []
+    },
+    "image.hough.lines": {
+      "tool_id": "image.hough.lines",
+      "display_name": "Find lines in an edge mask",
+      "summary": "Use polar voting to report line peaks and the accumulator.",
+      "aliases": []
+    },
+    "image.template.match": {
+      "tool_id": "image.template.match",
+      "display_name": "Find a template in an image",
+      "summary": "Score each eligible position using squared error or normalized correlation.",
+      "aliases": []
+    },
+    "image.traversal.order": {
+      "tool_id": "image.traversal.order",
+      "display_name": "List pixel coordinates in order",
+      "summary": "Choose a traversal, starting corner and direction for a region.",
+      "aliases": []
+    },
+    "image.traversal.permute": {
+      "tool_id": "image.traversal.permute",
+      "display_name": "Reorder pixel coordinates",
+      "summary": "Validate a destination-to-source permutation of a rectangular region.",
+      "aliases": []
+    },
+    "image.png.scanlines": {
+      "tool_id": "image.png.scanlines",
+      "display_name": "Extract native PNG scanlines",
+      "summary": "Read the filtered or reconstructed samples of a noninterlaced PNG.",
+      "aliases": []
+    },
+    "image.gif.indices": {
+      "tool_id": "image.gif.indices",
+      "display_name": "Extract native GIF palette indices",
+      "summary": "Read exact indices, the active palette and the frame offset from a GIF.",
+      "aliases": []
+    },
+    "image.stereo.separate": {
+      "tool_id": "image.stereo.separate",
+      "display_name": "Separate stereo views",
+      "summary": "Split a red–cyan or side-by-side image into left and right views.",
+      "aliases": []
+    },
+    "image.stereo.anaglyph": {
+      "tool_id": "image.stereo.anaglyph",
+      "display_name": "Create a Dubois red–cyan anaglyph",
+      "summary": "Project two opaque sRGB views into one red–cyan image.",
+      "aliases": []
+    },
+    "image.hash.perceptual": {
+      "tool_id": "image.hash.perceptual",
+      "display_name": "Calculate an image similarity hash",
+      "summary": "Compare visual similarity with a fixed average, difference or DCT profile.",
+      "aliases": []
+    },
+    "image.qr.encode": {
+      "tool_id": "image.qr.encode",
+      "display_name": "Generate a QR code",
+      "summary": "Encode bytes or explicit segments and inspect the selected mask.",
+      "aliases": []
+    },
+    "image.barcode.scan": {
+      "tool_id": "image.barcode.scan",
+      "display_name": "Scan a linear barcode",
+      "summary": "Read EAN-13, UPC-A, Code 39 or Code 128 from selected scanlines.",
+      "aliases": []
+    },
+    "image.barcode.decode": {
+      "tool_id": "image.barcode.decode",
+      "display_name": "Decode cropped visual codes",
+      "summary": "Read Data Matrix, Aztec or PDF417 from selected grayscale crops.",
       "aliases": []
     }
   }

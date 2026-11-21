@@ -292,7 +292,12 @@ export function mountPlayground(container, context) {
       const secret = secretPorts.has(port.name);
       const values = secret ? (page.privateInputs ??= {}) : page.extraInputs[selected.id];
       const attributes = { id: `extra-${port.name}`, value: values[port.name] ?? '',
-        onInput: event => { values[port.name] = event.target.value; changed(); instrument?.refresh(); } };
+        onInput: event => {
+          const value = event.target.value;
+          if (port.required || value !== '') values[port.name] = value;
+          else delete values[port.name];
+          changed(); instrument?.refresh();
+        } };
       const control = secret
         ? h('input', { ...attributes, type:'password', autocomplete:'off', maxlength:64 })
         : h('textarea', { ...attributes, rows:2, maxlength:131072 });
@@ -331,7 +336,7 @@ export function mountPlayground(container, context) {
       const primary = names[0];
       const representation = selected.direct.inputs[primary];
       let input = {type:'text',data:values.inputs[primary] ?? ''};
-      if (['bytes','byte_array'].includes(representation)) {
+      if (Object.hasOwn(values.inputs, primary) && ['bytes','byte_array'].includes(representation)) {
         const raw = JSON.parse(values.inputs[primary]);
         input = {type:'bytes',data:representation === 'byte_array' ? Uint8Array.from(raw) : (await runtime.call('execute',[{operation:'encoding.base64.decode',version:1,inputs:{input:raw.base64}}])).output};
       }
@@ -342,6 +347,7 @@ export function mountPlayground(container, context) {
       }));
       const extra = {};
       for (const name of names.slice(1)) {
+        if (!Object.hasOwn(values.inputs, name)) continue;
         const kind=selected.direct.inputs[name];
         if (kind === 'bytes') extra[name] = JSON.parse(values.inputs[name]).base64;
         else if (kind === 'byte_array') extra[name] = (await runtime.call('execute',[{operation:'encoding.base64.encode',version:1,inputs:{input:Uint8Array.from(JSON.parse(values.inputs[name]))}}])).output;
