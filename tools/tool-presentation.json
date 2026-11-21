@@ -1657,7 +1657,7 @@
     },
     "file.zip.validate": {
       "display_name": "Check a ZIP candidate",
-      "summary": "Check whether supplied data satisfies the supported ZIP validation rules.",
+      "summary": "Validate classic ZIP or ZIP64 archive framing and record extents at an explicit origin.",
       "aliases": [
         "Validate a ZIP candidate"
       ]
@@ -3118,6 +3118,141 @@
       "aliases": [
         "URL-safe Base64 decode"
       ]
+    },
+    "binary.bwt.decode": {
+      "display_name": "Decode Burrows–Wheeler",
+      "summary": "Invert the last column using its explicit primary index.",
+      "aliases": []
+    },
+    "binary.bwt.encode": {
+      "display_name": "Encode Burrows–Wheeler",
+      "summary": "Order cyclic rotations and return the last column and primary index.",
+      "aliases": []
+    },
+    "binary.bzip2.decode": {
+      "display_name": "Decode bzip2",
+      "summary": "Decode bounded standard BZh streams with verified framing.",
+      "aliases": []
+    },
+    "binary.bzip2.encode": {
+      "display_name": "Encode bzip2",
+      "summary": "Encode bounded standard BZh streams with verified framing.",
+      "aliases": []
+    },
+    "binary.entropy.decode": {
+      "display_name": "Decode arithmetic or range stream",
+      "summary": "Decode the declared count and verify canonical arithmetic or range termination.",
+      "aliases": []
+    },
+    "binary.entropy.encode": {
+      "display_name": "Encode arithmetic or range stream",
+      "summary": "Encode a fixed model with explicitly selected integer arithmetic or carry-buffered range coding.",
+      "aliases": []
+    },
+    "binary.huffman.construct": {
+      "display_name": "Construct canonical Huffman codes",
+      "summary": "Construct deterministic canonical byte codes from an exact frequency table.",
+      "aliases": []
+    },
+    "binary.huffman.decode": {
+      "display_name": "Decode canonical Huffman",
+      "summary": "Decode an exact symbol and bit count with a checked canonical Huffman length table.",
+      "aliases": []
+    },
+    "binary.huffman.encode": {
+      "display_name": "Encode canonical Huffman",
+      "summary": "Encode MSB-first canonical Huffman codes and return the exact bit count and code table.",
+      "aliases": []
+    },
+    "binary.lz4.decode": {
+      "display_name": "Decode LZ4",
+      "summary": "Decode a standard LZ4 frame or an explicitly selected raw block.",
+      "aliases": []
+    },
+    "binary.lz4.encode": {
+      "display_name": "Encode LZ4",
+      "summary": "Encode a standard LZ4 frame or an explicitly selected raw block.",
+      "aliases": []
+    },
+    "binary.lz77.decode": {
+      "display_name": "Decode LZ77 tokens",
+      "summary": "Expand and check explicit LZ77 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lz77.encode": {
+      "display_name": "Encode LZ77 tokens",
+      "summary": "Construct deterministic explicit LZ77 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lz78.decode": {
+      "display_name": "Decode LZ78 tokens",
+      "summary": "Expand and check explicit LZ78 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lz78.encode": {
+      "display_name": "Encode LZ78 tokens",
+      "summary": "Construct deterministic explicit LZ78 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lzw.decode": {
+      "display_name": "Decode GIF/TIFF LZW",
+      "summary": "Decode an explicit GIF89a or TIFF 6.0 LZW bitstream.",
+      "aliases": []
+    },
+    "binary.lzw.encode": {
+      "display_name": "Encode GIF/TIFF LZW",
+      "summary": "Encode an explicit GIF89a or TIFF 6.0 LZW bitstream.",
+      "aliases": []
+    },
+    "binary.mtf.decode": {
+      "display_name": "Decode move-to-front",
+      "summary": "Invert byte indexes using the same initial move-to-front alphabet.",
+      "aliases": []
+    },
+    "binary.mtf.encode": {
+      "display_name": "Encode move-to-front",
+      "summary": "Apply the move-to-front byte transform with an optional exact alphabet.",
+      "aliases": []
+    },
+    "binary.packbits.decode": {
+      "display_name": "Decode PackBits",
+      "summary": "Decode checked TIFF 6.0 PackBits runs and optionally verify the expected byte count.",
+      "aliases": []
+    },
+    "binary.packbits.encode": {
+      "display_name": "Encode PackBits",
+      "summary": "Compress bytes using TIFF 6.0 PackBits run and literal controls.",
+      "aliases": []
+    },
+    "file.bmp.inspect": {
+      "display_name": "Inspect BMP",
+      "summary": "Inspect a 40-byte Windows BMP header, dimensions and bounded raster extents.",
+      "aliases": []
+    },
+    "file.executable.inspect": {
+      "display_name": "Inspect ELF or PE",
+      "summary": "Inspect bounded ELF32/64 or PE32/32+ headers and declared extents.",
+      "aliases": []
+    },
+    "file.mpeg_audio.inspect": {
+      "display_name": "Inspect ID3 and MPEG audio",
+      "summary": "Inspect bounded ID3v2.3/v2.4 tags and MPEG Layer III frame ranges.",
+      "aliases": []
+    },
+    "file.ogg.inspect": {
+      "display_name": "Inspect Ogg pages",
+      "summary": "Verify RFC 3533 page CRCs and report Ogg streams and packet-fragment ranges.",
+      "aliases": []
+    },
+    "file.tiff.inspect": {
+      "display_name": "Inspect classic TIFF",
+      "summary": "Inspect a bounded classic TIFF directory graph and exact field ranges.",
+      "aliases": []
+    },
+    "file.webp.inspect": {
+      "display_name": "Inspect WebP",
+      "summary": "Inspect checked RIFF/WebP chunks, canvas dimensions and padding.",
+      "aliases": []
     }
   },
   "operations": {
@@ -5572,7 +5707,7 @@
     "file.zip.validate": {
       "tool_id": "file.zip.validate",
       "display_name": "Check a ZIP candidate",
-      "summary": "Check whether supplied data satisfies the supported ZIP validation rules.",
+      "summary": "Validate classic ZIP or ZIP64 archive framing and record extents at an explicit origin.",
       "aliases": [
         "Validate a ZIP candidate"
       ]
@@ -7809,6 +7944,168 @@
       "aliases": [
         "URL-safe Base64 decode"
       ]
+    },
+    "binary.bwt.decode": {
+      "tool_id": "binary.bwt.decode",
+      "display_name": "Decode Burrows–Wheeler",
+      "summary": "Invert the last column using its explicit primary index.",
+      "aliases": []
+    },
+    "binary.bwt.encode": {
+      "tool_id": "binary.bwt.encode",
+      "display_name": "Encode Burrows–Wheeler",
+      "summary": "Order cyclic rotations and return the last column and primary index.",
+      "aliases": []
+    },
+    "binary.bzip2.decode": {
+      "tool_id": "binary.bzip2.decode",
+      "display_name": "Decode bzip2",
+      "summary": "Decode bounded standard BZh streams with verified framing.",
+      "aliases": []
+    },
+    "binary.bzip2.encode": {
+      "tool_id": "binary.bzip2.encode",
+      "display_name": "Encode bzip2",
+      "summary": "Encode bounded standard BZh streams with verified framing.",
+      "aliases": []
+    },
+    "binary.entropy.decode": {
+      "tool_id": "binary.entropy.decode",
+      "display_name": "Decode arithmetic or range stream",
+      "summary": "Decode the declared count and verify canonical arithmetic or range termination.",
+      "aliases": []
+    },
+    "binary.entropy.encode": {
+      "tool_id": "binary.entropy.encode",
+      "display_name": "Encode arithmetic or range stream",
+      "summary": "Encode a fixed model with explicitly selected integer arithmetic or carry-buffered range coding.",
+      "aliases": []
+    },
+    "binary.huffman.construct": {
+      "tool_id": "binary.huffman.construct",
+      "display_name": "Construct canonical Huffman codes",
+      "summary": "Construct deterministic canonical byte codes from an exact frequency table.",
+      "aliases": []
+    },
+    "binary.huffman.decode": {
+      "tool_id": "binary.huffman.decode",
+      "display_name": "Decode canonical Huffman",
+      "summary": "Decode an exact symbol and bit count with a checked canonical Huffman length table.",
+      "aliases": []
+    },
+    "binary.huffman.encode": {
+      "tool_id": "binary.huffman.encode",
+      "display_name": "Encode canonical Huffman",
+      "summary": "Encode MSB-first canonical Huffman codes and return the exact bit count and code table.",
+      "aliases": []
+    },
+    "binary.lz4.decode": {
+      "tool_id": "binary.lz4.decode",
+      "display_name": "Decode LZ4",
+      "summary": "Decode a standard LZ4 frame or an explicitly selected raw block.",
+      "aliases": []
+    },
+    "binary.lz4.encode": {
+      "tool_id": "binary.lz4.encode",
+      "display_name": "Encode LZ4",
+      "summary": "Encode a standard LZ4 frame or an explicitly selected raw block.",
+      "aliases": []
+    },
+    "binary.lz77.decode": {
+      "tool_id": "binary.lz77.decode",
+      "display_name": "Decode LZ77 tokens",
+      "summary": "Expand and check explicit LZ77 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lz77.encode": {
+      "tool_id": "binary.lz77.encode",
+      "display_name": "Encode LZ77 tokens",
+      "summary": "Construct deterministic explicit LZ77 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lz78.decode": {
+      "tool_id": "binary.lz78.decode",
+      "display_name": "Decode LZ78 tokens",
+      "summary": "Expand and check explicit LZ78 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lz78.encode": {
+      "tool_id": "binary.lz78.encode",
+      "display_name": "Encode LZ78 tokens",
+      "summary": "Construct deterministic explicit LZ78 dictionary tokens.",
+      "aliases": []
+    },
+    "binary.lzw.decode": {
+      "tool_id": "binary.lzw.decode",
+      "display_name": "Decode GIF/TIFF LZW",
+      "summary": "Decode an explicit GIF89a or TIFF 6.0 LZW bitstream.",
+      "aliases": []
+    },
+    "binary.lzw.encode": {
+      "tool_id": "binary.lzw.encode",
+      "display_name": "Encode GIF/TIFF LZW",
+      "summary": "Encode an explicit GIF89a or TIFF 6.0 LZW bitstream.",
+      "aliases": []
+    },
+    "binary.mtf.decode": {
+      "tool_id": "binary.mtf.decode",
+      "display_name": "Decode move-to-front",
+      "summary": "Invert byte indexes using the same initial move-to-front alphabet.",
+      "aliases": []
+    },
+    "binary.mtf.encode": {
+      "tool_id": "binary.mtf.encode",
+      "display_name": "Encode move-to-front",
+      "summary": "Apply the move-to-front byte transform with an optional exact alphabet.",
+      "aliases": []
+    },
+    "binary.packbits.decode": {
+      "tool_id": "binary.packbits.decode",
+      "display_name": "Decode PackBits",
+      "summary": "Decode checked TIFF 6.0 PackBits runs and optionally verify the expected byte count.",
+      "aliases": []
+    },
+    "binary.packbits.encode": {
+      "tool_id": "binary.packbits.encode",
+      "display_name": "Encode PackBits",
+      "summary": "Compress bytes using TIFF 6.0 PackBits run and literal controls.",
+      "aliases": []
+    },
+    "file.bmp.inspect": {
+      "tool_id": "file.bmp.inspect",
+      "display_name": "Inspect BMP",
+      "summary": "Inspect a 40-byte Windows BMP header, dimensions and bounded raster extents.",
+      "aliases": []
+    },
+    "file.executable.inspect": {
+      "tool_id": "file.executable.inspect",
+      "display_name": "Inspect ELF or PE",
+      "summary": "Inspect bounded ELF32/64 or PE32/32+ headers and declared extents.",
+      "aliases": []
+    },
+    "file.mpeg_audio.inspect": {
+      "tool_id": "file.mpeg_audio.inspect",
+      "display_name": "Inspect ID3 and MPEG audio",
+      "summary": "Inspect bounded ID3v2.3/v2.4 tags and MPEG Layer III frame ranges.",
+      "aliases": []
+    },
+    "file.ogg.inspect": {
+      "tool_id": "file.ogg.inspect",
+      "display_name": "Inspect Ogg pages",
+      "summary": "Verify RFC 3533 page CRCs and report Ogg streams and packet-fragment ranges.",
+      "aliases": []
+    },
+    "file.tiff.inspect": {
+      "tool_id": "file.tiff.inspect",
+      "display_name": "Inspect classic TIFF",
+      "summary": "Inspect a bounded classic TIFF directory graph and exact field ranges.",
+      "aliases": []
+    },
+    "file.webp.inspect": {
+      "tool_id": "file.webp.inspect",
+      "display_name": "Inspect WebP",
+      "summary": "Inspect checked RIFF/WebP chunks, canvas dimensions and padding.",
+      "aliases": []
     }
   }
 }
